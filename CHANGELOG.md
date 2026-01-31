@@ -5,6 +5,63 @@ All notable changes to Loa will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-02-01 — Constructs Multi-Select UI
+
+### Why This Release
+
+The `/constructs` command brings a streamlined pack installation experience with multi-select UI. Browse the Loa Constructs Registry, select multiple packs, and install them in one flow.
+
+*"Point. Click. Install. The registry at your fingertips."*
+
+### Added
+
+#### `/constructs` Command (#88)
+
+New slash command for browsing and installing packs from the Loa Constructs Registry:
+
+```bash
+/constructs              # Browse with multi-select UI
+/constructs install <pack>   # Direct install
+/constructs list         # Show installed packs
+/constructs update       # Check for updates
+/constructs uninstall <pack> # Remove a pack
+/constructs auth         # Check auth status
+/constructs auth setup   # Configure API key
+```
+
+**Multi-Select UI**: Uses Claude Code's `AskUserQuestion` with `multiSelect: true` for intuitive pack selection:
+
+```
+Select packs to install:
+
+  [x] 🔮 Observer (6 skills) - User truth capture
+  [x] ⚗️ Crucible (5 skills) - Validation & testing
+  [ ] 🎨 Artisan (10 skills) - Brand/UI craftsmanship
+  [ ] 📣 GTM Collective (Pro) - Go-to-market skills 🔒
+
+  [Install Selected]  [Skip for Now]
+```
+
+**New Files**:
+- `.claude/commands/constructs.md` - Command definition with agent routing
+- `.claude/skills/browsing-constructs/` - Multi-select workflow skill
+- `.claude/scripts/constructs-browse.sh` - Registry API + caching (1hr TTL)
+- `.claude/scripts/constructs-auth.sh` - API key setup and validation
+
+**Authentication**: Premium packs require API key:
+```bash
+/constructs auth setup   # Interactive setup
+# Or set environment variable
+export LOA_CONSTRUCTS_API_KEY="sk_your_key"
+```
+
+### Documentation
+
+- **README.md** - Added `/constructs` to Ad-hoc commands
+- **INSTALLATION.md** - New "Browse and Install with `/constructs`" section
+
+---
+
 ## [1.13.0] - 2026-02-01 — Skill Best Practices & Security Hardening
 
 ### Why This Release
