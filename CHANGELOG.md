@@ -5,6 +5,136 @@ All notable changes to Loa will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-02-02 — Managed Scaffolding & Two-Tier Learnings
+
+### Why This Release
+
+This release introduces **Projen-Style Ownership** with managed scaffolding for framework files, and **Two-Tier Learnings Architecture** that ships 40 battle-tested patterns with every Loa installation. Framework files now have clear ownership markers, and learnings flow automatically to every project.
+
+*"Managed files stay managed. Learnings flow downstream. The framework teaches itself."*
+
+### Added
+
+#### Projen-Style Ownership with Managed Scaffolding (#134)
+
+Framework files in `.claude/` now use managed scaffolding inspired by AWS Projen:
+
+```bash
+# Check file ownership
+.claude/scripts/marker-utils.sh check-marker .claude/protocols/run-mode.md
+# → managed: true, version: 1.16.0
+
+# Eject from framework (transfer ownership)
+/loa-eject                    # Interactive eject wizard
+/loa-eject --file <path>      # Eject specific file
+/loa-eject --all              # Full framework eject
+```
+
+**Key Features**:
+- **`_loa_marker` metadata**: JSON/YAML files include `managed: true`, `version`, `hash` fields
+- **`_loa_managed` comments**: Markdown/script files use comment markers
+- **Integrity verification**: SHA-256 hash validation for tamper detection
+- **Eject command**: Transfer file ownership from framework to project
+- **Version-targeted updates**: Update only files from specific versions
+
+**New Files**:
+- `.claude/scripts/marker-utils.sh` - Marker verification utilities
+- `.claude/scripts/loa-eject.sh` - Eject command implementation
+- `.claude/commands/loa-eject.md` - Command routing
+- `.claude/skills/loa-eject/` - Eject skill with interactive wizard
+
+**Updated Files**:
+- All `.claude/protocols/*.md` - Added `_loa_managed` markers
+- All `.claude/schemas/*.json` - Added `_loa_marker` metadata
+- All `.claude/scripts/*.sh` - Added `_loa_managed` markers
+- `.claude/scripts/update.sh` - Version-targeted update support
+
+#### Two-Tier Learnings Architecture (#139)
+
+Framework learnings now ship with Loa and are available to all projects:
+
+```bash
+# Query framework learnings
+.claude/scripts/loa-learnings-index.sh query "bash" --tier framework
+
+# Query both tiers (default)
+.claude/scripts/loa-learnings-index.sh query "context management"
+
+# Check tier status
+.claude/scripts/loa-learnings-index.sh status
+# → Framework (Tier 1): 40 (weight: 1.0)
+# → Project (Tier 2): 0 (weight: 0.9)
+```
+
+**Two-Tier Model**:
+| Tier | Location | Weight | Source |
+|------|----------|--------|--------|
+| Framework | `.claude/loa/learnings/` | 1.0 | Ships with Loa |
+| Project | `grimoires/loa/a2a/compound/` | 0.9 | Project retrospectives |
+
+**40 Seeded Learnings**:
+- **10 Patterns**: Three-Zone Model, JIT Retrieval, Circuit Breaker, etc.
+- **8 Anti-Patterns**: Arrow closures, `((var++))` with set -e, etc.
+- **10 Decisions**: Why grimoires/, Why draft PRs, Why ICE layer, etc.
+- **12 Troubleshooting**: Bash 4+, macOS compatibility, yq vs jq, etc.
+
+**New Files**:
+- `.claude/loa/learnings/index.json` - Manifest with counts
+- `.claude/loa/learnings/patterns.json` - Proven architectural patterns
+- `.claude/loa/learnings/anti-patterns.json` - Common pitfalls
+- `.claude/loa/learnings/decisions.json` - Architectural decision records
+- `.claude/loa/learnings/troubleshooting.json` - Issue resolution guides
+
+**Updated Files**:
+- `.claude/schemas/learnings.schema.json` - Added `tier`, `version_added`, `source_origin`
+- `.claude/scripts/loa-learnings-index.sh` - Two-tier indexing with `--tier` flag
+- `.claude/scripts/anthropic-oracle.sh` - Weighted search across tiers
+- `.claude/scripts/update.sh` - `post_update_learnings()` for sync on update
+- `.loa.config.yaml` - `learnings` configuration section
+
+**Closes**: #76 (Extend /oracle to include Loa's own compound learnings)
+
+### Fixed
+
+#### Oracle Bash Increment Exit Code (#138)
+
+Fixed `((count++))` causing premature script termination when `set -e` is active and count starts at 0:
+
+```bash
+# Before (fails when count=0)
+((count++))
+
+# After (safe increment)
+count=$((count + 1))
+```
+
+This pattern is now documented in `.claude/loa/learnings/anti-patterns.json`.
+
+### Configuration
+
+New `.loa.config.yaml` sections:
+
+```yaml
+# Two-Tier Learnings
+learnings:
+  tiers:
+    framework:
+      enabled: true
+      weight: 1.0
+      source_dir: ".claude/loa/learnings"
+    project:
+      enabled: true
+      weight: 0.9
+  query:
+    default_tier: all
+    max_results: 10
+    deduplicate: true
+  index:
+    rebuild_on_update: true
+```
+
+---
+
 ## [1.15.0] - 2026-02-02 — Prompt Enhancement & Developer Experience
 
 ### Why This Release
