@@ -1,262 +1,251 @@
-# PRD: Construct-Aware Constraint Yielding
+# PRD: MibeStats — NFT Analytics Dashboard for Mibera333
 
-> Cycle: cycle-029 | Author: janitooor + Claude
-> Source: [#376](https://github.com/0xHoneyJar/loa/issues/376)
-> Related: [loa-constructs#129](https://github.com/0xHoneyJar/loa-constructs/issues/129)
-> Priority: P1 (framework architecture — enables construct ecosystem scaling)
+**Version**: 1.0.0
+**Status**: Draft
+**Author**: Discovery Phase (plan-and-analyze)
+**Cycle**: cycle-030
+**Date**: 2026-02-19
 
 ---
 
 ## 1. Problem Statement
 
-Loa's pipeline constraints (PRD → SDD → Sprint → Implement → Review → Audit) are enforced globally, forcing full-depth process on every task regardless of domain. A 26-line UI change (midi-interface #102) required PRD with 7 discovery phases, 2 GPT review rounds, sprint plan with 5 tasks, and 2 more review rounds — ~40% of the session was process, not code.
+### Context
 
-**The core issue**: Constructs already operate as self-contained expertise packages with their own workflows (Observer has 11 skills, Artisan has 14), but Loa's constraint system doesn't recognize this. When work touches the APP zone, constraints C-PROC-001/003/004 force the full pipeline regardless of whether a construct declares its own workflow.
+Mibera333 is a 9,999-token NFT collection on Berachain Mainnet (contract `0x6666397dfe9a8c469bf65dc744cb1c733416c420`), listed on Magic Eden and OpenSea. An existing project (`mibera-sheet-updater`) already fetches on-chain data and market stats, stores them in Google Sheets, and displays them via Looker Studio.
 
-> Sources: loa#376 body, loa#376 comment-1 (zkSoju), loa-constructs#129 body
+### Core Problems
 
----
+| # | Problem | Impact |
+|---|---------|--------|
+| P1 | Magic Eden API rate limit of **2 req/s** forces sequential processing — 10,000 tokens take 10+ minutes per run | Stale data, brittle pipeline |
+| P2 | GitHub Actions job timeout (6h) requires **10 staggered cron jobs** as a workaround for nightly updates | Complex, fragile orchestration |
+| P3 | Google Sheets is the **sole data store** — no proper querying, no indexing, limited to ~10M cells | Not scalable, no analytics SQL |
+| P4 | Looker Studio UI is **not interactive** — no wallet connect, no real-time updates, no custom UX | Poor user experience |
+| P5 | No public-facing product — community members must use a shared Looker Studio link with no personalization | No community ownership |
 
-## 2. Vision
+### Why Now
 
-**Loa's constraints yield when a construct declares workflow ownership.** The pipeline is a composable tool that constructs leverage for agentic backpressure, not a mandatory gate. Constructs compose the pipeline at their chosen depth via manifest declarations.
-
-### Three-Layer Architecture
-
-| Layer | What | Always? |
-|-------|------|---------|
-| **Loa Runtime** | Hooks, beads, events, memory, guardrails, git safety, three-zone model | Always available |
-| **Loa Pipeline** | PRD → SDD → Sprint → Implement → Review → Audit | Opt-in at chosen depth |
-| **Construct Workflow** | Domain-specific skills, verification, state | Defined by construct |
-
-A construct doesn't choose "pipeline OR own workflow" — it **composes both**.
-
-> Sources: loa#376 comment-3 (zkSoju architecture), loa-constructs#129 comment-2 (refined model)
+Berachain Mainnet launched and Mibera333 has an active trading community. A dedicated analytics tool would increase community engagement and provide collectors/traders with actionable data that doesn't exist anywhere else in this form.
 
 ---
 
-## 3. Goals & Success Metrics
+## 2. Goals & Success Metrics
 
-### G-1: Constraint System Reads Construct Workflow Declarations
-- Constraint enforcement checks whether an active construct declares workflow ownership before applying pipeline constraints
-- **Metric**: C-PROC-001/003/004/008 skip enforcement when construct with `workflow.gates` is active
+### Goals
 
-### G-2: Review/Audit Skills Accept Generic Inputs
-- Review and audit skills accept acceptance criteria from any source (issue body, manifest, inline), not just sprint.md
-- **Metric**: `/review-sprint` and `/audit-sprint` work with construct-provided inputs, not only pipeline artifacts
+| # | Goal | Measurable Outcome |
+|---|------|-------------------|
+| G1 | Replace Google Sheets + Looker Studio with a dedicated web app | MibeStats live and publicly accessible |
+| G2 | Solve data pipeline rate limiting with a proper cache layer | All 9,999 tokens indexed in PostgreSQL, no API timeout workarounds |
+| G3 | Provide real-time collection stats (floor, volume) | Floor price refresh ≤ 5 minutes |
+| G4 | Deliver interactive trait/rarity explorer | Users can filter and rank NFTs by any trait combination |
+| G5 | Enable wallet-based portfolio view | Any user can paste/connect a wallet address and see their Miberas |
 
-### G-3: Construct Manifest Supports Workflow Declaration
-- Pack manifests can declare `workflow` section with gates, depth, and verification method
-- **Metric**: Existing packs (Observer, Artisan) can retroactively declare their workflow depth
+### Success Metrics
 
-### G-4: Pipeline Stages Become Composable
-- The hard chain audit→review ("All good" magic string) is replaced with configurable gate contracts
-- **Metric**: A construct can declare `audit: skip` and still reach COMPLETED state
-
----
-
-## 4. User & Stakeholder Context
-
-### Primary Persona: Construct Author
-- Builds domain-specific expertise packages (FE/UI, BE/API, Data, Infra)
-- Wants to define workflow depth appropriate to their domain
-- Needs the Loa runtime (hooks, beads, guardrails) without the full pipeline overhead
-
-### Secondary Persona: Framework User (Loa default)
-- Uses Loa without constructs — the default pipeline applies
-- No change to their experience
-- The pipeline remains the default when no construct declares workflow ownership
-
-### Stakeholder: Maintainer (@janitooor)
-- Wants constructs to be peers, not subordinates to Loa's pipeline
-- Pipeline is a backpressure mechanism, not a quality gate hierarchy
-- Constructs that declare gates are trusted — they've earned trust by being installed, versioned, maintained
-
-> Sources: loa#376 comment-2 (zkSoju), loa#376 comment-4 (refined model)
+| Metric | Target |
+|--------|--------|
+| Time-to-first-meaningful-paint | < 2s on 4G |
+| API p95 response time | < 500ms |
+| Floor price data freshness | ≤ 5 min lag vs Magic Eden |
+| Trait data freshness | Updated daily (stable data) |
+| NFT trait coverage | 100% of 9,999 tokens indexed |
+| Uptime | > 99% (Vercel + managed DB) |
 
 ---
 
-## 5. Functional Requirements
+## 3. User & Stakeholder Context
 
-### FR-1: Manifest Workflow Schema (Loa-side reader)
+### Primary Personas
 
-**Note**: The manifest schema itself is defined in loa-constructs#129. This cycle implements the **Loa-side reader** that interprets the schema.
+**The Collector**
+- Owns one or more Miberas
+- Wants to track their portfolio value and compare their NFTs' trait rarity
+- Uses wallet connect to see their specific holdings
 
-Loa must read and validate this manifest section:
+**The Trader**
+- Actively buys/sells Miberas on Magic Eden
+- Needs real-time floor price, volume trends, recent sales history
+- Looks for underpriced NFTs based on trait rarity vs floor
 
-```yaml
-workflow:
-  depth: light | standard | deep | full
-  app_zone_access: true | false
-  gates:
-    prd: skip | condense | full
-    sdd: skip | condense | full
-    sprint: skip | condense | full
-    implement: required
-    review: skip | visual | textual | both
-    audit: skip | lightweight | full
-  verification:
-    method: visual | tsc | build | test | manual
-```
+**The Community Member**
+- Doesn't necessarily own Miberas but is active in the ecosystem
+- Curious about collection statistics, biggest sales, trait distribution
+- Uses MibeStats as a reference when discussing the collection
 
-**Note on `condense`**: The reader accepts `condense` as a valid value for forward compatibility with loa-constructs#129, but treats it as `full` in this cycle with a logged advisory. Full condense behavior (auto-generating sprint from issue body) is a construct-side concern.
+### Stakeholder
 
-**Acceptance Criteria**:
-- [ ] Loa can read `workflow` from pack manifest.json
-- [ ] Missing `workflow` section means "use default pipeline" (backwards compatible)
-- [ ] Invalid values produce clear validation errors
-- [ ] `implement: required` is enforced — cannot be set to `skip`
-- [ ] `condense` is accepted but treated as `full` with advisory log
-
-### FR-2: Active Construct Detection
-
-The system must determine whether a construct with declared workflow gates is currently handling work. Detection operates across three enforcement layers (see FR-3).
-
-**Mechanism**: When a skill is invoked, the loader knows which pack it came from. If that pack's `manifest.json` contains a `workflow` section, the construct is considered "workflow-active." This is a property of the skill loading context, not runtime heuristics.
-
-**State tracking**: A state marker (`.run/construct-workflow.json`) records the active construct and its gates during workflow execution. This enables pre-flight checks in command `.md` files to read the construct's declarations.
-
-**Acceptance Criteria**:
-- [ ] Skill loader writes `.run/construct-workflow.json` when invoking a skill from a pack with `workflow` declaration
-- [ ] File contains: construct name, pack slug, gates, depth, timestamp
-- [ ] File is cleared when construct workflow completes or on session end
-- [ ] Missing file means "no construct active" (default pipeline applies)
-- [ ] Detection uses skill loading context (which pack loaded the skill) — not runtime heuristics
-
-### FR-3: Constraint Yielding Logic
-
-Constraints are enforced through three layers. Yielding must occur at each:
-
-**Layer 1 — Prompt-level (constraints.json → CLAUDE.md)**: Add `construct_yield` field to relevant constraints. The CLAUDE.md renderer includes the yield clause (e.g., "...OR when a construct with `workflow.gates` declares ownership").
-
-**Layer 2 — Pre-flight (command .md files)**: Command pre-flight checks read `.run/construct-workflow.json`. If present and the construct declares a gate as `skip`, the pre-flight check passes without requiring the corresponding artifact.
-
-**Layer 3 — Safety hooks**: No changes needed. Hooks protect System Zone and destructive operations, not pipeline flow.
-
-| Constraint | Current | With Construct Active |
-|-----------|---------|----------------------|
-| C-PROC-001 | No code outside `/implement` | No code outside `/implement` **OR construct-owned workflow** |
-| C-PROC-003 | No skip without `/run` or `/bug` | No skip without `/run`, `/bug`, **OR construct with `workflow.gates`** |
-| C-PROC-004 | No skip review/audit | Yield when construct declares `review: skip` or `audit: skip` |
-| C-PROC-008 | Always check sprint plan | Yield when construct declares `sprint: skip` |
-
-**Acceptance Criteria**:
-- [ ] constraints.json modified with `construct_yield` field on C-PROC-001/003/004/008
-- [ ] CLAUDE.md rendering script includes yield clause in generated constraint tables
-- [ ] Command pre-flight checks in review-sprint.md and audit-sprint.md read construct-workflow.json
-- [ ] Yield only applies to the specific gate the construct skips — other constraints still enforced
-- [ ] Yield is logged to `.run/audit.jsonl` (observable via audit trail)
-- [ ] Default behavior unchanged when no construct is active
-
-### FR-4: Configurable Gate Contracts for Review/Audit
-
-Make the hard chain between review and audit configurable so constructs can compose at their declared depth. **This cycle focuses on gate configurability**, not full path generics (which require deeper refactoring deferred to a future cycle).
-
-| Current (pipeline-coupled) | This Cycle (construct-aware) | Future (fully generic) |
-|---------------------------|------------------------------|------------------------|
-| Hard gate on "All good" in `engineer-feedback.md` | Gate bypassed when construct declares `review: skip` | Accepts criteria from any source |
-| COMPLETED only via audit-sprint | COMPLETED available to construct workflows | Construct-declared completion signals |
-| Reads `sprint.md` for acceptance criteria | Unchanged (default path) | Accepts criteria from any source |
-| Output to `a2a/sprint-N/` | Unchanged (default path) | Configurable output paths |
-
-**Acceptance Criteria**:
-- [ ] Review/audit commands detect active construct via `.run/construct-workflow.json` and read criteria from construct's declared source
-- [ ] Audit command's "All good" check is bypassed when construct declares `review: skip` (no engineer-feedback.md required)
-- [ ] COMPLETED marker creation is available to construct workflows, not only audit-sprint
-- [ ] Default behavior unchanged — without active construct, reads sprint.md as before
-
-### FR-5: Construct Lifecycle Events
-
-When a construct workflow begins and ends, emit events for observability.
-
-**Acceptance Criteria**:
-- [ ] `construct.workflow.started` event emitted with construct name, declared depth, gates
-- [ ] `construct.workflow.completed` event emitted with outcome
-- [ ] Events are logged to audit trail (`.run/audit.jsonl`)
-- [ ] Other constructs can consume these events via the event bus
+- **@janitooor** (primary maintainer) — builds and owns MibeStats
+- **Mibera333 community** — primary users, no login required
 
 ---
 
-## 6. Technical & Non-Functional Requirements
+## 4. Functional Requirements
 
-### NF-1: Backwards Compatibility
-- All existing workflows work unchanged when no construct is active
-- The default pipeline is preserved — this is additive, not a replacement
-- Existing constructs (Observer, Artisan) that don't declare `workflow` continue working as they do today
+### 4.1 Page: Collection Overview
 
-### NF-2: Security — Trust Boundary
-- Only installed, versioned constructs can declare workflow gates
-- Runtime code cannot dynamically claim construct status to bypass constraints
-- Construct workflow declarations are validated at pack install time, not runtime
-- System Zone (`.claude/`) modifications remain blocked regardless of construct declarations
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F1.1 | Display current floor price (refreshed ≤ 5 min from Magic Eden API) | MUST |
+| F1.2 | Display volume metrics: 24h, 7d, 30d, all-time | MUST |
+| F1.3 | Display total sales count and total unique holders | MUST |
+| F1.4 | Display a chart of floor price over time (7d, 30d, all-time) | MUST |
+| F1.5 | Display most recent sales feed (last 10–20 sales with price, token, date) | SHOULD |
+| F1.6 | Display top sales of all time (by price) | SHOULD |
 
-### NF-3: Auditability
-- Every constraint yield is logged with: constraint ID, construct name, gate declaration, timestamp
-- Audit trail shows what was skipped and why
-- No silent bypasses — yields are observable
+### 4.2 Page: Traits / Rarity Explorer
 
-### NF-4: Fail-Closed
-- If construct detection fails (parse error, missing manifest), default to full pipeline
-- Ambiguous workflow declarations default to the more conservative option
-- This matches existing hook design (fail-open for hooks, fail-closed for constraints)
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F2.1 | Display all trait categories and their value distribution (count + % of supply) | MUST |
+| F2.2 | Compute and display a rarity score per token (e.g., statistical rarity based on trait frequency) | MUST |
+| F2.3 | Allow filtering the collection by one or more trait values (combinable filters) | MUST |
+| F2.4 | Display filtered results as a grid with token image, ID, rarity rank, and floor price | MUST |
+| F2.5 | Link each token to its Magic Eden listing page | SHOULD |
+| F2.6 | Display a rarity leaderboard (top 100 rarest tokens) | SHOULD |
 
----
+### 4.3 Page: Sales History & Charts
 
-## 7. Scope & Prioritization
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F3.1 | Display a price chart (line/area) of all sales over time | MUST |
+| F3.2 | Display daily/weekly volume bar chart | MUST |
+| F3.3 | Filterable sales table: date range, min/max price, token ID | SHOULD |
+| F3.4 | Highlight "grail" traits in the sales feed (visual indicator) | COULD |
 
-### In Scope (This Cycle)
+### 4.4 Page: Portfolio / Wallet Search
 
-| Priority | Feature | Why |
-|----------|---------|-----|
-| P0 | FR-1: Manifest workflow reader | Foundation — everything else depends on reading the schema |
-| P0 | FR-2: Active construct detection | Foundation — constraint yielding needs this |
-| P0 | FR-3: Constraint yielding logic | Core value — the actual yielding behavior |
-| P1 | FR-4: Configurable gate contracts | Enables constructs to bypass review→audit chain |
-| P2 | FR-5: Lifecycle events | Observability — important but not blocking |
-
-### Out of Scope
-
-| Item | Why | Where |
-|------|-----|-------|
-| Manifest schema definition | Construct-side concern | loa-constructs#129 |
-| Visual verification (deploy preview, screenshots) | Requires browser/deployment infra | Future cycle |
-| Cross-repo coordination layer | Multi-construct features | Future cycle |
-| Creating new domain-specific constructs (FE/UI, BE/API) | Construct authors build these | loa-constructs registry |
-| "condense" sprint generation from issue body | Requires construct-side implementation | loa-constructs#129 |
-| Golden path routing through construct manifests | v3 in the construct roadmap | Future cycle |
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| F4.1 | Accept a wallet address (paste or typed) without requiring wallet connection | MUST |
+| F4.2 | Display all Miberas held by that address with image, ID, and rarity rank | MUST |
+| F4.3 | Display estimated portfolio value (count × floor price) | MUST |
+| F4.4 | Optional wallet connect (Rainbow Kit / Wagmi) for auto-populating the address | SHOULD |
+| F4.5 | Display per-token estimated value, last sale price, and highest sale price | SHOULD |
 
 ---
 
-## 8. Risks & Dependencies
+## 5. Technical & Non-Functional Requirements
 
-### R-1: Schema Coordination (Medium)
-- **Risk**: Loa-side reader and loa-constructs#129 schema must agree
-- **Mitigation**: Define the reader to accept a superset; validate strictness can be added later
+### 5.1 Tech Stack
 
-### R-2: Constraint Escape Escalation (Low)
-- **Risk**: Construct workflow declarations could be abused to bypass all constraints
-- **Mitigation**: `implement: required` cannot be set to skip; System Zone always protected; construct must be installed (not runtime-injected)
+| Layer | Technology | Rationale |
+|-------|-----------|-----------|
+| Frontend | Next.js 14+ (App Router) + TypeScript | SSR for SEO, API routes, excellent Web3 ecosystem |
+| Styling | Tailwind CSS | Rapid UI development, consistent design |
+| Charts | Recharts or Chart.js | Lightweight, well-supported in Next.js |
+| Wallet Connect | Rainbow Kit + Wagmi + Viem | Standard Web3 stack, Berachain EVM-compatible |
+| Backend | Next.js API Routes | Unified codebase, Vercel-native |
+| Database | PostgreSQL via Supabase or Neon | Managed, free tier sufficient, proper SQL for analytics |
+| ORM | Prisma | Type-safe queries, auto-generated types |
+| Hosting | Vercel | GitHub integration, free tier, global CDN |
+| Data pipeline | Node.js or Python scripts (cron via Vercel Cron or GitHub Actions) | Replaces existing staggered cron workaround |
 
-### R-3: Backwards Compatibility Regression (Low)
-- **Risk**: Modifying constraint enforcement could break existing workflows
-- **Mitigation**: All changes are additive — default behavior only changes when a construct with `workflow` section is detected; comprehensive test coverage
+### 5.2 Data Sources & Strategy
 
-### D-1: Dependency — loa-constructs#129
-- The manifest schema is defined in loa-constructs. This cycle implements the **reader**, not the schema.
-- If schema changes, the reader adapts — we validate loosely and tighten later.
+| Data Type | Source | Refresh Strategy | Storage |
+|-----------|--------|-----------------|---------|
+| Floor price, volume, total sales | Magic Eden API | Polling every 5 min (single request, no rate limit pressure) | PostgreSQL `collection_stats` table |
+| Recent sales (last 500) | Magic Eden API | Hourly batch fetch, paginated | PostgreSQL `sales` table |
+| Historical sales (all-time) | Magic Eden API | One-time bulk import, then incremental | PostgreSQL `sales` table |
+| Token metadata & traits | Berachain RPC → IPFS | One-time full indexing, then daily delta | PostgreSQL `tokens` table |
+| Token images | IPFS gateway (stored as URLs, not base64) | One-time indexing, CDN-cached | PostgreSQL `tokens.image_url` |
+| Wallet holdings | Berachain RPC (`ownerOf` / `tokensOfOwner`) | On-demand (per wallet request) | Not stored (real-time query) |
+
+### 5.3 Non-Functional Requirements
+
+| Category | Requirement |
+|----------|-------------|
+| **Performance** | First Contentful Paint < 1.5s; API responses < 500ms p95 |
+| **Availability** | > 99% uptime (Vercel SLA + managed DB) |
+| **Security** | No private keys in codebase; API secrets in Vercel env vars; input validation on wallet addresses (EIP-55 checksum); rate-limit public API routes |
+| **Accessibility** | WCAG 2.1 AA — semantic HTML, keyboard navigation, sufficient color contrast |
+| **Responsiveness** | Mobile-first, tested on 375px, 768px, 1280px+ viewports |
+| **SEO** | Next.js SSR/SSG for collection and trait pages; meta tags for social sharing |
+| **Cost** | Target $0/month on free tiers (Vercel Hobby + Supabase/Neon free) for initial launch |
 
 ---
 
-## 9. Domain Examples (Reference)
+## 6. Scope & Prioritization
 
-For construct authors building on this infrastructure. **Note**: These are illustrative examples for future constructs. "direct" in the Data/Lore row maps to `implement: required` with all other gates set to `skip` — the construct still goes through an implement phase, it just has no planning or review overhead.
+### MVP (Sprint 1–2)
 
-| Construct Domain | PRD | SDD | Sprint | Implement | Review | Audit |
-|-----------------|-----|-----|--------|-----------|--------|-------|
-| **BE/API** | full | full | full | required | textual | full |
-| **FE/UI** | skip | skip | condense | required | visual | skip |
-| **FE/Data** | skip | skip | condense | required | tsc+build | lightweight |
-| **Infra** | full | full | full | required | both | full |
-| **Data/Lore** | skip | skip | skip | required | skip | skip |
+- Data pipeline: PostgreSQL schema + full initial indexing (traits, images) + ME sales import
+- Collection Overview page: floor, volume, sales count, price chart
+- Traits / Rarity Explorer: distribution, rarity scores, filter + grid
+- Deployment: Vercel + Supabase, GitHub Actions for daily cron
 
-> Source: loa-constructs#129 body (domain examples table)
+### Phase 2 (Sprint 3)
+
+- Sales History page: price chart, volume chart, sales table
+- Portfolio / Wallet Search: address lookup, holdings display, portfolio value
+
+### Phase 3 (Future)
+
+- Wallet connect (Rainbow Kit) — optional wallet auth
+- Notifications / alerts (floor drop, whale buy)
+- "Grail" rarity tier display
+- Comparison tool (my Miberas vs floor rarity)
+- Multi-language support
+
+### Out of Scope (v1.0)
+
+- Buying/selling NFTs (no marketplace functionality)
+- User accounts / login system
+- Push notifications
+- Mobile app
+- Multi-collection support (Mibera333 only at launch)
+
+---
+
+## 7. Risks & Dependencies
+
+### Technical Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Magic Eden API deprecates or changes endpoints | Medium | High | Abstract API calls behind a service layer; monitor ME developer docs |
+| Berachain RPC rate limits during initial indexing | Medium | Medium | Batch RPC calls with delays; use multiple public RPC endpoints as fallback |
+| IPFS gateway unavailability for image fetching | Low | Medium | Store image URLs (not base64); use multiple IPFS gateways with fallback |
+| Supabase/Neon free tier limits exceeded | Low | Medium | Monitor usage; upgrade to paid tier if needed (~$10/month) |
+| Vercel Hobby plan function timeout (10s) for heavy queries | Medium | Medium | Pre-aggregate heavy analytics on the data pipeline side, not at request time |
+
+### Security Risks
+
+| Risk | Mitigation |
+|------|-----------|
+| XSS through NFT metadata (malicious trait values) | Sanitize all user-generated / on-chain content before rendering |
+| Wallet address injection via query params | Validate EIP-55 checksum before any DB/RPC query |
+| API key exposure | Vercel env vars only; never in client-side code |
+| DDoS on public API routes | Vercel rate limiting + caching headers |
+
+### External Dependencies
+
+| Dependency | Risk Level | Notes |
+|-----------|-----------|-------|
+| Magic Eden API | Medium | Bearer token required; no SLA guarantee |
+| Berachain RPC (`rpc.berachain.com`) | Low | Public endpoint; can switch to Ankr/Alchemy Berachain |
+| IPFS (ipfs.io gateway) | Medium | Public gateway; no SLA |
+| Vercel (hosting) | Low | Established platform; 99.99% SLA on Pro |
+| Supabase / Neon (database) | Low | Managed PostgreSQL; free tier for MVP |
+
+---
+
+## 8. Source Tracing
+
+| Requirement Area | Source |
+|-----------------|--------|
+| Data sources (ME API, Berachain RPC, IPFS) | Derived from `mibera-sheet-updater` codebase analysis |
+| Rate limiting problems | `magiceden_update.py` + `cron_update_from_contract.yml` in existing repo |
+| Contract address + token range | Hardcoded in existing scripts: `0x6666...420`, IDs 1–9999 |
+| Pages (collection, traits, sales, portfolio) | Discovery Phase interview — user selection |
+| Stack (Next.js, PostgreSQL, Vercel) | Discovery Phase interview — user selection |
+| Data freshness strategy | Discovery Phase interview — "mix: floor real-time, traits daily" |
+| Wallet connect optional | Discovery Phase interview |
+| Archetype context | `grimoires/loa/context/archetype.md` |
+
+---
+
+*Generated by /plan-and-analyze on 2026-02-19*
+*Next step: /architect — Software Design Document*

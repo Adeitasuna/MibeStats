@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "active_cycle": "cycle-029",
-  "global_sprint_counter": 24,
+  "active_cycle": "cycle-030",
+  "global_sprint_counter": 27,
   "cycles": [
     {
       "id": "cycle-025",
@@ -251,6 +251,35 @@
           "status": "completed"
         }
       ]
+    },
+    {
+      "id": "cycle-030",
+      "label": "MibeStats — NFT Analytics Dashboard for Mibera333",
+      "status": "active",
+      "started_at": "2026-02-19",
+      "sprints": [
+        {
+          "id": "sprint-25",
+          "local_id": "sprint-1",
+          "label": "Foundation + Collection Overview",
+          "status": "completed",
+          "completed_at": "2026-02-21"
+        },
+        {
+          "id": "sprint-26",
+          "local_id": "sprint-2",
+          "label": "Traits + Sales History",
+          "status": "completed",
+          "completed_at": "2026-02-21"
+        },
+        {
+          "id": "sprint-27",
+          "local_id": "sprint-3",
+          "label": "Portfolio + Security + Polish",
+          "status": "pending"
+        }
+      ],
+      "sdd": "grimoires/loa/sdd.md"
     }
   ]
 }

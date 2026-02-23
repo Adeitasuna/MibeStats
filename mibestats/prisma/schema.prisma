@@ -1,0 +1,151 @@
+// MibeStats — Prisma Schema
+// Docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─────────────────────────────────────────────
+// tokens — 10,000 Mibera NFTs, seeded from mibera-codex
+// ─────────────────────────────────────────────
+model Token {
+  id    Int @id @default(autoincrement())
+
+  // Core identity
+  tokenId          Int     @unique @map("token_id")
+  archetype        String                              // Freetekno | Milady | Acidhouse | Chicago/Detroit
+  ancestor         String
+  timePeriod       String  @map("time_period")        // Modern | Ancient
+  birthday         String?
+  birthCoordinates String? @map("birth_coordinates")
+
+  // Astrology (all zodiac-related fields)
+  sunSign       String? @map("sun_sign")
+  moonSign      String? @map("moon_sign")
+  ascendingSign String? @map("ascending_sign")
+  element       String?                               // Air | Earth | Fire | Water
+
+  // Rarity — from mibera-codex (canonical, no recomputation)
+  swagScore  Int     @map("swag_score")               // 0–100
+  swagRank   String  @map("swag_rank")                // SSS | SS | S | A | B | C | D | F
+  rarityRank Int?    @map("rarity_rank")              // 1–10000 (computed on import)
+
+  // Visual traits
+  background    String?
+  body          String?
+  eyes          String?
+  eyebrows      String?
+  mouth         String?
+  hair          String?
+  shirt         String?
+  hat           String?
+  glasses       String?
+  mask          String?
+  earrings      String?
+  faceAccessory String? @map("face_accessory")
+  tattoo        String?
+  item          String?
+  drug          String?                               // 78 substances (maps to tarot)
+
+  // Grail — from grails.jsonl (42 hand-drawn 1/1s)
+  isGrail       Boolean @default(false) @map("is_grail")
+  grailName     String? @map("grail_name")
+  grailCategory String? @map("grail_category")       // Zodiac | Planet | Ancestor | etc.
+
+  // Market data (updated by daily pipeline)
+  ownerAddress  String?  @map("owner_address")
+  lastSalePrice Decimal? @map("last_sale_price") @db.Decimal(18, 8)
+  lastSaleDate  DateTime? @map("last_sale_date")
+  maxSalePrice  Decimal? @map("max_sale_price") @db.Decimal(18, 8)
+  maxSaleDate   DateTime? @map("max_sale_date")
+  saleCount     Int      @default(0) @map("sale_count")
+
+  // Image (object storage URL, not base64)
+  imageUrl String? @map("image_url")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sales Sale[]
+
+  @@index([archetype])
+  @@index([swagScore(sort: Desc)])
+  @@index([rarityRank])
+  @@index([ownerAddress])
+  @@index([isGrail])
+  @@index([drug])
+  @@index([ancestor])
+  @@index([element])
+  @@map("tokens")
+}
+
+// ─────────────────────────────────────────────
+// sales — all Magic Eden sales history
+// ─────────────────────────────────────────────
+model Sale {
+  id            BigInt   @id @default(autoincrement())
+  tokenId       Int      @map("token_id")
+  priceBera     Decimal  @map("price_bera") @db.Decimal(18, 8)
+  priceUsd      Decimal? @map("price_usd") @db.Decimal(18, 2)
+  soldAt        DateTime @map("sold_at")
+  buyerAddress  String?  @map("buyer_address")
+  sellerAddress String?  @map("seller_address")
+  txHash        String?  @unique @map("tx_hash")      // dedup guard
+  marketplace   String   @default("magic_eden")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  token Token @relation(fields: [tokenId], references: [tokenId])
+
+  @@index([tokenId])
+  @@index([soldAt(sort: Desc)])
+  @@index([priceBera(sort: Desc)])
+  @@map("sales")
+}
+
+// ─────────────────────────────────────────────
+// collection_stats — singleton row, updated ~5 min via ISR
+// ─────────────────────────────────────────────
+model CollectionStats {
+  id            Int      @id @default(1)              // always row 1
+  floorPrice    Decimal? @map("floor_price") @db.Decimal(18, 8)
+  volume24h     Decimal? @map("volume_24h") @db.Decimal(18, 8)
+  volume7d      Decimal? @map("volume_7d") @db.Decimal(18, 8)
+  volume30d     Decimal? @map("volume_30d") @db.Decimal(18, 8)
+  volumeAllTime Decimal? @map("volume_all_time") @db.Decimal(18, 8)
+  totalSales    Int?     @map("total_sales")
+  totalHolders  Int?     @map("total_holders")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("collection_stats")
+}
+
+// ─────────────────────────────────────────────
+// floor_price_history — daily snapshots for charts
+// ─────────────────────────────────────────────
+model FloorPriceHistory {
+  id         BigInt   @id @default(autoincrement())
+  floorPrice Decimal  @map("floor_price") @db.Decimal(18, 8)
+  recordedAt DateTime @map("recorded_at") @db.Date    // DATE type — one row per day
+
+  @@unique([recordedAt])
+  @@index([recordedAt(sort: Desc)])
+  @@map("floor_price_history")
+}
+
+// ─────────────────────────────────────────────
+// sync_state — pipeline position tracking
+// ─────────────────────────────────────────────
+model SyncState {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("sync_state")
+}
