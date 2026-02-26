@@ -251,29 +251,8 @@ export function EdenContent() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {/* Row 1 skeleton: 4 gold cards */}
-        <div id="skel-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={`g${i}`} className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card stat-card--gold"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
-          ))}
-        </div>
-        {/* Row 2 skeleton: 6 cards */}
-        <div id="skel-row2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={`s${i}`} className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
-          ))}
-        </div>
-        <style dangerouslySetInnerHTML={{ __html: `
-          @media (min-width: 768px) {
-            #skel-row1 { grid-template-columns: repeat(4, 1fr) !important; }
-            #skel-row2 { grid-template-columns: repeat(6, 1fr) !important; }
-          }
-        `}} />
-        {/* Chart skeleton */}
-        <div className="card p-4 animate-pulse"><div className="h-4 bg-white/5 rounded w-24 mb-4" /><div className="h-[200px] bg-white/5 rounded" /></div>
-        {/* Tables skeleton */}
-        <div className="card p-6 animate-pulse"><div className="h-4 bg-white/5 rounded w-48 mb-4" /><div className="h-40 bg-white/5 rounded" /></div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
+        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
       </div>
     )
   }
