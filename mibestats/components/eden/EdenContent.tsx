@@ -129,63 +129,69 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
     .map((d) => ({ date: d.date, price: Number(d.floorPrice.toFixed(4)) }))
 
   return (
-    <div className="card p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-mibe-gold uppercase tracking-wider">Floor Price</h3>
-        <div className="flex gap-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Floor Price</span>
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
           {(['7d', '30d', 'all'] as Range[]).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
-                range === r
-                  ? 'bg-mibe-gold/15 text-mibe-gold'
-                  : 'text-mibe-text-2 hover:text-white'
-              }`}
+              style={{
+                padding: '0.15rem 0.5rem',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                borderRadius: '0.25rem',
+                border: 'none',
+                cursor: 'pointer',
+                background: range === r ? 'rgba(255,215,0,0.15)' : 'transparent',
+                color: range === r ? '#ffd700' : '#8b949e',
+              }}
             >
               {r === 'all' ? 'All' : r}
             </button>
           ))}
         </div>
       </div>
-
-      {filtered.length === 0 ? (
-        <div className="h-48 flex items-center justify-center text-mibe-muted text-sm">
-          No data yet
-        </div>
-      ) : (
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={filtered} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <defs>
-              <linearGradient id="floorGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ffd700" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#ffd700" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-            <XAxis
-              dataKey="date"
-              tick={{ fill: '#8b949e', fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v: string) => v.slice(5)}
-            />
-            <YAxis
-              tick={{ fill: '#8b949e', fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v: number) => `${v}`}
-              width={45}
-            />
-            <Tooltip
-              contentStyle={{ background: '#21262d', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
-              labelStyle={{ color: '#8b949e' }}
-              formatter={(v: number) => [`${v} BERA`, 'Floor']}
-            />
-            <Area type="monotone" dataKey="price" stroke="#ffd700" strokeWidth={2} fill="url(#floorGradient)" dot={false} />
-          </AreaChart>
-        </ResponsiveContainer>
-      )}
+      <div className="stat-card" style={{ padding: '0.75rem' }}>
+        {filtered.length === 0 ? (
+          <div style={{ height: '12rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: '0.875rem' }}>
+            No data yet
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={filtered} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+              <defs>
+                <linearGradient id="floorGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ffd700" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#ffd700" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: '#8b949e', fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v: string) => v.slice(5)}
+              />
+              <YAxis
+                tick={{ fill: '#8b949e', fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v: number) => `${v}`}
+                width={45}
+              />
+              <Tooltip
+                contentStyle={{ background: '#21262d', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
+                labelStyle={{ color: '#8b949e' }}
+                formatter={(v: number) => [`${v} BERA`, 'Floor']}
+              />
+              <Area type="monotone" dataKey="price" stroke="#ffd700" strokeWidth={2} fill="url(#floorGradient)" dot={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
     </div>
   )
 }
@@ -194,22 +200,24 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
 
 function EdenPie({ data, title }: { data: { name: string; value: number }[]; title: string }) {
   return (
-    <div className="card p-4">
-      <h3 className="text-sm font-semibold text-mibe-gold mb-3 uppercase tracking-wider">{title}</h3>
-      <ResponsiveContainer width="100%" height={240}>
-        <PieChart>
-          <Pie data={data} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
-            {data.map((_, i) => (
-              <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
-            ))}
-          </Pie>
-          <Tooltip
-            contentStyle={{ background: '#21262d', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
-            formatter={(value: number) => [value.toLocaleString(), 'Count']}
-          />
-          <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />
-        </PieChart>
-      </ResponsiveContainer>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{title}</span>
+      <div className="stat-card" style={{ padding: '0.75rem' }}>
+        <ResponsiveContainer width="100%" height={240}>
+          <PieChart>
+            <Pie data={data} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
+              {data.map((_, i) => (
+                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{ background: '#21262d', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
+              formatter={(value: number) => [value.toLocaleString(), 'Count']}
+            />
+            <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 }
@@ -326,6 +334,7 @@ export function EdenContent() {
             grid-row: 1 / 3 !important;
           }
           #eden-pies { grid-template-columns: repeat(3, 1fr) !important; }
+          #eden-tables { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}} />
 
@@ -338,105 +347,106 @@ export function EdenContent() {
         </div>
       )}
 
-      {/* Row 5: Best Sales Top 30 */}
-      {eden && eden.bestSales.length > 0 && (
-        <div className="card overflow-hidden">
-          <div className="p-4 border-b border-mibe-border">
-            <h3 className="text-sm font-semibold text-mibe-gold uppercase tracking-wider">
-              Best Sales — Top 30
-            </h3>
-          </div>
-          <div className="table-responsive">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-mibe-border text-[10px] text-mibe-text-2 uppercase tracking-wider">
-                  <th className="p-3 text-left">#</th>
-                  <th className="p-3 text-left">Image</th>
-                  <th className="p-3 text-left">ID</th>
-                  <th className="p-3 text-left">Rank</th>
-                  <th className="p-3 text-left">Grail</th>
-                  <th className="p-3 text-right">Price (BERA)</th>
-                  <th className="p-3 text-left">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {eden.bestSales.map((sale, i) => (
-                  <tr key={sale.id} className="border-b border-mibe-border/30 hover:bg-mibe-hover/30 transition-colors">
-                    <td className="p-3 text-mibe-muted">{i + 1}</td>
-                    <td className="p-2">
-                      {sale.imageUrl ? (
-                        <Image src={sale.imageUrl} alt={`#${sale.tokenId}`} width={32} height={32} className="rounded object-cover shrink-0" />
-                      ) : (
-                        <div className="w-8 h-8 rounded bg-mibe-hover" />
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <a href={sale.magicEdenUrl} target="_blank" rel="noreferrer" className="text-mibe-cyan hover:underline">#{sale.tokenId}</a>
-                    </td>
-                    <td className="p-3">{sale.swagRank && <SwagRankBadge rank={sale.swagRank} size="sm" />}</td>
-                    <td className="p-3">
-                      {sale.isGrail ? (
-                        <span className="text-mibe-gold text-xs font-bold">{sale.grailName ?? 'Yes'}</span>
-                      ) : (
-                        <span className="text-mibe-muted">—</span>
-                      )}
-                    </td>
-                    <td className="p-3 text-right font-medium text-white tabular-nums">{sale.priceBera.toFixed(2)}</td>
-                    <td className="p-3 text-mibe-text-2 text-xs">{new Date(sale.soldAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {/* Row 5: Best Sales (cols 1-3) | Most Sold (cols 4-6) */}
+      {eden && (
+        <div id="eden-tables" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+          {/* Best Sales */}
+          {eden.bestSales.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Best Sales — Top 30</span>
+              <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div className="table-responsive">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#888' }}>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>#</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Img</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>ID</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Rank</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Grail</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'right' }}>Price</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eden.bestSales.map((sale, i) => (
+                        <tr key={sale.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '0.5rem 0.75rem', color: '#555' }}>{i + 1}</td>
+                          <td style={{ padding: '0.35rem' }}>
+                            {sale.imageUrl ? (
+                              <Image src={sale.imageUrl} alt={`#${sale.tokenId}`} width={28} height={28} className="rounded object-cover shrink-0" />
+                            ) : (
+                              <div style={{ width: 28, height: 28, borderRadius: '0.25rem', background: '#1a1a1a' }} />
+                            )}
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>
+                            <a href={sale.magicEdenUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{sale.tokenId}</a>
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>{sale.swagRank && <SwagRankBadge rank={sale.swagRank} size="sm" />}</td>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>
+                            {sale.isGrail ? (
+                              <span style={{ color: '#ffd700', fontSize: '0.75rem', fontWeight: 700 }}>{sale.grailName ?? 'Yes'}</span>
+                            ) : (
+                              <span style={{ color: '#555' }}>—</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', fontWeight: 500, color: '#fff' }}>{sale.priceBera.toFixed(2)}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', color: '#888', fontSize: '0.75rem' }}>{new Date(sale.soldAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
 
-      {/* Row 6: Most Sold Miberas */}
-      {eden && eden.mostSold.length > 0 && (
-        <div className="card overflow-hidden">
-          <div className="p-4 border-b border-mibe-border">
-            <h3 className="text-sm font-semibold text-mibe-gold uppercase tracking-wider">
-              Most Sold Miberas
-            </h3>
-          </div>
-          <div className="table-responsive">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-mibe-border text-[10px] text-mibe-text-2 uppercase tracking-wider">
-                  <th className="p-3 text-left">#</th>
-                  <th className="p-3 text-left">Image</th>
-                  <th className="p-3 text-left">ID</th>
-                  <th className="p-3 text-left">Rank</th>
-                  <th className="p-3 text-center">Sales</th>
-                  <th className="p-3 text-right">Max Price</th>
-                  <th className="p-3 text-right">Last Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {eden.mostSold.map((token, i) => (
-                  <tr key={token.tokenId} className="border-b border-mibe-border/30 hover:bg-mibe-hover/30 transition-colors">
-                    <td className="p-3 text-mibe-muted">{i + 1}</td>
-                    <td className="p-2">
-                      {token.imageUrl ? (
-                        <Image src={token.imageUrl} alt={`#${token.tokenId}`} width={32} height={32} className="rounded object-cover shrink-0" />
-                      ) : (
-                        <div className="w-8 h-8 rounded bg-mibe-hover" />
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <a href={token.magicEdenUrl} target="_blank" rel="noreferrer" className="text-mibe-cyan hover:underline">#{token.tokenId}</a>
-                    </td>
-                    <td className="p-3"><SwagRankBadge rank={token.swagRank} size="sm" /></td>
-                    <td className="p-3 text-center">
-                      <span className="bg-mibe-gold/15 text-mibe-gold px-2 py-0.5 rounded text-xs font-bold">{token.saleCount}</span>
-                    </td>
-                    <td className="p-3 text-right font-medium text-white tabular-nums">{token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}</td>
-                    <td className="p-3 text-right text-mibe-text-2 tabular-nums">{token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Most Sold */}
+          {eden.mostSold.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Most Sold Miberas</span>
+              <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div className="table-responsive">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#888' }}>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>#</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Img</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>ID</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Rank</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'center' }}>Sales</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'right' }}>Max</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'right' }}>Last</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eden.mostSold.map((token, i) => (
+                        <tr key={token.tokenId} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '0.5rem 0.75rem', color: '#555' }}>{i + 1}</td>
+                          <td style={{ padding: '0.35rem' }}>
+                            {token.imageUrl ? (
+                              <Image src={token.imageUrl} alt={`#${token.tokenId}`} width={28} height={28} className="rounded object-cover shrink-0" />
+                            ) : (
+                              <div style={{ width: 28, height: 28, borderRadius: '0.25rem', background: '#1a1a1a' }} />
+                            )}
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>
+                            <a href={token.magicEdenUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{token.tokenId}</a>
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem' }}><SwagRankBadge rank={token.swagRank} size="sm" /></td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>
+                            <span style={{ background: 'rgba(255,215,0,0.15)', color: '#ffd700', padding: '0.15rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.75rem', fontWeight: 700 }}>{token.saleCount}</span>
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', fontWeight: 500, color: '#fff' }}>{token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', color: '#888' }}>{token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
