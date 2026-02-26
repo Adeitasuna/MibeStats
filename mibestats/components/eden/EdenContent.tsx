@@ -240,27 +240,17 @@ export function EdenContent() {
   if (loading) {
     return (
       <div className="flex flex-col gap-4">
-        {/* Row 1 skeleton: 2 gold cards */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card stat-card--gold"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
-          <div className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card stat-card--gold"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
-        </div>
-        {/* Row 2 skeleton: 3 cards */}
-        <div className="grid grid-cols-3 gap-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={`c${i}`} className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-24 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
+        {/* Row 1 skeleton: 4 gold cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={`g${i}`} className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card stat-card--gold"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
           ))}
         </div>
-        {/* Row 3 skeleton: 3 cards */}
-        <div className="grid grid-cols-3 gap-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={`v${i}`} className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-24 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
+        {/* Row 2 skeleton: 6 cards */}
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={`s${i}`} className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
           ))}
-        </div>
-        {/* Row 4 skeleton: 2 cards */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
-          <div className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
         </div>
         {/* Chart skeleton */}
         <div className="card p-4 animate-pulse"><div className="h-4 bg-white/5 rounded w-24 mb-4" /><div className="h-[200px] bg-white/5 rounded" /></div>
@@ -289,28 +279,10 @@ export function EdenContent() {
         <div className="card p-3 border-mibe-red text-red-400 text-sm">{error}</div>
       )}
 
-      {/* Row 1: Floor Price | Max Sell Price */}
-      <div className="grid grid-cols-2 gap-3">
-        <GoldCard label="Floor Price" value={fmt(collection?.floorPrice)} />
-        <GoldCard label="Max Sell Price" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
-      </div>
-
-      {/* Row 2: Sales count 1d | 7d | alltime */}
-      <div className="grid grid-cols-3 gap-3">
-        <MiniCard label="Sales Count — 1 day" value={eden ? String(eden.salesStats.count1d) : '—'} />
-        <MiniCard label="Sales Count — 7 days" value={eden ? String(eden.salesStats.count7d) : '—'} />
-        <MiniCard label="Sales Count — All time" value={eden ? fmtShort(eden.salesStats.countAll) : '—'} />
-      </div>
-
-      {/* Row 3: Sales volume 1d | 7d | alltime */}
-      <div className="grid grid-cols-3 gap-3">
-        <MiniCard label="Sales Volume — 1 day" value={eden ? fmt(eden.salesStats.volume1d, 1) : '—'} />
-        <MiniCard label="Sales Volume — 7 days" value={eden ? fmt(eden.salesStats.volume7d, 1) : '—'} />
-        <MiniCard label="Sales Volume — All time" value={fmt(collection?.volumeAllTime, 1)} />
-      </div>
-
-      {/* Row 4: Lowest sale of day | Highest of day */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Row 1: Floor Price | Max Sell Price | Lowest of Day | Highest of Day */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <GoldCard label="Floor Price (7d)" value={fmt(collection?.floorPrice)} />
+        <GoldCard label="Max Sell Price (ATH)" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
         {(() => {
           const today = new Date().toISOString().slice(0, 10)
           const todaySales = eden?.bestSales.filter((s) => s.soldAt.slice(0, 10) === today) ?? []
@@ -318,11 +290,21 @@ export function EdenContent() {
           const highestOfDay = todaySales.length > 0 ? Math.max(...todaySales.map((s) => s.priceBera)) : null
           return (
             <>
-              <MiniCard label="Lowest Sale of Day" value={lowestOfDay != null ? fmt(lowestOfDay) : '—'} />
-              <MiniCard label="Highest Sale of Day" value={highestOfDay != null ? fmt(highestOfDay) : '—'} />
+              <GoldCard label="Lowest Sale of Day" value={lowestOfDay != null ? fmt(lowestOfDay) : '—'} />
+              <GoldCard label="Highest Sale of Day" value={highestOfDay != null ? fmt(highestOfDay) : '—'} />
             </>
           )
         })()}
+      </div>
+
+      {/* Row 2: Sales Count 1d|7d|All + Sales Volume 1d|7d|All */}
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        <MiniCard label="Sales Count — 1d" value={eden ? String(eden.salesStats.count1d) : '—'} />
+        <MiniCard label="Sales Count — 7d" value={eden ? String(eden.salesStats.count7d) : '—'} />
+        <MiniCard label="Sales Count — All" value={eden ? fmtShort(eden.salesStats.countAll) : '—'} />
+        <MiniCard label="Sales Vol. — 1d" value={eden ? fmt(eden.salesStats.volume1d, 1) : '—'} />
+        <MiniCard label="Sales Vol. — 7d" value={eden ? fmt(eden.salesStats.volume7d, 1) : '—'} />
+        <MiniCard label="Sales Vol. — All" value={fmt(collection?.volumeAllTime, 1)} />
       </div>
 
       {/* Row 3: Floor price chart */}
