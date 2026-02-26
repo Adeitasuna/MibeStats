@@ -146,6 +146,29 @@ body {
 .rank-D   { background: #6B7280; color: #fff; }
 .rank-F   { background: #374151; color: #9CA3AF; }
 
+/* ── Stat cards (title above, value inside bordered box) ── */
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  padding: 0.6rem 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card--gold {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.stat-card--gold:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.08);
+}
+
 /* ── Cards ── */
 
 .card {

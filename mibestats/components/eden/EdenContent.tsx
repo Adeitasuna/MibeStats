@@ -92,18 +92,22 @@ type Range = '7d' | '30d' | 'all'
 
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card-gold p-4 flex flex-col gap-1">
-      <span className="text-[10px] font-medium uppercase tracking-widest text-mibe-gold">{label}</span>
-      <span className="text-2xl font-bold text-white">{value}</span>
+    <div className="flex flex-col gap-1">
+      <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+      <div className="stat-card stat-card--gold">
+        <span className="text-2xl font-bold text-white">{value}</span>
+      </div>
     </div>
   )
 }
 
 function MiniCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card p-3 flex flex-col gap-0.5">
-      <span className="text-[10px] font-medium uppercase tracking-widest text-mibe-text-2">{label}</span>
-      <span className="text-lg font-bold text-white">{value}</span>
+    <div className="flex flex-col gap-1">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+      <div className="stat-card">
+        <span className="text-lg font-bold text-white">{value}</span>
+      </div>
     </div>
   )
 }
@@ -238,13 +242,13 @@ export function EdenContent() {
       <div className="flex flex-col gap-4">
         {/* Gold cards skeleton */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="card-gold p-4 animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-2" /><div className="h-7 bg-white/10 rounded w-32" /></div>
-          <div className="card-gold p-4 animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-2" /><div className="h-7 bg-white/10 rounded w-32" /></div>
+          <div className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
+          <div className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
         </div>
         {/* Stat cards skeleton */}
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="card p-3 animate-pulse"><div className="h-2.5 bg-white/5 rounded w-14 mb-2" /><div className="h-5 bg-white/5 rounded w-16" /></div>
+            <div key={i} className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-14 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
           ))}
         </div>
         {/* Chart skeleton */}
