@@ -237,6 +237,18 @@ export function EdenContent() {
     })
   }, [])
 
+  // Compute today's lowest/highest sale (must be before any early return to respect hooks rules)
+  const { lowestOfDay, highestOfDay } = useMemo(() => {
+    if (!eden) return { lowestOfDay: null, highestOfDay: null }
+    const today = new Date().toISOString().slice(0, 10)
+    const todaySales = eden.bestSales.filter((s) => s.soldAt.slice(0, 10) === today)
+    if (todaySales.length === 0) return { lowestOfDay: null, highestOfDay: null }
+    return {
+      lowestOfDay: Math.min(...todaySales.map((s) => s.priceBera)),
+      highestOfDay: Math.max(...todaySales.map((s) => s.priceBera)),
+    }
+  }, [eden])
+
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -278,18 +290,6 @@ export function EdenContent() {
         .map((d) => ({ name: d.saleCount === 1 ? '1 sale' : `${d.saleCount} sales`, value: d.tokenCount }))
         .slice(0, 8)
     : []
-
-  // Compute today's lowest/highest sale (client-only to avoid hydration mismatch)
-  const { lowestOfDay, highestOfDay } = useMemo(() => {
-    if (!eden || typeof window === 'undefined') return { lowestOfDay: null, highestOfDay: null }
-    const today = new Date().toISOString().slice(0, 10)
-    const todaySales = eden.bestSales.filter((s) => s.soldAt.slice(0, 10) === today)
-    if (todaySales.length === 0) return { lowestOfDay: null, highestOfDay: null }
-    return {
-      lowestOfDay: Math.min(...todaySales.map((s) => s.priceBera)),
-      highestOfDay: Math.max(...todaySales.map((s) => s.priceBera)),
-    }
-  }, [eden])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
