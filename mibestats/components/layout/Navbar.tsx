@@ -9,11 +9,19 @@ const WalletButton = dynamic(
       const { ConnectButton } = mod
       return function WalletBtn() {
         return (
-          <ConnectButton
-            chainStatus="none"
-            accountStatus="avatar"
-            showBalance={false}
-          />
+          <ConnectButton.Custom>
+            {({ account, chain, openAccountModal, openConnectModal, mounted }) => {
+              const connected = mounted && account && chain
+              return (
+                <button
+                  onClick={connected ? openAccountModal : openConnectModal}
+                  className="wallet-btn"
+                >
+                  {connected ? account.displayName : '[ Connect ]'}
+                </button>
+              )
+            }}
+          </ConnectButton.Custom>
         )
       }
     }),
@@ -28,7 +36,7 @@ interface NavbarProps {
 export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
   return (
     <header
-      className="border-b border-mibe-border bg-mibe-bg"
+      className="border-b border-mibe-border"
       style={{
         position: 'fixed',
         top: 0,
@@ -40,6 +48,7 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 1rem',
+        backgroundColor: '#000000',
       }}
     >
       {/* Left: mobile hamburger + logo */}

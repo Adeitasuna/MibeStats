@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           left: 0,
           top: '3rem',
           bottom: 0,
-          width: '13rem',
+          width: '20vw',
           zIndex: 40,
           display: 'none',
           backgroundColor: 'var(--menu-bg)',
@@ -87,7 +87,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <style dangerouslySetInnerHTML={{ __html: `
         @media (min-width: 1024px) {
           #desktop-sidebar { display: block !important; }
-          #main-content { margin-left: 13rem !important; }
+          #main-content { margin-left: 20vw !important; }
         }
       `}} />
     </>

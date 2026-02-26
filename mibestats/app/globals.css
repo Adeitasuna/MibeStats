@@ -89,7 +89,8 @@ body {
 }
 
 .side-menu-title {
-  padding: 0.6rem 0.875rem 0.35rem;
+  padding: 0.9rem 0.875rem 0.4rem;
+  margin-bottom: 0.15rem;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -97,6 +98,7 @@ body {
   color: var(--accent-gold);
   user-select: none;
   cursor: default;
+  border-bottom: 1px solid #1e1c16;
 }
 
 .side-menu-link {
@@ -212,6 +214,28 @@ a.link-cyan:hover {
 
 .table-responsive table {
   min-width: 600px;
+}
+
+/* ── Wallet button (cypherpunk) ── */
+
+.wallet-btn {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.75rem;
+  background-color: var(--accent-gold);
+  color: #000;
+  border: 1px solid var(--accent-gold);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.wallet-btn:hover {
+  background-color: #000;
+  color: var(--accent-gold);
 }
 
 /* ── Blinking cursor ── */
