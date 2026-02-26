@@ -28,22 +28,27 @@ interface NavbarProps {
 export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
   return (
     <header
+      className="border-b border-mibe-border bg-mibe-bg"
       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
         height: '3rem',
+        zIndex: 50,
         display: 'flex',
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        flexShrink: 0,
-        flexWrap: 'nowrap',
+        padding: '0 1rem',
       }}
-      className="px-4 border-b border-mibe-border bg-mibe-bg z-50"
     >
       {/* Left: mobile hamburger + logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <button
+          id="mobile-hamburger"
           onClick={onMenuToggle}
-          className="lg:hidden text-mibe-text-2 hover:text-mibe-gold transition-colors"
+          className="text-mibe-text-2 hover:text-mibe-gold transition-colors"
+          style={{ display: 'none' }}
           aria-label="Toggle menu"
         >
           {mobileOpen ? (
@@ -56,10 +61,10 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
             </svg>
           )}
         </button>
-        <Link href="/eden" className="font-title text-mibe-gold text-lg tracking-wide" style={{ whiteSpace: 'nowrap' }}>
+        <Link href="/eden" className="font-title text-mibe-gold text-lg" style={{ whiteSpace: 'nowrap' }}>
           Mibestats
         </Link>
-        <span className="hidden sm:inline text-mibe-muted text-xs" style={{ whiteSpace: 'nowrap' }}>
+        <span className="text-mibe-muted text-xs" id="header-subtitle" style={{ whiteSpace: 'nowrap' }}>
           // mibera333 analytics
         </span>
       </div>
@@ -68,6 +73,16 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
       <div style={{ flexShrink: 0 }}>
         <WalletButton />
       </div>
+
+      {/* Responsive: show hamburger + hide subtitle on mobile */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 1023px) {
+          #mobile-hamburger { display: block !important; }
+        }
+        @media (max-width: 639px) {
+          #header-subtitle { display: none !important; }
+        }
+      `}} />
     </header>
   )
 }

@@ -9,77 +9,83 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const closeMobile = useCallback(() => setMobileOpen(false), [])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <>
       {/* CRT scanline overlay */}
       <div className="crt-overlay" />
 
-      {/* Header */}
+      {/* Fixed header */}
       <Navbar
         onMenuToggle={() => setMobileOpen((o) => !o)}
         mobileOpen={mobileOpen}
       />
 
-      {/* Body: sidebar + content */}
-      <div style={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 0 }}>
-        {/* Desktop sidebar */}
-        <aside
-          className="border-r border-mibe-border bg-mibe-sidebar"
-          style={{
-            width: '13rem',
-            minWidth: '13rem',
-            flexShrink: 0,
-            overflowY: 'auto',
-            display: 'none',
-          }}
-          id="desktop-sidebar"
-        >
-          <SideMenu />
-        </aside>
+      {/* Fixed desktop sidebar */}
+      <aside
+        id="desktop-sidebar"
+        className="border-r border-mibe-border bg-mibe-sidebar overflow-y-auto"
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: '3rem',
+          bottom: 0,
+          width: '13rem',
+          zIndex: 40,
+          display: 'none',
+        }}
+      >
+        <SideMenu />
+      </aside>
 
-        {/* Mobile sidebar overlay */}
-        {mobileOpen && (
-          <>
-            <div
-              className="lg:hidden"
-              style={{
-                position: 'fixed',
-                inset: 0,
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                zIndex: 30,
-              }}
-              onClick={closeMobile}
-            />
-            <aside
-              className="lg:hidden border-r border-mibe-border bg-mibe-bg"
-              style={{
-                position: 'fixed',
-                left: 0,
-                top: '3rem',
-                bottom: 0,
-                width: '14rem',
-                zIndex: 40,
-                overflowY: 'auto',
-              }}
-            >
-              <SideMenu onNavigate={closeMobile} />
-            </aside>
-          </>
-        )}
+      {/* Mobile sidebar overlay */}
+      {mobileOpen && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              zIndex: 30,
+            }}
+            onClick={closeMobile}
+          />
+          <aside
+            className="border-r border-mibe-border bg-mibe-bg overflow-y-auto"
+            style={{
+              position: 'fixed',
+              left: 0,
+              top: '3rem',
+              bottom: 0,
+              width: '14rem',
+              zIndex: 40,
+            }}
+          >
+            <SideMenu onNavigate={closeMobile} />
+          </aside>
+        </>
+      )}
 
-        {/* Main content — scrolls independently */}
-        <main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }} className="p-4 lg:p-6">
-          <div className="max-w-6xl w-full">
-            {children}
-          </div>
-        </main>
-      </div>
+      {/* Main content — scrolls naturally */}
+      <main
+        id="main-content"
+        className="p-4 lg:p-6"
+        style={{
+          marginTop: '3rem',
+          marginLeft: 0,
+          minHeight: 'calc(100vh - 3rem)',
+        }}
+      >
+        <div className="max-w-6xl w-full">
+          {children}
+        </div>
+      </main>
 
-      {/* Show desktop sidebar at lg+ via CSS */}
-      <style>{`
+      {/* Responsive sidebar visibility */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (min-width: 1024px) {
           #desktop-sidebar { display: block !important; }
+          #main-content { margin-left: 13rem !important; }
         }
-      `}</style>
-    </div>
+      `}} />
+    </>
   )
 }
