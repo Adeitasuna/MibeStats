@@ -2,7 +2,7 @@
 
 const cspHeader = `
   default-src 'self';
-  img-src 'self' https://mibera.fsn1.your-objectstorage.com data: blob:;
+  img-src 'self' https://gateway.irys.xyz data: blob:;
   script-src 'self' 'unsafe-eval' 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
   connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rpc.berachain.com https://api-mainnet.magiceden.dev https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org https://*.web3modal.org https://*.reown.com wss://*.reown.com;
@@ -17,7 +17,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'mibera.fsn1.your-objectstorage.com',
+        hostname: 'gateway.irys.xyz',
         pathname: '/**',
       },
     ],
