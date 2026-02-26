@@ -14,7 +14,7 @@ const config: Config = {
         mibe: {
           bg:        '#0a0a0a',
           'bg-alt':  '#111111',
-          sidebar:   '#0e0e0e',
+          sidebar:   '#131210',
           card:      '#141414',
           hover:     '#1a1a1a',
           border:    '#2a2a2a',

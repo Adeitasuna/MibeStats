@@ -7,7 +7,7 @@
 :root {
   --bg-primary:   #0a0a0a;
   --bg-secondary: #111111;
-  --bg-sidebar:   #0e0e0e;
+  --bg-sidebar:   #131210;
   --bg-card:      #141414;
   --bg-hover:     #1a1a1a;
 
@@ -24,6 +24,12 @@
   --accent-magenta: #ff69b4;
   --accent-green:   #3fb950;
   --accent-red:     #f85149;
+
+  /* Menu colors */
+  --menu-bg:        #131210;
+  --menu-link-bg:   #1a1810;
+  --menu-link-hover:#252214;
+  --menu-link-active:#ffd700;
 
   /* Legacy compat */
   --background: #0a0a0a;
@@ -60,11 +66,58 @@ body {
   z-index: 9999;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.08) 0px,
-    rgba(0, 0, 0, 0.08) 1px,
+    rgba(0, 0, 0, 0.06) 0px,
+    rgba(0, 0, 0, 0.06) 1px,
     transparent 1px,
     transparent 3px
   );
+}
+
+/* ── Side Menu (midi-style) ── */
+
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 0.8125rem;
+  height: 100%;
+}
+
+.side-menu-section {
+  border-bottom: 1px solid #1e1c16;
+}
+
+.side-menu-title {
+  padding: 0.6rem 0.875rem 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  user-select: none;
+  cursor: default;
+}
+
+.side-menu-link {
+  display: block;
+  padding: 0.4rem 0.875rem;
+  color: #ccc;
+  background-color: var(--menu-link-bg);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  text-decoration: none;
+  border-bottom: 1px solid #1a1810;
+}
+
+.side-menu-link:hover {
+  background-color: var(--menu-link-hover);
+  color: #fff;
+}
+
+.side-menu-link.active {
+  background-color: var(--menu-link-active);
+  color: #000;
+  font-weight: 600;
 }
 
 /* ── Swag Rank badge colours ── */
@@ -107,48 +160,6 @@ body {
 .section-title {
   font-family: 'Pirata One', 'Georgia', serif;
   color: var(--accent-gold);
-}
-
-/* ── Side menu ── */
-
-.menu-item {
-  transition: all 0.15s ease;
-  position: relative;
-}
-
-.menu-item::before {
-  content: '  ';
-  white-space: pre;
-}
-
-.menu-item:hover {
-  color: var(--accent-gold);
-  background-color: var(--bg-hover);
-}
-
-.menu-item.active {
-  color: var(--accent-gold);
-}
-
-.menu-item.active::before {
-  content: '> ';
-  color: var(--accent-gold);
-}
-
-.menu-section-title {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.menu-section-title::before {
-  content: '── ';
-}
-
-.menu-section-title::after {
-  content: ' ──';
 }
 
 /* ── Scrollbar ── */

@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Fixed desktop sidebar */}
       <aside
         id="desktop-sidebar"
-        className="border-r border-mibe-border bg-mibe-sidebar overflow-y-auto"
+        className="border-r overflow-y-auto"
         style={{
           position: 'fixed',
           left: 0,
@@ -31,6 +31,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           width: '13rem',
           zIndex: 40,
           display: 'none',
+          backgroundColor: 'var(--menu-bg)',
+          borderColor: '#1e1c16',
         }}
       >
         <SideMenu />
@@ -49,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={closeMobile}
           />
           <aside
-            className="border-r border-mibe-border bg-mibe-bg overflow-y-auto"
+            className="border-r overflow-y-auto"
             style={{
               position: 'fixed',
               left: 0,
@@ -57,6 +59,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               bottom: 0,
               width: '14rem',
               zIndex: 40,
+              backgroundColor: 'var(--menu-bg)',
+              borderColor: '#1e1c16',
             }}
           >
             <SideMenu onNavigate={closeMobile} />

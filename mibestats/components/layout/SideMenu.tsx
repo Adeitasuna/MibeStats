@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { clsx } from 'clsx'
 
 /* ── Data ── */
 
@@ -12,13 +11,13 @@ interface NavItem {
 }
 
 interface NavSection {
-  title: string | null
+  title: string
   items: NavItem[]
 }
 
 const NAV_SECTIONS: NavSection[] = [
   {
-    title: null,
+    title: 'Explore',
     items: [
       { href: '/lore', label: 'MibeLore' },
       { href: '/eden', label: 'MibeEden' },
@@ -28,7 +27,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'Datas',
     items: [
       { href: '/map', label: 'MibeMap' },
-      { href: '/distribution', label: 'MibeDistribution' },
+      { href: '/distribution', label: 'MibeDistrib.' },
       { href: '/timeline', label: 'MibeTimeline' },
     ],
   },
@@ -37,11 +36,11 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: '/metadatas', label: 'MibeMetadatas' },
       { href: '/grails', label: 'MibeGrails' },
-      { href: '/miladies', label: 'Miladies to Mibera' },
+      { href: '/miladies', label: 'Miladies' },
     ],
   },
   {
-    title: null,
+    title: 'Wallet',
     items: [
       { href: '/portfolio', label: 'Portfolio' },
     ],
@@ -65,46 +64,29 @@ export function SideMenu({ onNavigate }: SideMenuProps) {
   const pathname = usePathname()
 
   return (
-    <nav className="flex flex-col py-4 px-3 gap-1 font-terminal text-sm">
-      {NAV_SECTIONS.map((section, i) => (
-        <div key={section.title ?? `section-${i}`}>
-          {/* Section title */}
-          {section.title && (
-            <div className="menu-section-title px-2 pt-3 pb-1 select-none">
-              {section.title}
-            </div>
-          )}
+    <nav className="side-menu">
+      {NAV_SECTIONS.map((section) => (
+        <div key={section.title} className="side-menu-section">
+          {/* Section title — non-clickable separator */}
+          <div className="side-menu-title">
+            {section.title}
+          </div>
 
-          {/* Items */}
-          {section.items.map((item) => {
-            const active = isActive(pathname, item.href)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onNavigate}
-                className={clsx(
-                  'menu-item block px-2 py-1 rounded-sm',
-                  active
-                    ? 'active text-mibe-gold'
-                    : 'text-mibe-text-2 hover:text-mibe-gold',
-                )}
-              >
-                {item.label}
-              </Link>
-            )
-          })}
+          {/* Menu items */}
+          {section.items.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              className={
+                'side-menu-link' + (isActive(pathname, item.href) ? ' active' : '')
+              }
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       ))}
-
-      {/* Footer */}
-      <div className="mt-auto pt-6 px-2 text-[10px] text-mibe-muted leading-relaxed">
-        <div className="border-t border-mibe-border pt-3">
-          community analytics
-          <br />
-          for mibera333 on berachain
-        </div>
-      </div>
     </nav>
   )
 }
