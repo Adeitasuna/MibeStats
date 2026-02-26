@@ -150,15 +150,13 @@ export function EdenDataSection() {
                   <td className="p-3 text-mibe-muted">{i + 1}</td>
                   <td className="p-2">
                     {sale.imageUrl ? (
-                      <div className="relative w-8 h-8 rounded overflow-hidden">
-                        <Image
-                          src={sale.imageUrl}
-                          alt={`#${sale.tokenId}`}
-                          fill
-                          className="object-cover"
-                          sizes="32px"
-                        />
-                      </div>
+                      <Image
+                        src={sale.imageUrl}
+                        alt={`#${sale.tokenId}`}
+                        width={32}
+                        height={32}
+                        className="rounded object-cover shrink-0"
+                      />
                     ) : (
                       <div className="w-8 h-8 rounded bg-mibe-hover" />
                     )}
@@ -224,15 +222,13 @@ export function EdenDataSection() {
                   <td className="p-3 text-mibe-muted">{i + 1}</td>
                   <td className="p-2">
                     {token.imageUrl ? (
-                      <div className="relative w-8 h-8 rounded overflow-hidden">
-                        <Image
-                          src={token.imageUrl}
-                          alt={`#${token.tokenId}`}
-                          fill
-                          className="object-cover"
-                          sizes="32px"
-                        />
-                      </div>
+                      <Image
+                        src={token.imageUrl}
+                        alt={`#${token.tokenId}`}
+                        width={32}
+                        height={32}
+                        className="rounded object-cover shrink-0"
+                      />
                     ) : (
                       <div className="w-8 h-8 rounded bg-mibe-hover" />
                     )}
