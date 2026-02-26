@@ -84,18 +84,18 @@ body {
   color: var(--accent-gold);
 }
 
-/* Sidebar styles */
-.sidebar-item {
+/* Navbar styles */
+.navbar-link {
   transition: all 0.15s ease;
+  position: relative;
 }
 
-.sidebar-item:hover {
-  background-color: var(--bg-hover);
+.navbar-link.active {
+  color: var(--accent-gold);
 }
 
-.sidebar-item.active {
-  background-color: var(--accent-blue);
-  color: #fff;
+.navbar-dropdown {
+  z-index: 60;
 }
 
 /* Scrollbar styling for dark theme */
