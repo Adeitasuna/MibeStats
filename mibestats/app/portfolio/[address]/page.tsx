@@ -15,7 +15,7 @@ interface Props {
 
 export function generateMetadata({ params }: Props): Metadata {
   return {
-    title: `${params.address.slice(0, 6)}…${params.address.slice(-4)} Portfolio`,
+    title: `${params.address.slice(0, 6)}...${params.address.slice(-4)} Portfolio`,
   }
 }
 
@@ -25,13 +25,13 @@ export default async function PortfolioAddressPage({ params }: Props) {
   if (!parsed.success) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-        <p className="text-xl font-semibold text-red-400">Invalid address</p>
-        <p className="text-sm text-gray-400">
+        <p className="text-xl font-semibold text-mibe-red">Invalid address</p>
+        <p className="text-sm text-mibe-text-2">
           This is not a valid EIP-55 checksummed Ethereum address.
         </p>
         <Link
           href="/portfolio"
-          className="px-4 py-2 rounded-md bg-white/10 hover:bg-white/20 text-sm transition-colors"
+          className="px-4 py-2 rounded-lg bg-mibe-card border border-mibe-border hover:border-mibe-gold text-sm text-white transition-colors"
         >
           Search again
         </Link>
@@ -83,21 +83,24 @@ export default async function PortfolioAddressPage({ params }: Props) {
     magicEdenUrl:  magicEdenUrl(t.tokenId),
   }))
 
-  const short = `${address.slice(0, 6)}…${address.slice(-4)}`
+  const short = `${address.slice(0, 6)}...${address.slice(-4)}`
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
           href="/portfolio"
-          className="text-gray-500 hover:text-white transition-colors text-sm"
+          className="text-mibe-text-2 hover:text-white transition-colors flex items-center gap-1 text-sm"
         >
-          ← Portfolio
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Portfolio
         </Link>
-        <h1 className="text-xl font-bold text-white font-mono">{short}</h1>
+        <h1 className="section-title text-xl font-mono">{short}</h1>
         {count > 0 && (
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-mibe-text-2">
             {count} Mibera{count !== 1 ? 's' : ''}
           </span>
         )}
@@ -110,7 +113,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
 
       {/* Holdings */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <h2 className="text-[10px] font-semibold text-mibe-gold uppercase tracking-wider mb-3">
           Holdings
         </h2>
         <HoldingsGrid tokens={mappedTokens} />

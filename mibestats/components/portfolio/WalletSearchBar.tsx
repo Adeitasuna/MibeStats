@@ -35,6 +35,9 @@ export function WalletSearchBar() {
     <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto">
       <div className="flex gap-2">
         <div className="flex-1 relative">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mibe-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input
             type="text"
             value={value}
@@ -45,18 +48,18 @@ export function WalletSearchBar() {
             placeholder="0x... (EIP-55 checksummed address)"
             spellCheck={false}
             autoComplete="off"
-            className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 font-mono"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-mibe-bg border border-mibe-border text-sm text-white placeholder:text-mibe-muted focus:outline-none focus:border-mibe-gold font-mono"
           />
         </div>
         <button
           type="submit"
-          className="px-5 py-2.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-black text-sm font-semibold transition-colors shrink-0"
+          className="px-5 py-2.5 rounded-lg bg-mibe-gold hover:bg-yellow-300 text-black text-sm font-semibold transition-colors shrink-0"
         >
           Search
         </button>
       </div>
       {error && (
-        <p className="mt-2 text-xs text-red-400">{error}</p>
+        <p className="mt-2 text-xs text-mibe-red">{error}</p>
       )}
     </form>
   )

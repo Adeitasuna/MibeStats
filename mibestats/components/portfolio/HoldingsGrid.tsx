@@ -10,8 +10,8 @@ export function HoldingsGrid({ tokens }: Props) {
   if (tokens.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-        <p className="text-gray-400 text-lg font-medium">No Miberas found</p>
-        <p className="text-sm text-gray-600">
+        <p className="text-mibe-text-2 text-lg font-medium">No Miberas found</p>
+        <p className="text-sm text-mibe-muted">
           This wallet does not hold any Mibera333 tokens — or owner data may be up to 24 hours
           stale. Try again later.
         </p>
@@ -20,7 +20,7 @@ export function HoldingsGrid({ tokens }: Props) {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
       {tokens.map((token) => (
         <TokenCard
           key={token.tokenId}
