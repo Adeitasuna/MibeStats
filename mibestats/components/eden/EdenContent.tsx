@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -239,19 +239,25 @@ export function EdenContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {/* Row 1 skeleton: 4 gold cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div id="skel-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={`g${i}`} className="animate-pulse"><div className="h-3 bg-white/10 rounded w-20 mb-1.5" /><div className="stat-card stat-card--gold"><div className="h-7 bg-white/10 rounded w-32" /></div></div>
           ))}
         </div>
         {/* Row 2 skeleton: 6 cards */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        <div id="skel-row2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={`s${i}`} className="animate-pulse"><div className="h-2.5 bg-white/5 rounded w-20 mb-1.5" /><div className="stat-card"><div className="h-5 bg-white/5 rounded w-16" /></div></div>
           ))}
         </div>
+        <style dangerouslySetInnerHTML={{ __html: `
+          @media (min-width: 768px) {
+            #skel-row1 { grid-template-columns: repeat(4, 1fr) !important; }
+            #skel-row2 { grid-template-columns: repeat(6, 1fr) !important; }
+          }
+        `}} />
         {/* Chart skeleton */}
         <div className="card p-4 animate-pulse"><div className="h-4 bg-white/5 rounded w-24 mb-4" /><div className="h-[200px] bg-white/5 rounded" /></div>
         {/* Tables skeleton */}
@@ -273,32 +279,34 @@ export function EdenContent() {
         .slice(0, 8)
     : []
 
+  // Compute today's lowest/highest sale (client-only to avoid hydration mismatch)
+  const { lowestOfDay, highestOfDay } = useMemo(() => {
+    if (!eden || typeof window === 'undefined') return { lowestOfDay: null, highestOfDay: null }
+    const today = new Date().toISOString().slice(0, 10)
+    const todaySales = eden.bestSales.filter((s) => s.soldAt.slice(0, 10) === today)
+    if (todaySales.length === 0) return { lowestOfDay: null, highestOfDay: null }
+    return {
+      lowestOfDay: Math.min(...todaySales.map((s) => s.priceBera)),
+      highestOfDay: Math.max(...todaySales.map((s) => s.priceBera)),
+    }
+  }, [eden])
+
   return (
-    <div className="flex flex-col gap-5">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {error && (
         <div className="card p-3 border-mibe-red text-red-400 text-sm">{error}</div>
       )}
 
       {/* Row 1: Floor Price | Max Sell Price | Lowest of Day | Highest of Day */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div id="eden-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
         <GoldCard label="Floor Price (7d)" value={fmt(collection?.floorPrice)} />
         <GoldCard label="Max Sell Price (ATH)" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
-        {(() => {
-          const today = new Date().toISOString().slice(0, 10)
-          const todaySales = eden?.bestSales.filter((s) => s.soldAt.slice(0, 10) === today) ?? []
-          const lowestOfDay = todaySales.length > 0 ? Math.min(...todaySales.map((s) => s.priceBera)) : null
-          const highestOfDay = todaySales.length > 0 ? Math.max(...todaySales.map((s) => s.priceBera)) : null
-          return (
-            <>
-              <GoldCard label="Lowest Sale of Day" value={lowestOfDay != null ? fmt(lowestOfDay) : '—'} />
-              <GoldCard label="Highest Sale of Day" value={highestOfDay != null ? fmt(highestOfDay) : '—'} />
-            </>
-          )
-        })()}
+        <GoldCard label="Lowest Sale of Day" value={lowestOfDay != null ? fmt(lowestOfDay) : '—'} />
+        <GoldCard label="Highest Sale of Day" value={highestOfDay != null ? fmt(highestOfDay) : '—'} />
       </div>
 
       {/* Row 2: Sales Count 1d|7d|All + Sales Volume 1d|7d|All */}
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+      <div id="eden-row2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
         <MiniCard label="Sales Count — 1d" value={eden ? String(eden.salesStats.count1d) : '—'} />
         <MiniCard label="Sales Count — 7d" value={eden ? String(eden.salesStats.count7d) : '—'} />
         <MiniCard label="Sales Count — All" value={eden ? fmtShort(eden.salesStats.countAll) : '—'} />
@@ -307,12 +315,21 @@ export function EdenContent() {
         <MiniCard label="Sales Vol. — All" value={fmt(collection?.volumeAllTime, 1)} />
       </div>
 
+      {/* Responsive grid override for desktop */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (min-width: 768px) {
+          #eden-row1 { grid-template-columns: repeat(4, 1fr) !important; }
+          #eden-row2 { grid-template-columns: repeat(6, 1fr) !important; }
+          #eden-pies { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}} />
+
       {/* Row 3: Floor price chart */}
       <FloorChart data={floorHistory} />
 
       {/* Row 4: Pie charts */}
       {eden && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div id="eden-pies" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
           <EdenPie data={grailPieData} title="Diamond per Mibera (Grails)" />
           <EdenPie data={salesDistPie} title="Nb Sales per Mibera" />
         </div>
