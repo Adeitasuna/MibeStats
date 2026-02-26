@@ -9,7 +9,7 @@ import { TraitDistributionChart } from '@/components/traits/TraitDistributionCha
 import { RarityLeaderboard } from '@/components/traits/RarityLeaderboard'
 import { toTraitCounts } from '@/lib/traits'
 import { magicEdenUrl } from '@/types'
-import type { TraitCount, TraitDistribution } from '@/types'
+import type { TraitCount, TraitDistribution, SwagRank } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Traits & Rarity Explorer',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     'Explore Mibera333 traits, rarity rankings, and filter by any attribute combination.',
 }
 
-export const revalidate = 86400   // 24-hour ISR
+export const dynamic = 'force-dynamic'   // Render at request time (requires DB)
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -124,6 +124,7 @@ const getLeaderboard = unstable_cache(
     })
     return rows.map((r) => ({
       ...r,
+      swagRank:      r.swagRank as SwagRank,
       lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
       maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
       magicEdenUrl:  magicEdenUrl(r.tokenId),
@@ -187,6 +188,7 @@ async function getTokens(params: Record<string, string>) {
   return {
     data: rows.map((r) => ({
       ...r,
+      swagRank:      r.swagRank as SwagRank,
       lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
       maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
       magicEdenUrl:  magicEdenUrl(r.tokenId),

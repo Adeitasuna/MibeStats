@@ -1,15 +1,15 @@
-import dynamic from 'next/dynamic'
+import nextDynamic from 'next/dynamic'
 import { StatCard } from '@/components/ui/StatCard'
 import { RecentSalesFeed } from '@/components/collection/RecentSalesFeed'
 import { TopSales } from '@/components/collection/TopSales'
 import type { CollectionResponse, FloorSnapshot } from '@/types'
 
-const FloorPriceChart = dynamic(
+const FloorPriceChart = nextDynamic(
   () => import('@/components/charts/FloorPriceChart').then((m) => m.FloorPriceChart),
   { ssr: false, loading: () => <div className="card p-4 h-[240px] bg-white/5 animate-pulse rounded" /> },
 )
 
-export const revalidate = 300   // 5-minute ISR
+export const dynamic = 'force-dynamic'   // Render at request time (requires DB)
 
 // Fetch collection stats from our own API route (server-side, no client hop)
 async function getCollectionData(): Promise<CollectionResponse | null> {

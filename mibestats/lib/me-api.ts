@@ -1,9 +1,13 @@
 /**
- * Magic Eden API wrapper for Berachain NFTs.
+ * Magic Eden v4 EVM API wrapper for Berachain NFTs.
  * All calls are server-side only — ME_BEARER_TOKEN is never exposed to the client.
+ *
+ * Migrated from deprecated /v3/rtp/ (Reservoir proxy) to /v4/evm-public/ endpoints.
  */
 
-const ME_BASE = 'https://api-mainnet.magiceden.dev/v3/rtp/berachain'
+const ME_BASE = 'https://api-mainnet.magiceden.dev/v4/evm-public'
+const CHAIN = 'berachain'
+const CONTRACT = process.env.ME_CONTRACT_ADDRESS ?? '0x6666397dfe9a8c469bf65dc744cb1c733416c420'
 const COLLECTION_SLUG = process.env.NEXT_PUBLIC_ME_COLLECTION_SLUG ?? 'mibera333'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -45,22 +49,50 @@ export class MEApiError extends Error {
 
 // ─── Internal fetch with retry ────────────────────────────────────────────────
 
-async function meFetch(endpoint: string, attempt = 0): Promise<Response> {
+async function meGet(endpoint: string, attempt = 0): Promise<Response> {
   const token = process.env.ME_BEARER_TOKEN
   if (!token) throw new Error('ME_BEARER_TOKEN is not set')
 
   const res = await fetch(`${ME_BASE}${endpoint}`, {
     headers: { Authorization: `Bearer ${token}` },
-    // next: { revalidate: 0 } — called from pipeline scripts, not Next.js cache
   })
 
   if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
     if (attempt >= 2) {
       throw new MEApiError(res.status, endpoint, 'Max retries exceeded')
     }
-    const delay = Math.pow(2, attempt) * 1000   // 1s, 2s, 4s
+    const delay = Math.pow(2, attempt) * 1000
     await new Promise((r) => setTimeout(r, delay))
-    return meFetch(endpoint, attempt + 1)
+    return meGet(endpoint, attempt + 1)
+  }
+
+  if (!res.ok) {
+    throw new MEApiError(res.status, endpoint, res.statusText)
+  }
+
+  return res
+}
+
+async function mePost(endpoint: string, body: unknown, attempt = 0): Promise<Response> {
+  const token = process.env.ME_BEARER_TOKEN
+  if (!token) throw new Error('ME_BEARER_TOKEN is not set')
+
+  const res = await fetch(`${ME_BASE}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
+    if (attempt >= 2) {
+      throw new MEApiError(res.status, endpoint, 'Max retries exceeded')
+    }
+    const delay = Math.pow(2, attempt) * 1000
+    await new Promise((r) => setTimeout(r, delay))
+    return mePost(endpoint, body, attempt + 1)
   }
 
   if (!res.ok) {
@@ -74,59 +106,96 @@ async function meFetch(endpoint: string, attempt = 0): Promise<Response> {
 
 /**
  * Fetch current collection-level stats (floor, volume, holders).
- * Single request — no rate limit pressure.
+ * Uses v4 asks + activities endpoints since v4 collections doesn't return stats.
  */
 export async function getCollectionStats(): Promise<MECollectionStats> {
-  const res = await meFetch(`/collections/v7?id=${COLLECTION_SLUG}`)
-  const json = await res.json()
+  // Floor price: lowest active listing
+  const floorRes = await meGet(
+    `/orders/asks?chain=${CHAIN}&collectionId=${CONTRACT}&status[]=active&sortBy=price&sortDir=asc&limit=1`,
+  )
+  const floorJson = await floorRes.json()
+  const floorAsk = (floorJson as { asks?: { price?: { amount?: { native?: string } } }[] })?.asks?.[0]
+  const floorPrice = toNumber(floorAsk?.price?.amount?.native)
 
-  // Magic Eden v7 collections endpoint response shape
-  const col = json?.collections?.[0] ?? json
+  // Volume: compute from recent activity (24h, 7d, 30d)
+  // We fetch recent trades and sum — ME v4 doesn't have a dedicated volume endpoint
+  const now = Date.now()
+  const oneDayAgo  = new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString()
+  const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+  // Fetch up to 100 recent trades for volume calculation
+  const actRes = await meGet(
+    `/activities?chain=${CHAIN}&activityTypes[]=TRADE&collectionId=${CONTRACT}&limit=100`,
+  )
+  const actJson = await actRes.json()
+  const activities = (actJson as { activities?: Activity[] })?.activities ?? []
+
+  let volume24h = 0
+  let volume7d = 0
+  let volumeAll = 0
+  for (const a of activities) {
+    const price = toNumber(a.unitPrice?.amount?.native) ?? 0
+    const ts = new Date(a.timestamp).getTime()
+    volumeAll += price
+    if (a.timestamp >= sevenDaysAgo) volume7d += price
+    if (a.timestamp >= oneDayAgo) volume24h += price
+  }
 
   return {
-    floorPrice:    toNumber(col?.floorAsk?.price?.amount?.native ?? col?.floorPrice),
-    volume24h:     toNumber(col?.volume?.['1day']),
-    volume7d:      toNumber(col?.volume?.['7day']),
-    volume30d:     toNumber(col?.volume?.['30day']),
-    volumeAllTime: toNumber(col?.volume?.allTime),
-    totalSales:    toInt(col?.salesCount),
-    totalHolders:  toInt(col?.ownerCount),
+    floorPrice,
+    volume24h:     volume24h > 0 ? volume24h : null,
+    volume7d:      volume7d > 0 ? volume7d : null,
+    volume30d:     null,    // would require paginating all 30d trades
+    volumeAllTime: null,    // not available from v4 without full pagination
+    totalSales:    null,    // not available from v4 collections
+    totalHolders:  null,    // not available from v4 collections
   }
 }
 
 /**
- * Fetch a page of sales for the collection.
- * @param limit     Items per page (max 100)
- * @param continuation  Pagination cursor from previous page
+ * Fetch a page of sales (TRADE activities) for the collection.
  */
 export async function getSalesPage(
   limit = 100,
   continuation?: string,
 ): Promise<MESalesPage> {
   const params = new URLSearchParams({
-    collection: COLLECTION_SLUG,
-    limit:      String(limit),
-    sortBy:     'time',
-    sortDirection: 'desc',
+    chain:        CHAIN,
+    'activityTypes[]': 'TRADE',
+    collectionId: CONTRACT,
+    limit:        String(Math.min(limit, 100)),
   })
   if (continuation) params.set('continuation', continuation)
 
-  const res  = await meFetch(`/sales/v6?${params}`)
+  const res  = await meGet(`/activities?${params}`)
   const json = await res.json()
+  const activities = (json as { activities?: Activity[]; continuation?: string })
 
-  const sales = (json?.sales ?? []).map((s: Record<string, unknown>) => ({
-    tokenId:       toInt((s?.token as Record<string, unknown>)?.tokenId) ?? 0,
-    priceBera:     toNumber((s?.price as Record<string, unknown>)?.amount?.native) ?? 0,
-    soldAt:        (s?.timestamp as string) ?? new Date().toISOString(),
-    buyerAddress:  (s?.buyer as string) ?? null,
-    sellerAddress: (s?.seller as string) ?? null,
-    txHash:        (s?.txHash as string) ?? null,
-  })) as MESale[]
+  const sales: MESale[] = (activities.activities ?? []).map((a) => ({
+    tokenId:       toInt(a.asset?.id?.split(':')[1]) ?? 0,
+    priceBera:     toNumber(a.unitPrice?.amount?.native) ?? 0,
+    soldAt:        a.timestamp ?? new Date().toISOString(),
+    buyerAddress:  a.toAddress ?? null,
+    sellerAddress: a.fromAddress ?? null,
+    txHash:        a.transactionInfo?.transactionId ?? null,
+  }))
 
   return {
     sales,
-    continuation: (json?.continuation as string) ?? null,
+    continuation: activities.continuation ?? null,
   }
+}
+
+// ─── Internal types ──────────────────────────────────────────────────────────
+
+interface Activity {
+  activityType: string
+  timestamp: string
+  fromAddress: string
+  toAddress: string
+  unitPrice?: { amount?: { native?: string; fiat?: { usd?: string } } }
+  asset?: { id?: string }
+  transactionInfo?: { transactionId?: string }
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const mapped = grails.map((t) => ({
+    const mapped = grails.map((t: typeof grails[number]) => ({
       ...t,
       lastSalePrice: t.lastSalePrice ? Number(t.lastSalePrice) : null,
       maxSalePrice:  t.maxSalePrice  ? Number(t.maxSalePrice)  : null,

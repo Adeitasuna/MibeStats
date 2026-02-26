@@ -3,10 +3,11 @@ import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { addressSchema } from '@/lib/validation'
 import { magicEdenUrl } from '@/types'
+import type { SwagRank } from '@/types'
 import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
 import { HoldingsGrid } from '@/components/portfolio/HoldingsGrid'
 
-export const revalidate = 60   // 1-minute ISR
+export const dynamic = 'force-dynamic'   // Render at request time (requires DB)
 
 interface Props {
   params: { address: string }
@@ -75,6 +76,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
 
   const mappedTokens = tokens.map((t) => ({
     ...t,
+    swagRank:      t.swagRank as SwagRank,
     lastSalePrice: t.lastSalePrice ? Number(t.lastSalePrice) : null,
     maxSalePrice:  t.maxSalePrice  ? Number(t.maxSalePrice)  : null,
     magicEdenUrl:  magicEdenUrl(t.tokenId),

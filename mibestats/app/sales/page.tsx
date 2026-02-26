@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { SalesCharts } from '@/components/sales/SalesCharts'
 import { SalesTable } from '@/components/sales/SalesTable'
-import type { Sale } from '@/types'
+import type { Sale, SwagRank } from '@/types'
 import type { SalePoint } from '@/components/sales/PriceChart'
 import type { VolumeEntry } from '@/components/sales/VolumeChart'
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Mibera333 sales history — price chart, daily volume, and filterable sales table.',
 }
 
-export const revalidate = 3600   // 1-hour ISR
+export const dynamic = 'force-dynamic'   // Render at request time (requires DB)
 
 async function getRecentSales(): Promise<{ sales: Sale[]; chartPoints: SalePoint[] }> {
   const rows = await prisma.sale.findMany({
@@ -48,7 +48,7 @@ async function getRecentSales(): Promise<{ sales: Sale[]; chartPoints: SalePoint
     sellerAddress: r.sellerAddress,
     txHash:        r.txHash,
     marketplace:   r.marketplace,
-    token:         r.token ?? undefined,
+    token:         r.token ? { ...r.token, swagRank: r.token.swagRank as SwagRank } : undefined,
   }))
 
   const chartPoints: SalePoint[] = sales.map((s) => ({

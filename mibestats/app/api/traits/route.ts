@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { toTraitCounts } from '@/lib/traits'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import type { TraitCount, TraitDistribution } from '@/types'
 
 export const revalidate = 86400   // 24-hour cache — trait distribution is static
+
+interface TraitRow { category: string; value: string | null; count: bigint }
 
 export async function GET(req: NextRequest) {
   const ip = getClientIp(req)
@@ -17,70 +18,61 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [
-      archetypes, ancestors, elements, sunSigns, drugs,
-      backgrounds, bodies, eyes, eyebrows, mouths, hairs, hats, glasses, shirts, swagRanks,
-      grailRows,
-    ] = await Promise.all([
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT archetype AS value, COUNT(*) AS count FROM tokens GROUP BY archetype`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT ancestor AS value, COUNT(*) AS count FROM tokens GROUP BY ancestor`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT element AS value, COUNT(*) AS count FROM tokens WHERE element IS NOT NULL GROUP BY element`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT sun_sign AS value, COUNT(*) AS count FROM tokens WHERE sun_sign IS NOT NULL GROUP BY sun_sign`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT drug AS value, COUNT(*) AS count FROM tokens WHERE drug IS NOT NULL GROUP BY drug`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT background AS value, COUNT(*) AS count FROM tokens WHERE background IS NOT NULL GROUP BY background`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT body AS value, COUNT(*) AS count FROM tokens WHERE body IS NOT NULL GROUP BY body`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT eyes AS value, COUNT(*) AS count FROM tokens WHERE eyes IS NOT NULL GROUP BY eyes`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT eyebrows AS value, COUNT(*) AS count FROM tokens WHERE eyebrows IS NOT NULL GROUP BY eyebrows`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT mouth AS value, COUNT(*) AS count FROM tokens WHERE mouth IS NOT NULL GROUP BY mouth`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT hair AS value, COUNT(*) AS count FROM tokens WHERE hair IS NOT NULL GROUP BY hair`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT hat AS value, COUNT(*) AS count FROM tokens WHERE hat IS NOT NULL GROUP BY hat`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT glasses AS value, COUNT(*) AS count FROM tokens WHERE glasses IS NOT NULL GROUP BY glasses`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT shirt AS value, COUNT(*) AS count FROM tokens WHERE shirt IS NOT NULL GROUP BY shirt`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT swag_rank AS value, COUNT(*) AS count FROM tokens GROUP BY swag_rank`,
-      prisma.$queryRaw<{ grail_category: string | null; count: bigint }[]>`
-        SELECT grail_category, COUNT(*) AS count FROM tokens WHERE is_grail = TRUE GROUP BY grail_category`,
-    ])
+    // Single query with UNION ALL — avoids exhausting connection pool
+    const rows = await prisma.$queryRaw<TraitRow[]>`
+      SELECT 'archetype' AS category, archetype AS value, COUNT(*) AS count FROM tokens GROUP BY archetype
+      UNION ALL SELECT 'ancestor', ancestor, COUNT(*) FROM tokens GROUP BY ancestor
+      UNION ALL SELECT 'element', element, COUNT(*) FROM tokens WHERE element IS NOT NULL GROUP BY element
+      UNION ALL SELECT 'sunSign', sun_sign, COUNT(*) FROM tokens WHERE sun_sign IS NOT NULL GROUP BY sun_sign
+      UNION ALL SELECT 'drug', drug, COUNT(*) FROM tokens WHERE drug IS NOT NULL GROUP BY drug
+      UNION ALL SELECT 'background', background, COUNT(*) FROM tokens WHERE background IS NOT NULL GROUP BY background
+      UNION ALL SELECT 'body', body, COUNT(*) FROM tokens WHERE body IS NOT NULL GROUP BY body
+      UNION ALL SELECT 'eyes', eyes, COUNT(*) FROM tokens WHERE eyes IS NOT NULL GROUP BY eyes
+      UNION ALL SELECT 'eyebrows', eyebrows, COUNT(*) FROM tokens WHERE eyebrows IS NOT NULL GROUP BY eyebrows
+      UNION ALL SELECT 'mouth', mouth, COUNT(*) FROM tokens WHERE mouth IS NOT NULL GROUP BY mouth
+      UNION ALL SELECT 'hair', hair, COUNT(*) FROM tokens WHERE hair IS NOT NULL GROUP BY hair
+      UNION ALL SELECT 'hat', hat, COUNT(*) FROM tokens WHERE hat IS NOT NULL GROUP BY hat
+      UNION ALL SELECT 'glasses', glasses, COUNT(*) FROM tokens WHERE glasses IS NOT NULL GROUP BY glasses
+      UNION ALL SELECT 'shirt', shirt, COUNT(*) FROM tokens WHERE shirt IS NOT NULL GROUP BY shirt
+      UNION ALL SELECT 'swagRank', swag_rank, COUNT(*) FROM tokens GROUP BY swag_rank
+      UNION ALL SELECT 'grail', grail_category, COUNT(*) FROM tokens WHERE is_grail = TRUE GROUP BY grail_category
+    `
 
-    const grailCategories: TraitCount[] = grailRows
-      .filter((r) => r.grail_category !== null)
-      .map((r) => ({
-        value: r.grail_category as string,
-        count: Number(r.count),
-        pct:   Math.round((Number(r.count) / 42) * 10000) / 100,
-      }))
+    // Group rows by category
+    const grouped = new Map<string, TraitRow[]>()
+    for (const r of rows) {
+      const list = grouped.get(r.category) ?? []
+      list.push(r)
+      grouped.set(r.category, list)
+    }
+
+    const toTraitCounts = (key: string, total = 10000): TraitCount[] =>
+      (grouped.get(key) ?? [])
+        .filter((r) => r.value !== null)
+        .map((r) => ({
+          value: r.value as string,
+          count: Number(r.count),
+          pct:   Math.round((Number(r.count) / total) * 10000) / 100,
+        }))
+        .sort((a, b) => b.count - a.count)
 
     const response: TraitDistribution = {
-      archetypes:      toTraitCounts(archetypes),
-      ancestors:       toTraitCounts(ancestors),
-      elements:        toTraitCounts(elements),
-      sunSigns:        toTraitCounts(sunSigns),
-      drugs:           toTraitCounts(drugs),
-      backgrounds:     toTraitCounts(backgrounds),
-      bodies:          toTraitCounts(bodies),
-      eyes:            toTraitCounts(eyes),
-      eyebrows:        toTraitCounts(eyebrows),
-      mouths:          toTraitCounts(mouths),
-      hairs:           toTraitCounts(hairs),
-      hats:            toTraitCounts(hats),
-      glasses:         toTraitCounts(glasses),
-      shirts:          toTraitCounts(shirts),
-      swagRanks:       toTraitCounts(swagRanks),
-      grailCategories,
+      archetypes:      toTraitCounts('archetype'),
+      ancestors:       toTraitCounts('ancestor'),
+      elements:        toTraitCounts('element'),
+      sunSigns:        toTraitCounts('sunSign'),
+      drugs:           toTraitCounts('drug'),
+      backgrounds:     toTraitCounts('background'),
+      bodies:          toTraitCounts('body'),
+      eyes:            toTraitCounts('eyes'),
+      eyebrows:        toTraitCounts('eyebrows'),
+      mouths:          toTraitCounts('mouth'),
+      hairs:           toTraitCounts('hair'),
+      hats:            toTraitCounts('hat'),
+      glasses:         toTraitCounts('glasses'),
+      shirts:          toTraitCounts('shirt'),
+      swagRanks:       toTraitCounts('swagRank'),
+      grailCategories: toTraitCounts('grail', 42),
       grailCount:      42,
     }
 

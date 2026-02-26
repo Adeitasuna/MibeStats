@@ -99,11 +99,13 @@ export function TraitDistributionChart({ traits, activeCategory, currentFilters 
                 background: '#111', border: '1px solid #222',
                 borderRadius: 8, fontSize: 12,
               }}
-              formatter={(value: number, _: string, props: TooltipEntry) => [
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: number, _: string, props: any) => [
                 `${value.toLocaleString()} (${props.payload.pct}%)`,
                 'Tokens',
               ]}
-              labelFormatter={(_: string, props: TooltipEntry[]) =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              labelFormatter={(_: string, props: any[]) =>
                 props[0]?.payload?.fullName ?? _
               }
             />

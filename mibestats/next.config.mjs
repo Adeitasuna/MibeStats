@@ -1,18 +1,18 @@
-import type { NextConfig } from 'next'
+/** @type {import('next').NextConfig} */
 
 const cspHeader = `
   default-src 'self';
   img-src 'self' https://mibera.fsn1.your-objectstorage.com data: blob:;
   script-src 'self' 'unsafe-eval' 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rpc.berachain.com https://api-mainnet.magiceden.dev https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rpc.berachain.com https://api-mainnet.magiceden.dev https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org https://*.web3modal.org https://*.reown.com wss://*.reown.com;
   font-src 'self';
   frame-src 'none';
   object-src 'none';
   base-uri 'self';
 `
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
     remotePatterns: [
       {
