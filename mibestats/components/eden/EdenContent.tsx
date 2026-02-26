@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -65,6 +65,9 @@ interface EdenApiData {
     countAll: number
     volume1d: number
     volume7d: number
+    volumeAll: number
+    lowestSaleOfDay: number | null
+    highestSaleOfDay: number | null
   }
   grailStats: {
     grails: number
@@ -245,18 +248,6 @@ export function EdenContent() {
     })
   }, [])
 
-  // Compute today's lowest/highest sale (must be before any early return to respect hooks rules)
-  const { lowestOfDay, highestOfDay } = useMemo(() => {
-    if (!eden) return { lowestOfDay: null, highestOfDay: null }
-    const today = new Date().toISOString().slice(0, 10)
-    const todaySales = eden.bestSales.filter((s) => s.soldAt.slice(0, 10) === today)
-    if (todaySales.length === 0) return { lowestOfDay: null, highestOfDay: null }
-    return {
-      lowestOfDay: Math.min(...todaySales.map((s) => s.priceBera)),
-      highestOfDay: Math.max(...todaySales.map((s) => s.priceBera)),
-    }
-  }, [eden])
-
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
@@ -301,8 +292,8 @@ export function EdenContent() {
       <div id="eden-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
         <GoldCard label="Floor Price (7d)" value={fmt(collection?.floorPrice)} />
         <GoldCard label="Max Sell Price (ATH)" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
-        <GoldCard label="Lowest Sale of Day" value={lowestOfDay != null ? fmt(lowestOfDay) : '—'} />
-        <GoldCard label="Highest Sale of Day" value={highestOfDay != null ? fmt(highestOfDay) : '—'} />
+        <GoldCard label="Lowest Sale of Day" value={eden?.salesStats.lowestSaleOfDay != null ? fmt(eden.salesStats.lowestSaleOfDay) : '—'} />
+        <GoldCard label="Highest Sale of Day" value={eden?.salesStats.highestSaleOfDay != null ? fmt(eden.salesStats.highestSaleOfDay) : '—'} />
       </div>
 
       {/* Rows 2-3: Sales cards (cols 1-3) + Floor chart (cols 4-6 spanning 2 rows) */}
@@ -318,7 +309,7 @@ export function EdenContent() {
         {/* Row 3 cols 1-3: Sales Volume */}
         <MiniCard label="Sales Vol. — 1d" value={eden ? fmt(eden.salesStats.volume1d, 1) : '—'} />
         <MiniCard label="Sales Vol. — 7d" value={eden ? fmt(eden.salesStats.volume7d, 1) : '—'} />
-        <MiniCard label="Sales Vol. — All" value={fmt(collection?.volumeAllTime, 1)} />
+        <MiniCard label="Sales Vol. — All" value={eden ? fmt(eden.salesStats.volumeAll, 1) : '—'} />
       </div>
 
       {/* Responsive: on desktop, 6 cols with chart spanning cols 4-6 and rows 1-2 */}

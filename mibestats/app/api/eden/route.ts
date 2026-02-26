@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import { magicEdenUrl } from '@/types'
 
-export const revalidate = 3600
+export const revalidate = 900
 
 interface SaleCountBucket { sale_count: number; token_count: bigint }
 interface TopSoldRow {
@@ -23,7 +23,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [bestSales, salesDistribution, mostSold, salesCount1d, salesCount7d] = await Promise.all([
+    const todayStart = new Date()
+    todayStart.setUTCHours(0, 0, 0, 0)
+
+    const [
+      bestSales, salesDistribution, mostSold,
+      salesCount1d, salesCount7d, totalSales,
+      vol1d, vol7d, volAll, daySales,
+      grailCount, totalTokens,
+    ] = await Promise.all([
       // Best sales top 30
       prisma.sale.findMany({
         orderBy: { priceBera: 'desc' },
@@ -65,20 +73,39 @@ export async function GET(req: NextRequest) {
       prisma.sale.count({
         where: { soldAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
       }),
-    ])
 
-    const totalSales = await prisma.sale.count()
+      // Total sales count
+      prisma.sale.count(),
 
-    // Sum volume 1d and 7d
-    const [vol1d, vol7d] = await Promise.all([
+      // Volume 1d
       prisma.sale.aggregate({
         _sum: { priceBera: true },
         where: { soldAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
       }),
+
+      // Volume 7d
       prisma.sale.aggregate({
         _sum: { priceBera: true },
         where: { soldAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
       }),
+
+      // Volume all-time
+      prisma.sale.aggregate({
+        _sum: { priceBera: true },
+      }),
+
+      // Today's lowest and highest sale
+      prisma.sale.aggregate({
+        _min: { priceBera: true },
+        _max: { priceBera: true },
+        where: { soldAt: { gte: todayStart } },
+      }),
+
+      // Grail count from DB
+      prisma.token.count({ where: { isGrail: true } }),
+
+      // Total token count
+      prisma.token.count(),
     ])
 
     return NextResponse.json({
@@ -114,10 +141,13 @@ export async function GET(req: NextRequest) {
         countAll: totalSales,
         volume1d: vol1d._sum.priceBera ? Number(vol1d._sum.priceBera) : 0,
         volume7d: vol7d._sum.priceBera ? Number(vol7d._sum.priceBera) : 0,
+        volumeAll: volAll._sum.priceBera ? Number(volAll._sum.priceBera) : 0,
+        lowestSaleOfDay: daySales._min.priceBera ? Number(daySales._min.priceBera) : null,
+        highestSaleOfDay: daySales._max.priceBera ? Number(daySales._max.priceBera) : null,
       },
       grailStats: {
-        grails: 42,
-        nonGrails: 9958,
+        grails: grailCount,
+        nonGrails: totalTokens - grailCount,
       },
     })
   } catch (err) {
