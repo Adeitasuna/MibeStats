@@ -54,6 +54,22 @@ function isActive(pathname: string, href: string) {
   return pathname === href
 }
 
+function formatDate(iso: string) {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }) + ' ' + d.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return iso
+  }
+}
+
 /* ── Component ── */
 
 interface SideMenuProps {
@@ -62,6 +78,8 @@ interface SideMenuProps {
 
 export function SideMenu({ onNavigate }: SideMenuProps) {
   const pathname = usePathname()
+  const version = process.env.NEXT_PUBLIC_GIT_HASH ?? 'dev'
+  const buildDate = process.env.NEXT_PUBLIC_GIT_DATE ?? ''
 
   return (
     <nav className="side-menu">
@@ -87,6 +105,12 @@ export function SideMenu({ onNavigate }: SideMenuProps) {
           ))}
         </div>
       ))}
+
+      {/* Version footer */}
+      <div className="side-menu-footer">
+        <span>v.{version}</span>
+        {buildDate && <span>{formatDate(buildDate)}</span>}
+      </div>
     </nav>
   )
 }

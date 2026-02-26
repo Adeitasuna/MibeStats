@@ -45,6 +45,7 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 0.9375rem;
 }
 
 /* ── Typography ── */
@@ -80,7 +81,7 @@ body {
   flex-direction: column;
   padding: 0;
   font-family: 'Share Tech Mono', 'Courier New', monospace;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   height: 100%;
 }
 
@@ -91,7 +92,7 @@ body {
 .side-menu-title {
   padding: 0.9rem 0.875rem 0.4rem;
   margin-bottom: 0.15rem;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -103,7 +104,7 @@ body {
 
 .side-menu-link {
   display: block;
-  padding: 0.4rem 0.875rem;
+  padding: 0.5rem 0.875rem;
   color: #ccc;
   background-color: var(--menu-link-bg);
   transition: background-color 0.15s ease, color 0.15s ease;
@@ -120,6 +121,18 @@ body {
   background-color: var(--menu-link-active);
   color: #000;
   font-weight: 600;
+}
+
+.side-menu-footer {
+  margin-top: auto;
+  padding: 0.75rem 0.875rem;
+  border-top: 1px solid #1e1c16;
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  letter-spacing: 0.05em;
 }
 
 /* ── Swag Rank badge colours ── */

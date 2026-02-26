@@ -1,4 +1,14 @@
+import { execSync } from 'child_process'
+
 /** @type {import('next').NextConfig} */
+
+/* Build-time git info */
+let gitHash = 'dev'
+let gitDate = new Date().toISOString()
+try {
+  gitHash = execSync('git rev-parse --short HEAD').toString().trim()
+  gitDate = execSync('git log -1 --format=%cI').toString().trim()
+} catch { /* fallback to defaults */ }
 
 const cspHeader = `
   default-src 'self';
@@ -13,6 +23,10 @@ const cspHeader = `
 `
 
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_GIT_HASH: gitHash,
+    NEXT_PUBLIC_GIT_DATE: gitDate,
+  },
   images: {
     remotePatterns: [
       {
