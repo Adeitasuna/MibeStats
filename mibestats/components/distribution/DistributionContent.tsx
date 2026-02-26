@@ -4,32 +4,89 @@ import { useEffect, useState } from 'react'
 import { PieChartGrid } from '@/components/charts/PieChartGrid'
 import type { TraitDistribution, TraitCount } from '@/types'
 
-const CHART_SECTIONS: Array<{ key: keyof TraitDistribution; title: string }> = [
-  { key: 'swagRanks',      title: 'Swag Rank' },
-  { key: 'elements',       title: 'Element' },
-  { key: 'archetypes',     title: 'Archetype' },
-  { key: 'timePeriods',    title: 'Time Period' },
-  { key: 'ancestors',      title: 'Ancestor' },
-  { key: 'ascendingSigns', title: 'Ascending Sign' },
-  { key: 'sunSigns',       title: 'Sun Sign' },
-  { key: 'moonSigns',      title: 'Moon Sign' },
-  { key: 'bodies',         title: 'Body' },
-  { key: 'eyebrows',       title: 'Eyebrows' },
-  { key: 'mouths',         title: 'Mouth' },
-  { key: 'glasses',        title: 'Glasses' },
-  { key: 'masks',          title: 'Mask' },
-  { key: 'earrings',       title: 'Earrings' },
-  { key: 'drugs',          title: 'Drug' },
-  { key: 'faceAccessories', title: 'Face Accessory' },
-  { key: 'hairs',          title: 'Hair' },
-  { key: 'hats',           title: 'Hat' },
-  { key: 'items',          title: 'Item' },
-  { key: 'eyes',           title: 'Eyes' },
-  { key: 'shirts',         title: 'Shirt' },
-  { key: 'backgrounds',    title: 'Background' },
-  { key: 'tattoos',        title: 'Tattoo' },
-  { key: 'grailCategories', title: 'Grail Category' },
+interface ChartGroup {
+  groupTitle: string
+  charts: Array<{ key: keyof TraitDistribution; title: string }>
+}
+
+const CHART_GROUPS: ChartGroup[] = [
+  {
+    groupTitle: 'Core Traits',
+    charts: [
+      { key: 'swagRanks',  title: 'Swag Rank' },
+      { key: 'elements',   title: 'Element' },
+      { key: 'archetypes', title: 'Archetype' },
+      { key: 'ancestors',  title: 'Ancestor' },
+    ],
+  },
+  {
+    groupTitle: 'Astrology',
+    charts: [
+      { key: 'sunSigns',       title: 'Sun Sign' },
+      { key: 'moonSigns',      title: 'Moon Sign' },
+      { key: 'ascendingSigns', title: 'Ascending Sign' },
+    ],
+  },
+  {
+    groupTitle: 'Appearance',
+    charts: [
+      { key: 'bodies',         title: 'Body' },
+      { key: 'eyes',           title: 'Eyes' },
+      { key: 'eyebrows',       title: 'Eyebrows' },
+      { key: 'mouths',         title: 'Mouth' },
+      { key: 'hairs',          title: 'Hair' },
+      { key: 'hats',           title: 'Hat' },
+      { key: 'glasses',        title: 'Glasses' },
+      { key: 'masks',          title: 'Mask' },
+      { key: 'earrings',       title: 'Earrings' },
+      { key: 'faceAccessories', title: 'Face Accessory' },
+      { key: 'tattoos',        title: 'Tattoo' },
+      { key: 'shirts',         title: 'Shirt' },
+      { key: 'backgrounds',    title: 'Background' },
+    ],
+  },
+  {
+    groupTitle: 'Items & Special',
+    charts: [
+      { key: 'drugs',           title: 'Drug' },
+      { key: 'items',           title: 'Item' },
+      { key: 'grailCategories', title: 'Grail Category' },
+    ],
+  },
 ]
+
+function BarChart({ data, colorMap }: { data: TraitCount[]; colorMap?: Record<string, string> }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {data.map((item) => {
+        const barColor = colorMap?.[item.value] ?? '#ffd700'
+        const widthPct = Math.max(item.pct, 2) // min 2% so the bar is always visible
+        return (
+          <div key={item.value} className="flex items-center gap-2">
+            <span className="text-xs text-white w-20 shrink-0 truncate">{item.value}</span>
+            <div className="flex-1 h-5 bg-mibe-hover rounded overflow-hidden">
+              <div
+                className="h-full rounded flex items-center px-1.5"
+                style={{ width: `${widthPct}%`, backgroundColor: barColor, opacity: 0.75 }}
+              >
+                {item.pct >= 8 && (
+                  <span className="text-[9px] font-bold text-black whitespace-nowrap">
+                    {item.count.toLocaleString()} ({item.pct}%)
+                  </span>
+                )}
+              </div>
+            </div>
+            {item.pct < 8 && (
+              <span className="text-[9px] text-mibe-text-2 tabular-nums shrink-0">
+                {item.count.toLocaleString()} ({item.pct}%)
+              </span>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export function DistributionContent() {
   const [traits, setTraits] = useState<TraitDistribution | null>(null)
@@ -44,11 +101,18 @@ export function DistributionContent() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {Array.from({ length: 24 }).map((_, i) => (
-          <div key={i} className="card p-4 h-[260px] animate-pulse">
-            <div className="h-3 bg-white/5 rounded w-24 mb-3" />
-            <div className="h-[200px] bg-white/5 rounded" />
+      <div className="flex flex-col gap-6">
+        {Array.from({ length: 4 }).map((_, g) => (
+          <div key={g}>
+            <div className="h-5 bg-white/5 rounded w-32 mb-3 animate-pulse" />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {Array.from({ length: g === 2 ? 8 : 4 }).map((_, i) => (
+                <div key={i} className="card p-4 h-[260px] animate-pulse">
+                  <div className="h-3 bg-white/5 rounded w-24 mb-3" />
+                  <div className="h-[200px] bg-white/5 rounded" />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
@@ -63,81 +127,54 @@ export function DistributionContent() {
     )
   }
 
-  const sections = CHART_SECTIONS
-    .map((s) => {
-      const data = traits[s.key]
-      return {
-        title: s.title,
-        data: Array.isArray(data) ? (data as TraitCount[]) : [],
-      }
-    })
-    .filter((s) => s.data.length > 0)
-
   return (
     <div className="flex flex-col gap-8">
-      {/* Main trait pie charts */}
-      <PieChartGrid sections={sections} />
+      {/* Grouped trait pie charts */}
+      {CHART_GROUPS.map((group) => {
+        const sections = group.charts
+          .map((s) => {
+            const data = traits[s.key]
+            return {
+              title: s.title,
+              data: Array.isArray(data) ? (data as TraitCount[]) : [],
+            }
+          })
+          .filter((s) => s.data.length > 0)
+
+        if (sections.length === 0) return null
+
+        return (
+          <section key={group.groupTitle}>
+            <h2 className="text-sm font-semibold text-mibe-gold uppercase tracking-wider mb-3">
+              {group.groupTitle}
+            </h2>
+            <PieChartGrid sections={sections} />
+          </section>
+        )
+      })}
 
       {/* Chronos Area — Time Period breakdown */}
       <section>
-        <h2 className="section-title text-xl mb-4">Chronos Area</h2>
-        <p className="text-mibe-text-2 text-sm mb-4">
-          Distribution by historical time period
+        <h2 className="section-title text-xl mb-2">Chronos Area</h2>
+        <p className="text-mibe-text-2 text-xs mb-4">
+          Distribution by historical time period and element
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="card p-4">
-            <h3 className="text-xs font-semibold text-mibe-gold mb-2 uppercase tracking-wider">
+            <h3 className="text-[10px] font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
               Time Period Split
             </h3>
-            <div className="flex flex-col gap-2">
-              {(traits.timePeriods || []).map((tp) => (
-                <div key={tp.value} className="flex items-center gap-3">
-                  <span className="text-sm text-white w-20">{tp.value}</span>
-                  <div className="flex-1 h-6 bg-mibe-hover rounded-md overflow-hidden">
-                    <div
-                      className="h-full bg-mibe-gold/70 rounded-md flex items-center px-2"
-                      style={{ width: `${tp.pct}%` }}
-                    >
-                      <span className="text-[10px] font-bold text-black">
-                        {tp.count.toLocaleString()} ({tp.pct}%)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <BarChart data={traits.timePeriods || []} />
           </div>
 
           <div className="card p-4">
-            <h3 className="text-xs font-semibold text-mibe-gold mb-2 uppercase tracking-wider">
-              Element by Time Period
+            <h3 className="text-[10px] font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
+              Element Distribution
             </h3>
-            <div className="flex flex-col gap-2">
-              {(traits.elements || []).map((el) => {
-                const colors: Record<string, string> = {
-                  Earth: '#3fb950', Fire: '#f85149', Water: '#58a6ff', Air: '#bc8cff',
-                }
-                return (
-                  <div key={el.value} className="flex items-center gap-3">
-                    <span className="text-sm text-white w-16">{el.value}</span>
-                    <div className="flex-1 h-6 bg-mibe-hover rounded-md overflow-hidden">
-                      <div
-                        className="h-full rounded-md flex items-center px-2"
-                        style={{
-                          width: `${el.pct}%`,
-                          backgroundColor: colors[el.value] ?? '#8b949e',
-                          opacity: 0.7,
-                        }}
-                      >
-                        <span className="text-[10px] font-bold text-white">
-                          {el.count.toLocaleString()} ({el.pct}%)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <BarChart
+              data={traits.elements || []}
+              colorMap={{ Earth: '#3fb950', Fire: '#f85149', Water: '#58a6ff', Air: '#bc8cff' }}
+            />
           </div>
         </div>
       </section>

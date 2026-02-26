@@ -1,8 +1,5 @@
 import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
-import type { TraitDistribution } from '@/types'
-
-export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'MibeDistribution',
@@ -13,11 +10,18 @@ const DistributionContent = nextDynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {Array.from({ length: 24 }).map((_, i) => (
-          <div key={i} className="card p-4 h-[260px] animate-pulse">
-            <div className="h-3 bg-white/5 rounded w-24 mb-3" />
-            <div className="h-[200px] bg-white/5 rounded" />
+      <div className="flex flex-col gap-6">
+        {[4, 3, 8, 3].map((count, g) => (
+          <div key={g}>
+            <div className="h-4 bg-white/5 rounded w-28 mb-3 animate-pulse" />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {Array.from({ length: count }).map((_, i) => (
+                <div key={i} className="card p-4 h-[240px] animate-pulse">
+                  <div className="h-3 bg-white/5 rounded w-20 mb-3" />
+                  <div className="h-[180px] bg-white/5 rounded" />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>

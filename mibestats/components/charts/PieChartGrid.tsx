@@ -25,30 +25,32 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
   const top = data.slice(0, maxSlices)
   const restCount = data.slice(maxSlices).reduce((sum, d) => sum + d.count, 0)
   const chartData = [
-    ...top.map((d) => ({ name: d.value, value: d.count })),
-    ...(restCount > 0 ? [{ name: 'Other', value: restCount }] : []),
+    ...top.map((d) => ({ name: d.value, value: d.count, pct: d.pct })),
+    ...(restCount > 0 ? [{ name: 'Other', value: restCount, pct: +(restCount / 100).toFixed(1) }] : []),
   ]
+  const total = chartData.reduce((s, d) => s + d.value, 0)
 
   return (
-    <div className="card p-3">
-      <h3 className="text-xs font-semibold text-mibe-gold mb-1 uppercase tracking-wider truncate">
+    <div className="card p-3 flex flex-col">
+      <h3 className="text-[10px] font-semibold text-mibe-gold mb-1 uppercase tracking-wider truncate">
         {title}
+        <span className="text-mibe-muted font-normal ml-1.5">({data.length})</span>
       </h3>
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={180}>
         <PieChart>
           <Pie
             data={chartData}
             cx="50%"
             cy="50%"
-            outerRadius={65}
-            innerRadius={28}
+            outerRadius={60}
+            innerRadius={25}
             dataKey="value"
             nameKey="name"
             paddingAngle={1}
             stroke="none"
           >
             {chartData.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} opacity={0.8} />
+              <Cell key={i} fill={COLORS[i % COLORS.length]} opacity={0.85} />
             ))}
           </Pie>
           <Tooltip
@@ -60,25 +62,25 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
               color: '#e6edf3',
             }}
             formatter={(value: number, name: string) => {
-              const pct = ((value / 10000) * 100).toFixed(1)
+              const pct = ((value / total) * 100).toFixed(1)
               return [`${value.toLocaleString()} (${pct}%)`, name]
             }}
           />
         </PieChart>
       </ResponsiveContainer>
-      {/* Compact legend below */}
-      <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1 px-1">
-        {chartData.slice(0, 6).map((d, i) => (
-          <span key={d.name} className="flex items-center gap-1 text-[9px] text-mibe-text-2">
+      {/* Compact legend — show top items with percentage */}
+      <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5 px-0.5">
+        {chartData.slice(0, 8).map((d, i) => (
+          <span key={d.name} className="flex items-center gap-0.5 text-[8px] text-mibe-text-2 leading-tight">
             <span
-              className="inline-block w-2 h-2 rounded-full shrink-0"
+              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: COLORS[i % COLORS.length] }}
             />
-            <span className="truncate max-w-[60px]">{d.name}</span>
+            <span className="truncate max-w-[70px]">{d.name}</span>
           </span>
         ))}
-        {chartData.length > 6 && (
-          <span className="text-[9px] text-mibe-muted">+{chartData.length - 6} more</span>
+        {chartData.length > 8 && (
+          <span className="text-[8px] text-mibe-muted">+{chartData.length - 8}</span>
         )}
       </div>
     </div>
