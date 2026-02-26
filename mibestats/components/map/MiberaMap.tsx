@@ -113,6 +113,7 @@ export function MiberaMap() {
   const [error, setError] = useState<string | null>(null)
   const [activeFilters, setActiveFilters] = useState<Partial<Record<FilterKey, string>>>({})
   const [filterOptions, setFilterOptions] = useState<MapFilters | null>(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const initialLoad = useRef(true)
 
   // Fetch filter options once
@@ -167,7 +168,8 @@ export function MiberaMap() {
   }
 
   const clearFilters = () => setActiveFilters({})
-  const hasFilters = Object.keys(activeFilters).length > 0
+  const activeFilterEntries = Object.entries(activeFilters).filter(([, v]) => v)
+  const filterCount = activeFilterEntries.length
 
   const getOptions = (key: FilterKey): string[] => {
     if (!filterOptions) return []
@@ -183,56 +185,105 @@ export function MiberaMap() {
     }
   }
 
+  const getFilterLabel = (key: string): string => {
+    return FILTER_KEYS.find((f) => f.key === key)?.label ?? key
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Filters */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-mibe-gold uppercase tracking-wider">
-            Filters
-          </h3>
-          {hasFilters && (
-            <button onClick={clearFilters} className="text-xs text-mibe-cyan hover:text-white transition-colors">
-              Clear all
-            </button>
+    <div className="flex flex-col gap-3">
+      {/* Stats bar + filter toggle */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-mibe-text-2">
+            <strong className="text-white text-lg tabular-nums">{data?.total?.toLocaleString() ?? '...'}</strong>{' '}
+            miberas
+          </span>
+          {loading && (
+            <span className="inline-flex items-center gap-1.5 text-mibe-gold text-xs">
+              <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Loading...
+            </span>
           )}
+          {error && <span className="text-mibe-red text-xs">{error}</span>}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2">
-          {FILTER_KEYS.map((def) => (
-            <div key={def.key}>
-              <label htmlFor={`map-filter-${def.key}`} className="text-[9px] text-mibe-text-2 uppercase tracking-wider block mb-0.5">
-                {def.label}
-              </label>
-              <select
-                id={`map-filter-${def.key}`}
-                value={activeFilters[def.key] ?? ''}
-                onChange={(e) => setFilter(def.key, e.target.value)}
-                className="w-full px-1.5 py-1 rounded bg-mibe-card border border-mibe-border text-white text-[11px] focus:border-mibe-gold focus:outline-none"
-              >
-                <option value="">All</option>
-                {getOptions(def.key).map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-          ))}
-        </div>
+        <button
+          onClick={() => setFiltersOpen((o) => !o)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-mibe-card border border-mibe-border text-sm text-mibe-text-2 hover:text-white hover:border-mibe-gold transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          Filters
+          {filterCount > 0 && (
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-mibe-gold text-black text-[10px] font-bold">
+              {filterCount}
+            </span>
+          )}
+        </button>
       </div>
 
-      {/* Stats bar */}
-      <div className="flex items-center gap-4 text-sm text-mibe-text-2">
-        <span>
-          <strong className="text-white">{data?.total?.toLocaleString() ?? '...'}</strong> miberas on map
-        </span>
-        {loading && <span className="text-mibe-gold animate-pulse text-xs">Loading...</span>}
-        {error && <span className="text-red-400 text-xs">{error}</span>}
-      </div>
+      {/* Active filter pills */}
+      {filterCount > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {activeFilterEntries.map(([key, value]) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key as FilterKey, '')}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mibe-gold/15 text-mibe-gold text-xs font-medium hover:bg-mibe-gold/25 transition-colors"
+            >
+              <span className="text-mibe-text-2">{getFilterLabel(key)}:</span> {value}
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          ))}
+          <button
+            onClick={clearFilters}
+            className="text-[10px] text-mibe-muted hover:text-white transition-colors px-1.5 py-0.5"
+          >
+            Clear all
+          </button>
+        </div>
+      )}
+
+      {/* Collapsible Filters */}
+      {filtersOpen && (
+        <div className="card p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {FILTER_KEYS.map((def) => (
+              <div key={def.key}>
+                <label htmlFor={`map-filter-${def.key}`} className="text-[10px] text-mibe-text-2 uppercase tracking-wider block mb-1 font-medium">
+                  {def.label}
+                </label>
+                <select
+                  id={`map-filter-${def.key}`}
+                  value={activeFilters[def.key] ?? ''}
+                  onChange={(e) => setFilter(def.key, e.target.value)}
+                  className="w-full px-2 py-1.5 rounded-lg bg-mibe-bg border border-mibe-border text-white text-xs focus:border-mibe-gold focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option value="">All</option>
+                  {getOptions(def.key).map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Map */}
-      <div className="card overflow-hidden" style={{ height: 600 }}>
+      <div className="card overflow-hidden h-[400px] md:h-[550px] lg:h-[650px]">
         {initialLoad.current && loading ? (
-          <div className="w-full h-full flex items-center justify-center bg-mibe-card">
-            <span className="text-mibe-text-2 animate-pulse">Loading 10,000 birth locations...</span>
+          <div className="w-full h-full flex flex-col items-center justify-center bg-mibe-card gap-3">
+            <svg className="w-8 h-8 text-mibe-gold animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-mibe-text-2 text-sm">Loading 10,000 birth locations...</span>
           </div>
         ) : (
           <MapContainer
@@ -279,23 +330,26 @@ export function MiberaMap() {
       </div>
 
       {/* Legend */}
-      <div className="card p-4">
-        <h3 className="text-xs font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
-          Ancestor Legend
-        </h3>
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+      <div className="card p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-[10px] font-semibold text-mibe-gold uppercase tracking-wider">
+            Ancestors — click to filter
+          </h3>
+          <span className="text-[10px] text-mibe-muted">{data?.ancestors?.length ?? Object.keys(ANCESTOR_COLORS).length} ancestors</span>
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
           {(data?.ancestors ?? Object.keys(ANCESTOR_COLORS)).map((ancestor) => (
             <button
               key={ancestor}
               onClick={() => setFilter('ancestor', activeFilters.ancestor === ancestor ? '' : ancestor)}
-              className="flex items-center gap-1.5 text-xs text-mibe-text-2 hover:text-white transition-colors"
+              className="flex items-center gap-1 text-[11px] text-mibe-text-2 hover:text-white transition-colors py-0.5"
               aria-label={`Filter by ancestor: ${ancestor}`}
             >
               <span
-                className="inline-block w-3 h-3 rounded-full shrink-0"
+                className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: getAncestorColor(ancestor) }}
               />
-              <span className={activeFilters.ancestor === ancestor ? 'text-white font-medium' : ''}>
+              <span className={activeFilters.ancestor === ancestor ? 'text-white font-semibold' : ''}>
                 {ancestor}
               </span>
             </button>

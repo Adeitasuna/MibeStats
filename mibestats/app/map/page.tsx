@@ -12,9 +12,19 @@ const MiberaMap = nextDynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="card" style={{ height: 600 }}>
-        <div className="w-full h-full flex items-center justify-center bg-mibe-card animate-pulse">
-          <span className="text-mibe-text-2">Loading map...</span>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="h-5 bg-white/5 rounded w-24 animate-pulse" />
+          <div className="h-8 bg-white/5 rounded w-28 animate-pulse" />
+        </div>
+        <div className="card h-[400px] md:h-[550px] lg:h-[650px] animate-pulse">
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-mibe-text-2 text-sm">Loading map...</span>
+          </div>
+        </div>
+        <div className="card p-3 animate-pulse">
+          <div className="h-3 bg-white/5 rounded w-32 mb-2" />
+          <div className="h-4 bg-white/5 rounded w-full" />
         </div>
       </div>
     ),
