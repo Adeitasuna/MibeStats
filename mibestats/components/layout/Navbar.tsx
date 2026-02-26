@@ -27,9 +27,20 @@ interface NavbarProps {
 
 export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
   return (
-    <header className="h-12 flex items-center justify-between px-4 border-b border-mibe-border bg-mibe-bg shrink-0 z-50">
+    <header
+      style={{
+        height: '3rem',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        flexWrap: 'nowrap',
+      }}
+      className="px-4 border-b border-mibe-border bg-mibe-bg z-50"
+    >
       {/* Left: mobile hamburger + logo */}
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
         <button
           onClick={onMenuToggle}
           className="lg:hidden text-mibe-text-2 hover:text-mibe-gold transition-colors"
@@ -45,14 +56,16 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
             </svg>
           )}
         </button>
-        <Link href="/eden" className="font-title text-mibe-gold text-lg tracking-wide">
+        <Link href="/eden" className="font-title text-mibe-gold text-lg tracking-wide" style={{ whiteSpace: 'nowrap' }}>
           Mibestats
         </Link>
-        <span className="hidden sm:inline text-mibe-muted text-xs">// mibera333 analytics</span>
+        <span className="hidden sm:inline text-mibe-muted text-xs" style={{ whiteSpace: 'nowrap' }}>
+          // mibera333 analytics
+        </span>
       </div>
 
       {/* Right: wallet */}
-      <div className="flex items-center gap-3">
+      <div style={{ flexShrink: 0 }}>
         <WalletButton />
       </div>
     </header>

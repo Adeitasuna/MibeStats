@@ -9,7 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const closeMobile = useCallback(() => setMobileOpen(false), [])
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* CRT scanline overlay */}
       <div className="crt-overlay" />
 
@@ -20,9 +20,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       />
 
       {/* Body: sidebar + content */}
-      <div className="flex flex-1 min-h-0">
+      <div style={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 0 }}>
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex flex-col w-52 border-r border-mibe-border bg-mibe-sidebar shrink-0 overflow-y-auto">
+        <aside
+          className="border-r border-mibe-border bg-mibe-sidebar"
+          style={{
+            width: '13rem',
+            minWidth: '13rem',
+            flexShrink: 0,
+            overflowY: 'auto',
+            display: 'none',
+          }}
+          id="desktop-sidebar"
+        >
           <SideMenu />
         </aside>
 
@@ -30,22 +40,46 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {mobileOpen && (
           <>
             <div
-              className="fixed inset-0 bg-black/70 z-30 lg:hidden"
+              className="lg:hidden"
+              style={{
+                position: 'fixed',
+                inset: 0,
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                zIndex: 30,
+              }}
               onClick={closeMobile}
             />
-            <aside className="fixed left-0 top-12 bottom-0 w-56 z-40 bg-mibe-bg border-r border-mibe-border overflow-y-auto lg:hidden">
+            <aside
+              className="lg:hidden border-r border-mibe-border bg-mibe-bg"
+              style={{
+                position: 'fixed',
+                left: 0,
+                top: '3rem',
+                bottom: 0,
+                width: '14rem',
+                zIndex: 40,
+                overflowY: 'auto',
+              }}
+            >
               <SideMenu onNavigate={closeMobile} />
             </aside>
           </>
         )}
 
         {/* Main content — scrolls independently */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }} className="p-4 lg:p-6">
           <div className="max-w-6xl w-full">
             {children}
           </div>
         </main>
       </div>
+
+      {/* Show desktop sidebar at lg+ via CSS */}
+      <style>{`
+        @media (min-width: 1024px) {
+          #desktop-sidebar { display: block !important; }
+        }
+      `}</style>
     </div>
   )
 }
