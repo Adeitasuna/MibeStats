@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { AppShell } from '@/components/layout/AppShell'
 import { Web3Providers } from '@/components/providers/Web3Providers'
 
 export const metadata: Metadata = {
@@ -42,13 +41,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen">
         <Web3Providers>
-          <Navbar />
-          <main className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
+          <AppShell>
             {children}
-          </main>
-          <Footer />
+          </AppShell>
         </Web3Providers>
       </body>
     </html>

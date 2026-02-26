@@ -77,7 +77,10 @@ const getTraits = unstable_cache(
       archetypes:      toTraitCounts(archetypes),
       ancestors:       toTraitCounts(ancestors),
       elements:        toTraitCounts(elements),
+      timePeriods:     [],
       sunSigns:        toTraitCounts(sunSigns),
+      moonSigns:       [],
+      ascendingSigns:  [],
       drugs:           toTraitCounts(drugs),
       backgrounds:     toTraitCounts(backgrounds),
       bodies:          toTraitCounts(bodies),
@@ -87,6 +90,11 @@ const getTraits = unstable_cache(
       hairs:           toTraitCounts(hairs),
       hats:            toTraitCounts(hats),
       glasses:         toTraitCounts(glasses),
+      masks:           [],
+      earrings:        [],
+      faceAccessories: [],
+      tattoos:         [],
+      items:           [],
       shirts:          toTraitCounts(shirts),
       swagRanks:       toTraitCounts(swagRanks),
       grailCategories: grailRows
@@ -111,6 +119,7 @@ const getLeaderboard = unstable_cache(
       take:    100,
       select: {
         tokenId: true, archetype: true, ancestor: true, timePeriod: true,
+        birthday: true, birthCoordinates: true,
         element: true, sunSign: true, moonSign: true, ascendingSign: true,
         swagScore: true, swagRank: true, rarityRank: true,
         background: true, body: true, eyes: true, eyebrows: true,
@@ -172,6 +181,7 @@ async function getTokens(params: Record<string, string>) {
       take:    limit,
       select: {
         tokenId: true, archetype: true, ancestor: true, timePeriod: true,
+        birthday: true, birthCoordinates: true,
         element: true, sunSign: true, moonSign: true, ascendingSign: true,
         swagScore: true, swagRank: true, rarityRank: true,
         background: true, body: true, eyes: true, eyebrows: true,

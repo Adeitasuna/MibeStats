@@ -1,5 +1,6 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { defineChain } from 'viem'
+import type { Config } from 'wagmi'
 
 export const berachain = defineChain({
   id: 80094,
@@ -13,9 +14,20 @@ export const berachain = defineChain({
   },
 })
 
-export const wagmiConfig = getDefaultConfig({
-  appName:   'MibeStats',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '',
-  chains:    [berachain],
-  ssr:       true,
-})
+let _config: Config | null = null
+
+export function getWagmiConfig(): Config | null {
+  if (_config) return _config
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+  if (!projectId) return null
+  _config = getDefaultConfig({
+    appName:   'MibeStats',
+    projectId,
+    chains:    [berachain],
+    ssr:       true,
+  })
+  return _config
+}
+
+// Legacy export for backward compat — throws if projectId missing
+export const wagmiConfig = null as unknown as Config

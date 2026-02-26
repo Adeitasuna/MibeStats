@@ -10,16 +10,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Mibera brand palette
+        // New design system
+        mibe: {
+          bg:        '#0d1117',
+          'bg-alt':  '#1a1a2e',
+          sidebar:   '#161b22',
+          card:      '#21262d',
+          hover:     '#30363d',
+          border:    '#30363d',
+          gold:      '#ffd700',
+          cyan:      '#58a6ff',
+          blue:      '#1f6feb',
+          magenta:   '#ff69b4',
+          green:     '#3fb950',
+          red:       '#f85149',
+          text:      '#e6edf3',
+          'text-2':  '#8b949e',
+          muted:     '#6e7681',
+        },
+        // Legacy Mibera brand palette
         mibera: {
           gold:    '#FFD700',
           silver:  '#C0C0C0',
           bronze:  '#CD7F32',
           purple:  '#7C3AED',
           pink:    '#EC4899',
-          dark:    '#0A0A0A',
-          surface: '#111111',
-          border:  '#222222',
+          dark:    '#0d1117',
+          surface: '#21262d',
+          border:  '#30363d',
         },
         // Swag Rank colours
         rank: {
@@ -34,7 +52,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
+        title: ['"Pirata One"', 'cursive'],
+        body:  ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono:  ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
     },
   },

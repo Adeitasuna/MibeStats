@@ -2,11 +2,11 @@
 
 const cspHeader = `
   default-src 'self';
-  img-src 'self' https://gateway.irys.xyz https://uploader.irys.xyz data: blob:;
+  img-src 'self' https://gateway.irys.xyz https://uploader.irys.xyz https://ipfs.io https://*.ipfs.dweb.link https://*.basemaps.cartocdn.com data: blob:;
   script-src 'self' 'unsafe-eval' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rpc.berachain.com https://api-mainnet.magiceden.dev https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org https://*.web3modal.org https://*.reown.com wss://*.reown.com;
-  font-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rpc.berachain.com https://api-mainnet.magiceden.dev https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org https://*.web3modal.org https://*.reown.com wss://*.reown.com https://*.basemaps.cartocdn.com;
+  font-src 'self' https://fonts.gstatic.com;
   frame-src 'none';
   object-src 'none';
   base-uri 'self';
@@ -23,6 +23,16 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'uploader.irys.xyz',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ipfs.io',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.ipfs.dweb.link',
         pathname: '/**',
       },
     ],

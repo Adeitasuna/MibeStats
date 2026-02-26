@@ -7,6 +7,8 @@ export interface Token {
   archetype: string
   ancestor: string
   timePeriod: string
+  birthday: string | null
+  birthCoordinates: string | null
   element: string | null
   sunSign: string | null
   moonSign: string | null
@@ -91,7 +93,10 @@ export interface TraitDistribution {
   archetypes: TraitCount[]
   ancestors: TraitCount[]
   elements: TraitCount[]
+  timePeriods: TraitCount[]
   sunSigns: TraitCount[]
+  moonSigns: TraitCount[]
+  ascendingSigns: TraitCount[]
   drugs: TraitCount[]
   backgrounds: TraitCount[]
   bodies: TraitCount[]
@@ -101,6 +106,11 @@ export interface TraitDistribution {
   hairs: TraitCount[]
   hats: TraitCount[]
   glasses: TraitCount[]
+  masks: TraitCount[]
+  earrings: TraitCount[]
+  faceAccessories: TraitCount[]
+  tattoos: TraitCount[]
+  items: TraitCount[]
   shirts: TraitCount[]
   swagRanks: TraitCount[]
   grailCategories: TraitCount[]

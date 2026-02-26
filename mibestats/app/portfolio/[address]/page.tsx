@@ -48,6 +48,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
       orderBy: { rarityRank: 'asc' },
       select: {
         tokenId: true, archetype: true, ancestor: true, timePeriod: true,
+        birthday: true, birthCoordinates: true,
         element: true, sunSign: true, moonSign: true, ascendingSign: true,
         swagScore: true, swagRank: true, rarityRank: true,
         background: true, body: true, eyes: true, eyebrows: true,

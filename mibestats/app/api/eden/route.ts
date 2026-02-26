@@ -1,0 +1,127 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/db'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { magicEdenUrl } from '@/types'
+
+export const revalidate = 3600
+
+interface SaleCountBucket { sale_count: number; token_count: bigint }
+interface TopSoldRow {
+  token_id: number; sale_count: number; image_url: string | null
+  swag_rank: string; is_grail: boolean; grail_name: string | null
+  max_sale_price: string | null; last_sale_price: string | null
+}
+
+export async function GET(req: NextRequest) {
+  const ip = getClientIp(req)
+  const rl = checkRateLimit(`eden:${ip}`, 100, 60)
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetMs - Date.now()) / 1000)) } },
+    )
+  }
+
+  try {
+    const [bestSales, salesDistribution, mostSold, salesCount1d, salesCount7d] = await Promise.all([
+      // Best sales top 30
+      prisma.sale.findMany({
+        orderBy: { priceBera: 'desc' },
+        take: 30,
+        include: {
+          token: {
+            select: {
+              tokenId: true, imageUrl: true, swagRank: true,
+              isGrail: true, grailName: true,
+            },
+          },
+        },
+      }),
+
+      // Sales distribution: how many tokens have 0, 1, 2, 3... sales
+      prisma.$queryRaw<SaleCountBucket[]>`
+        SELECT sale_count, COUNT(*) AS token_count
+        FROM tokens
+        GROUP BY sale_count
+        ORDER BY sale_count ASC
+      `,
+
+      // Most sold miberas (top 30 by sale count)
+      prisma.$queryRaw<TopSoldRow[]>`
+        SELECT token_id, sale_count, image_url, swag_rank, is_grail,
+               grail_name, max_sale_price::text, last_sale_price::text
+        FROM tokens
+        WHERE sale_count > 0
+        ORDER BY sale_count DESC, token_id ASC
+        LIMIT 30
+      `,
+
+      // Sales count 1d
+      prisma.sale.count({
+        where: { soldAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+      }),
+
+      // Sales count 7d
+      prisma.sale.count({
+        where: { soldAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+      }),
+    ])
+
+    const totalSales = await prisma.sale.count()
+
+    // Sum volume 1d and 7d
+    const [vol1d, vol7d] = await Promise.all([
+      prisma.sale.aggregate({
+        _sum: { priceBera: true },
+        where: { soldAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+      }),
+      prisma.sale.aggregate({
+        _sum: { priceBera: true },
+        where: { soldAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+      }),
+    ])
+
+    return NextResponse.json({
+      bestSales: bestSales.map((s) => ({
+        id: String(s.id),
+        tokenId: s.tokenId,
+        priceBera: Number(s.priceBera),
+        soldAt: s.soldAt.toISOString(),
+        imageUrl: s.token?.imageUrl ?? null,
+        swagRank: s.token?.swagRank ?? null,
+        isGrail: s.token?.isGrail ?? false,
+        grailName: s.token?.grailName ?? null,
+        magicEdenUrl: magicEdenUrl(s.tokenId),
+      })),
+      salesDistribution: salesDistribution.map((r) => ({
+        saleCount: r.sale_count,
+        tokenCount: Number(r.token_count),
+      })),
+      mostSold: mostSold.map((r) => ({
+        tokenId: r.token_id,
+        saleCount: r.sale_count,
+        imageUrl: r.image_url,
+        swagRank: r.swag_rank,
+        isGrail: r.is_grail,
+        grailName: r.grail_name,
+        maxSalePrice: r.max_sale_price ? Number(r.max_sale_price) : null,
+        lastSalePrice: r.last_sale_price ? Number(r.last_sale_price) : null,
+        magicEdenUrl: magicEdenUrl(r.token_id),
+      })),
+      salesStats: {
+        count1d: salesCount1d,
+        count7d: salesCount7d,
+        countAll: totalSales,
+        volume1d: vol1d._sum.priceBera ? Number(vol1d._sum.priceBera) : 0,
+        volume7d: vol7d._sum.priceBera ? Number(vol7d._sum.priceBera) : 0,
+      },
+      grailStats: {
+        grails: 42,
+        nonGrails: 9958,
+      },
+    })
+  } catch (err) {
+    console.error('[/api/eden]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
