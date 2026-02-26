@@ -91,41 +91,46 @@ export function TimelineTreemap({ data }: TreemapProps) {
     )
   }
 
-  const maxCount = Math.max(...data.map((d) => d.size))
+  let maxCount = 0
+  for (const d of data) {
+    if (d.size > maxCount) maxCount = d.size
+  }
   const treemapData = [{ name: 'root', children: data }]
 
   return (
-    <div className="card p-4">
-      <ResponsiveContainer width="100%" height={500}>
-        <RechartTreemap
-          data={treemapData}
-          dataKey="size"
-          nameKey="name"
-          aspectRatio={4 / 3}
-          stroke="#0d1117"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          content={<CustomTreemapContent maxCount={maxCount} x={0} y={0} width={0} height={0} name="" size={0} /> as any}
-        >
-          <Tooltip
-            contentStyle={{
-              background: '#21262d',
-              border: '1px solid #30363d',
-              borderRadius: 8,
-              fontSize: 12,
-              color: '#e6edf3',
-            }}
-            formatter={(value: number) => [
-              `${value.toLocaleString()} miberas`,
-              'Born this year',
-            ]}
-          />
-        </RechartTreemap>
-      </ResponsiveContainer>
+    <div className="card p-3">
+      <div className="h-[300px] md:h-[420px] lg:h-[520px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartTreemap
+            data={treemapData}
+            dataKey="size"
+            nameKey="name"
+            aspectRatio={4 / 3}
+            stroke="#0d1117"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            content={<CustomTreemapContent maxCount={maxCount} x={0} y={0} width={0} height={0} name="" size={0} /> as any}
+          >
+            <Tooltip
+              contentStyle={{
+                background: '#21262d',
+                border: '1px solid #30363d',
+                borderRadius: 8,
+                fontSize: 12,
+                color: '#e6edf3',
+              }}
+              formatter={(value: number) => [
+                `${value.toLocaleString()} miberas`,
+                'Born this year',
+              ]}
+            />
+          </RechartTreemap>
+        </ResponsiveContainer>
+      </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-3 px-2">
-        <span className="text-xs text-mibe-muted">Fewer</span>
-        <div className="flex-1 h-3 rounded-full overflow-hidden flex">
+      <div className="flex items-center gap-3 mt-2 px-1">
+        <span className="text-[10px] text-mibe-muted shrink-0">Fewer</span>
+        <div className="flex-1 h-2.5 rounded-full overflow-hidden flex">
           {Array.from({ length: 20 }).map((_, i) => (
             <div
               key={i}
@@ -134,7 +139,7 @@ export function TimelineTreemap({ data }: TreemapProps) {
             />
           ))}
         </div>
-        <span className="text-xs text-mibe-muted">More miberas</span>
+        <span className="text-[10px] text-mibe-muted shrink-0">More miberas</span>
       </div>
     </div>
   )
