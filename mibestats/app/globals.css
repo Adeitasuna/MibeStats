@@ -1,22 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-primary:   #0d1117;
-  --bg-secondary: #1a1a2e;
-  --bg-sidebar:   #161b22;
-  --bg-card:      #21262d;
-  --bg-hover:     #30363d;
+  --bg-primary:   #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-sidebar:   #0e0e0e;
+  --bg-card:      #141414;
+  --bg-hover:     #1a1a1a;
 
-  --border-default: #30363d;
+  --border-default: #2a2a2a;
   --border-gold:    #ffd700;
 
-  --text-primary:   #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted:     #6e7681;
+  --text-primary:   #e0e0e0;
+  --text-secondary: #888888;
+  --text-muted:     #555555;
 
   --accent-gold:    #ffd700;
   --accent-cyan:    #58a6ff;
@@ -26,25 +26,49 @@
   --accent-red:     #f85149;
 
   /* Legacy compat */
-  --background: #0d1117;
-  --surface:    #21262d;
-  --border:     #30363d;
-  --text:       #e6edf3;
-  --muted:      #8b949e;
+  --background: #0a0a0a;
+  --surface:    #141414;
+  --border:     #2a2a2a;
+  --text:       #e0e0e0;
+  --muted:      #888888;
 }
+
+/* ── Base ── */
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
 }
 
-/* Title font with fallback */
+/* ── Typography ── */
+
 .font-title {
   font-family: 'Pirata One', 'Georgia', serif;
 }
 
-/* Swag Rank badge colours */
+.font-terminal {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+}
+
+/* ── CRT Scanline Overlay ── */
+
+.crt-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.08) 0px,
+    rgba(0, 0, 0, 0.08) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ── Swag Rank badge colours ── */
+
 .rank-SSS { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
 .rank-SS  { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #000; }
 .rank-S   { background: linear-gradient(135deg, #CD7F32, #A0522D); color: #fff; }
@@ -54,54 +78,84 @@ body {
 .rank-D   { background: #6B7280; color: #fff; }
 .rank-F   { background: #374151; color: #9CA3AF; }
 
-/* Card base */
+/* ── Cards ── */
+
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: 0.75rem;
+  border-radius: 0.25rem;
   transition: border-color 0.2s ease;
 }
 
 .card:hover {
-  border-color: #484f58;
+  border-color: var(--text-muted);
 }
 
-/* Gold-bordered card variant */
 .card-gold {
   background: var(--bg-card);
   border: 1px solid var(--accent-gold);
-  border-radius: 0.75rem;
+  border-radius: 0.25rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card-gold:hover {
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.12);
 }
 
-/* Section title styling */
+/* ── Section titles ── */
+
 .section-title {
   font-family: 'Pirata One', 'Georgia', serif;
   color: var(--accent-gold);
 }
 
-/* Navbar styles */
-.navbar-link {
+/* ── Side menu ── */
+
+.menu-item {
   transition: all 0.15s ease;
   position: relative;
 }
 
-.navbar-link.active {
+.menu-item::before {
+  content: '  ';
+  white-space: pre;
+}
+
+.menu-item:hover {
+  color: var(--accent-gold);
+  background-color: var(--bg-hover);
+}
+
+.menu-item.active {
   color: var(--accent-gold);
 }
 
-.navbar-dropdown {
-  z-index: 60;
+.menu-item.active::before {
+  content: '> ';
+  color: var(--accent-gold);
 }
 
-/* Scrollbar styling for dark theme */
+.menu-section-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.menu-section-title::before {
+  content: '── ';
+}
+
+.menu-section-title::after {
+  content: ' ──';
+}
+
+/* ── Scrollbar ── */
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -110,14 +164,15 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-default);
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--accent-gold);
 }
 
-/* Gold link styling */
+/* ── Links ── */
+
 a.link-gold {
   color: var(--accent-gold);
   text-decoration: underline;
@@ -128,7 +183,6 @@ a.link-gold:hover {
   color: #ffe566;
 }
 
-/* Cyan link styling */
 a.link-cyan {
   color: var(--accent-cyan);
 }
@@ -138,7 +192,8 @@ a.link-cyan:hover {
   text-decoration: underline;
 }
 
-/* Table utility — force horizontal scroll on small screens */
+/* ── Table utility ── */
+
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -146,4 +201,18 @@ a.link-cyan:hover {
 
 .table-responsive table {
   min-width: 600px;
+}
+
+/* ── Blinking cursor ── */
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: var(--accent-gold);
+  margin-left: 2px;
 }

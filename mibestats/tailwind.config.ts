@@ -10,23 +10,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // New design system
+        // Cypherpunk design system
         mibe: {
-          bg:        '#0d1117',
-          'bg-alt':  '#1a1a2e',
-          sidebar:   '#161b22',
-          card:      '#21262d',
-          hover:     '#30363d',
-          border:    '#30363d',
+          bg:        '#0a0a0a',
+          'bg-alt':  '#111111',
+          sidebar:   '#0e0e0e',
+          card:      '#141414',
+          hover:     '#1a1a1a',
+          border:    '#2a2a2a',
           gold:      '#ffd700',
           cyan:      '#58a6ff',
           blue:      '#1f6feb',
           magenta:   '#ff69b4',
           green:     '#3fb950',
           red:       '#f85149',
-          text:      '#e6edf3',
-          'text-2':  '#8b949e',
-          muted:     '#6e7681',
+          text:      '#e0e0e0',
+          'text-2':  '#888888',
+          muted:     '#555555',
         },
         // Legacy Mibera brand palette
         mibera: {
@@ -35,9 +35,9 @@ const config: Config = {
           bronze:  '#CD7F32',
           purple:  '#7C3AED',
           pink:    '#EC4899',
-          dark:    '#0d1117',
-          surface: '#21262d',
-          border:  '#30363d',
+          dark:    '#0a0a0a',
+          surface: '#141414',
+          border:  '#2a2a2a',
         },
         // Swag Rank colours
         rank: {
@@ -53,8 +53,9 @@ const config: Config = {
       },
       fontFamily: {
         title: ['"Pirata One"', 'cursive'],
-        body:  ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono:  ['var(--font-mono)', 'ui-monospace', 'monospace'],
+        terminal: ['"Share Tech Mono"', '"Courier New"', 'monospace'],
+        body:  ['"Share Tech Mono"', '"Courier New"', 'monospace'],
+        mono:  ['"Share Tech Mono"', 'ui-monospace', 'monospace'],
       },
     },
   },
