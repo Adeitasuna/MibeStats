@@ -131,7 +131,7 @@ export function EdenDataSection() {
             Best Sales — Top 30
           </h3>
         </div>
-        <div className="overflow-x-auto">
+        <div className="table-responsive">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-mibe-border text-[10px] text-mibe-text-2 uppercase tracking-wider">
@@ -203,7 +203,7 @@ export function EdenDataSection() {
             Most Sold Miberas
           </h3>
         </div>
-        <div className="overflow-x-auto">
+        <div className="table-responsive">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-mibe-border text-[10px] text-mibe-text-2 uppercase tracking-wider">

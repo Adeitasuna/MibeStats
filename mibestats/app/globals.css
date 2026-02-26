@@ -39,9 +39,9 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Title font */
+/* Title font with fallback */
 .font-title {
-  font-family: 'Pirata One', cursive;
+  font-family: 'Pirata One', 'Georgia', serif;
 }
 
 /* Swag Rank badge colours */
@@ -59,6 +59,11 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: #484f58;
 }
 
 /* Gold-bordered card variant */
@@ -66,11 +71,16 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--accent-gold);
   border-radius: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-gold:hover {
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
 }
 
 /* Section title styling */
 .section-title {
-  font-family: 'Pirata One', cursive;
+  font-family: 'Pirata One', 'Georgia', serif;
   color: var(--accent-gold);
 }
 
@@ -90,17 +100,17 @@ body {
 
 /* Scrollbar styling for dark theme */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-default);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -126,4 +136,14 @@ a.link-cyan {
 a.link-cyan:hover {
   color: #79c0ff;
   text-decoration: underline;
+}
+
+/* Table utility — force horizontal scroll on small screens */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 600px;
 }
