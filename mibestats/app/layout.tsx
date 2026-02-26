@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description:
     'Real-time NFT analytics for the Mibera333 collection on Berachain. Floor price, volume, rarity explorer, sales history, and wallet portfolio.',
   icons: {
-    icon: 'https://mibera.fsn1.your-objectstorage.com/333.png',
-    apple: 'https://mibera.fsn1.your-objectstorage.com/333.png',
+    icon: 'https://gateway.irys.xyz/7rpvwFYcB5t7S1HziaBAr4RgfAFpqCwCYbFUbkFqpbAq/db60349b44a4dd31e595e2ba0d238c184696565a.png',
+    apple: 'https://gateway.irys.xyz/7rpvwFYcB5t7S1HziaBAr4RgfAFpqCwCYbFUbkFqpbAq/db60349b44a4dd31e595e2ba0d238c184696565a.png',
   },
   openGraph: {
     title:       'MibeStats — Mibera333 Analytics',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     type:        'website',
     images: [
       {
-        url:    'https://mibera.fsn1.your-objectstorage.com/333.png',
+        url:    'https://gateway.irys.xyz/7rpvwFYcB5t7S1HziaBAr4RgfAFpqCwCYbFUbkFqpbAq/db60349b44a4dd31e595e2ba0d238c184696565a.png',
         width:  512,
         height: 512,
         alt:    'Mibera #333',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card:  'summary',
     title: 'MibeStats — Mibera333 Analytics',
     description: 'Real-time NFT analytics for Mibera333 on Berachain.',
-    images: ['https://mibera.fsn1.your-objectstorage.com/333.png'],
+    images: ['https://gateway.irys.xyz/7rpvwFYcB5t7S1HziaBAr4RgfAFpqCwCYbFUbkFqpbAq/db60349b44a4dd31e595e2ba0d238c184696565a.png'],
   },
 }
 

@@ -23,7 +23,7 @@ const CODEX_BASE =
   'https://raw.githubusercontent.com/0xHoneyJar/mibera-codex/main/_codex/data'
 const MIBERAS_URL  = `${CODEX_BASE}/miberas.jsonl`
 const GRAILS_URL   = `${CODEX_BASE}/grails.jsonl`
-const IMAGE_BASE   = 'https://mibera.fsn1.your-objectstorage.com'
+const IMAGE_BASE   = 'https://gateway.irys.xyz/7rpvwFYcB5t7S1HziaBAr4RgfAFpqCwCYbFUbkFqpbAq'
 
 // ─── Validation schemas ───────────────────────────────────────────────────────
 
