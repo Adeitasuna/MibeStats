@@ -92,10 +92,10 @@ type Range = '7d' | '30d' | 'all'
 
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{label}</span>
       <div className="stat-card stat-card--gold">
-        <span className="text-2xl font-bold text-white">{value}</span>
+        <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff' }}>{value}</span>
       </div>
     </div>
   )
@@ -103,10 +103,10 @@ function GoldCard({ label, value }: { label: string; value: string }) {
 
 function MiniCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{label}</span>
       <div className="stat-card">
-        <span className="text-lg font-bold text-white">{value}</span>
+        <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{value}</span>
       </div>
     </div>
   )
@@ -291,6 +291,19 @@ export function EdenContent() {
         .slice(0, 8)
     : []
 
+  // Diamond Mibera: never sold vs at least 1 sale
+  const diamondMiberaPie = eden ? (() => {
+    const totalCollection = eden.grailStats.grails + eden.grailStats.nonGrails
+    const soldCount = eden.salesDistribution
+      .filter((d) => d.saleCount > 0)
+      .reduce((sum, d) => sum + d.tokenCount, 0)
+    const neverSold = totalCollection - soldCount
+    return [
+      { name: `Never sold (${neverSold})`, value: neverSold },
+      { name: `Sold (${soldCount})`, value: soldCount },
+    ]
+  })() : []
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {error && (
@@ -305,33 +318,44 @@ export function EdenContent() {
         <GoldCard label="Highest Sale of Day" value={highestOfDay != null ? fmt(highestOfDay) : '—'} />
       </div>
 
-      {/* Row 2: Sales Count 1d|7d|All + Sales Volume 1d|7d|All */}
-      <div id="eden-row2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+      {/* Rows 2-3: Sales cards (cols 1-3) + Floor chart (cols 4-6 spanning 2 rows) */}
+      <div id="eden-stats-chart" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+        {/* Row 2 cols 1-3: Sales Count */}
         <MiniCard label="Sales Count — 1d" value={eden ? String(eden.salesStats.count1d) : '—'} />
         <MiniCard label="Sales Count — 7d" value={eden ? String(eden.salesStats.count7d) : '—'} />
         <MiniCard label="Sales Count — All" value={eden ? fmtShort(eden.salesStats.countAll) : '—'} />
+        {/* Floor chart spanning cols 4-6, rows 1-2 (positioned via CSS) */}
+        <div id="eden-floor-chart" style={{ gridColumn: '1 / -1' }}>
+          <FloorChart data={floorHistory} />
+        </div>
+        {/* Row 3 cols 1-3: Sales Volume */}
         <MiniCard label="Sales Vol. — 1d" value={eden ? fmt(eden.salesStats.volume1d, 1) : '—'} />
         <MiniCard label="Sales Vol. — 7d" value={eden ? fmt(eden.salesStats.volume7d, 1) : '—'} />
         <MiniCard label="Sales Vol. — All" value={fmt(collection?.volumeAllTime, 1)} />
       </div>
 
-      {/* Responsive grid override for desktop */}
+      {/* Responsive: on desktop, 6 cols with chart spanning cols 4-6 and rows 1-2 */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media (min-width: 768px) {
           #eden-row1 { grid-template-columns: repeat(4, 1fr) !important; }
-          #eden-row2 { grid-template-columns: repeat(6, 1fr) !important; }
-          #eden-pies { grid-template-columns: repeat(2, 1fr) !important; }
+          #eden-stats-chart {
+            grid-template-columns: repeat(6, 1fr) !important;
+            grid-template-rows: auto auto !important;
+          }
+          #eden-floor-chart {
+            grid-column: 4 / 7 !important;
+            grid-row: 1 / 3 !important;
+          }
+          #eden-pies { grid-template-columns: repeat(3, 1fr) !important; }
         }
       `}} />
 
-      {/* Row 3: Floor price chart */}
-      <FloorChart data={floorHistory} />
-
-      {/* Row 4: Pie charts */}
+      {/* Row 4: 3 Pie charts */}
       {eden && (
         <div id="eden-pies" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
           <EdenPie data={grailPieData} title="Diamond per Mibera (Grails)" />
           <EdenPie data={salesDistPie} title="Nb Sales per Mibera" />
+          <EdenPie data={diamondMiberaPie} title="Diamond Mibera" />
         </div>
       )}
 
