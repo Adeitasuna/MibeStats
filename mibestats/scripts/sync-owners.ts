@@ -33,6 +33,7 @@ async function main() {
 
   console.log(`Blocks ${startBlock} → ${latestBlock}`)
   const ownerMap = new Map<number, string>()
+  const transferCounts = new Map<number, number>()
 
   for (let from = startBlock; from <= latestBlock; from += BATCH_BLOCKS) {
     const to = from + BATCH_BLOCKS - 1n < latestBlock ? from + BATCH_BLOCKS - 1n : latestBlock
@@ -40,7 +41,10 @@ async function main() {
     for (const log of logs) {
       const id   = Number(log.args.tokenId)
       const addr = log.args.to?.toLowerCase()
-      if (id && addr) ownerMap.set(id, addr)
+      if (id && addr) {
+        ownerMap.set(id, addr)
+        transferCounts.set(id, (transferCounts.get(id) ?? 0) + 1)
+      }
     }
     if (from + BATCH_BLOCKS <= latestBlock) await sleep(SLEEP_MS)
   }
@@ -57,6 +61,22 @@ async function main() {
         WHERE token_id IN (${ids})
       `)
     }
+  }
+
+  // Update transfer counts (incremental — add to existing counts)
+  if (transferCounts.size > 0) {
+    const entries = Array.from(transferCounts.entries())
+    const BATCH = 500
+    for (let i = 0; i < entries.length; i += BATCH) {
+      const b     = entries.slice(i, i + BATCH)
+      const cases = b.map(([id, count]) => `WHEN ${id} THEN ${count}`).join('\n      ')
+      const ids   = b.map(([id]) => id).join(', ')
+      await prisma.$executeRawUnsafe(`
+        UPDATE tokens SET transfer_count = transfer_count + CASE token_id ${cases} END
+        WHERE token_id IN (${ids})
+      `)
+    }
+    console.log(`Updated transfer counts for ${transferCounts.size} tokens`)
   }
 
   await prisma.syncState.upsert({

@@ -7,7 +7,7 @@ export const revalidate = 900
 
 interface SaleCountBucket { sale_count: number; token_count: bigint }
 interface TopSoldRow {
-  token_id: number; sale_count: number; image_url: string | null
+  token_id: number; sale_count: number; transfer_count: number; image_url: string | null
   swag_rank: string; is_grail: boolean; grail_name: string | null
   max_sale_price: string | null; last_sale_price: string | null
 }
@@ -26,11 +26,14 @@ export async function GET(req: NextRequest) {
     const todayStart = new Date()
     todayStart.setUTCHours(0, 0, 0, 0)
 
+    const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+    const DEAD_ADDRESS = '0x000000000000000000000000000000000000dead'
+
     const [
       bestSales, salesDistribution, mostSold,
       salesCount1d, salesCount7d, totalSales,
       vol1d, vol7d, volAll, daySales,
-      grailCount, totalTokens,
+      grailCount, totalTokens, burnedCount,
     ] = await Promise.all([
       // Best sales top 30
       prisma.sale.findMany({
@@ -56,7 +59,7 @@ export async function GET(req: NextRequest) {
 
       // Most sold miberas (top 30 by sale count)
       prisma.$queryRaw<TopSoldRow[]>`
-        SELECT token_id, sale_count, image_url, swag_rank, is_grail,
+        SELECT token_id, sale_count, transfer_count, image_url, swag_rank, is_grail,
                grail_name, max_sale_price::text, last_sale_price::text
         FROM tokens
         WHERE sale_count > 0
@@ -94,11 +97,11 @@ export async function GET(req: NextRequest) {
         _sum: { priceBera: true },
       }),
 
-      // Today's lowest and highest sale
+      // Last 24h lowest and highest sale
       prisma.sale.aggregate({
         _min: { priceBera: true },
         _max: { priceBera: true },
-        where: { soldAt: { gte: todayStart } },
+        where: { soldAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
       }),
 
       // Grail count from DB
@@ -106,6 +109,11 @@ export async function GET(req: NextRequest) {
 
       // Total token count
       prisma.token.count(),
+
+      // Burned tokens (sent to zero or dead address)
+      prisma.token.count({
+        where: { ownerAddress: { in: [ZERO_ADDRESS, DEAD_ADDRESS] } },
+      }),
     ])
 
     return NextResponse.json({
@@ -127,6 +135,7 @@ export async function GET(req: NextRequest) {
       mostSold: mostSold.map((r) => ({
         tokenId: r.token_id,
         saleCount: r.sale_count,
+        transferCount: r.transfer_count,
         imageUrl: r.image_url,
         swagRank: r.swag_rank,
         isGrail: r.is_grail,
@@ -142,12 +151,13 @@ export async function GET(req: NextRequest) {
         volume1d: vol1d._sum.priceBera ? Number(vol1d._sum.priceBera) : 0,
         volume7d: vol7d._sum.priceBera ? Number(vol7d._sum.priceBera) : 0,
         volumeAll: volAll._sum.priceBera ? Number(volAll._sum.priceBera) : 0,
-        lowestSaleOfDay: daySales._min.priceBera ? Number(daySales._min.priceBera) : null,
-        highestSaleOfDay: daySales._max.priceBera ? Number(daySales._max.priceBera) : null,
+        lowestSale24h: daySales._min.priceBera ? Number(daySales._min.priceBera) : null,
+        highestSale24h: daySales._max.priceBera ? Number(daySales._max.priceBera) : null,
       },
       grailStats: {
         grails: grailCount,
-        nonGrails: totalTokens - grailCount,
+        nonGrails: totalTokens - grailCount - burnedCount,
+        burned: burnedCount,
       },
     })
   } catch (err) {

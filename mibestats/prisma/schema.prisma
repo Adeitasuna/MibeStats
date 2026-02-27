@@ -65,6 +65,7 @@ model Token {
   maxSalePrice  Decimal? @map("max_sale_price") @db.Decimal(18, 8)
   maxSaleDate   DateTime? @map("max_sale_date")
   saleCount     Int      @default(0) @map("sale_count")
+  transferCount Int      @default(0) @map("transfer_count")
 
   // Image (object storage URL, not base64)
   imageUrl String? @map("image_url")

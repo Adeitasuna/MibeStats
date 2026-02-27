@@ -46,6 +46,7 @@ interface SalesDistItem {
 interface MostSoldItem {
   tokenId: number
   saleCount: number
+  transferCount: number
   imageUrl: string | null
   swagRank: string
   isGrail: boolean
@@ -66,12 +67,13 @@ interface EdenApiData {
     volume1d: number
     volume7d: number
     volumeAll: number
-    lowestSaleOfDay: number | null
-    highestSaleOfDay: number | null
+    lowestSale24h: number | null
+    highestSale24h: number | null
   }
   grailStats: {
     grails: number
     nonGrails: number
+    burned: number
   }
 }
 
@@ -233,6 +235,7 @@ export function EdenContent() {
   const [eden, setEden] = useState<EdenApiData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -257,9 +260,10 @@ export function EdenContent() {
   }
 
   // Prepare pie data
-  const grailPieData = eden ? [
-    { name: `Grails (${eden.grailStats.grails})`, value: eden.grailStats.grails },
+  const nftStatusPie = eden ? [
     { name: `Standard (${eden.grailStats.nonGrails})`, value: eden.grailStats.nonGrails },
+    { name: `Grail (${eden.grailStats.grails})`, value: eden.grailStats.grails },
+    ...(eden.grailStats.burned > 0 ? [{ name: `Burned (${eden.grailStats.burned})`, value: eden.grailStats.burned }] : []),
   ] : []
 
   const salesDistPie = eden
@@ -292,8 +296,8 @@ export function EdenContent() {
       <div id="eden-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
         <GoldCard label="Floor Price (7d)" value={fmt(collection?.floorPrice)} />
         <GoldCard label="Max Sell Price (ATH)" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
-        <GoldCard label="Lowest Sale of Day" value={eden?.salesStats.lowestSaleOfDay != null ? fmt(eden.salesStats.lowestSaleOfDay) : '—'} />
-        <GoldCard label="Highest Sale of Day" value={eden?.salesStats.highestSaleOfDay != null ? fmt(eden.salesStats.highestSaleOfDay) : '—'} />
+        <GoldCard label="Lowest Sale (24h)" value={eden?.salesStats.lowestSale24h != null ? fmt(eden.salesStats.lowestSale24h) : '—'} />
+        <GoldCard label="Highest Sale (24h)" value={eden?.salesStats.highestSale24h != null ? fmt(eden.salesStats.highestSale24h) : '—'} />
       </div>
 
       {/* Rows 2-3: Sales cards (cols 1-3) + Floor chart (cols 4-6 spanning 2 rows) */}
@@ -332,7 +336,7 @@ export function EdenContent() {
       {/* Row 4: 3 Pie charts */}
       {eden && (
         <div id="eden-pies" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-          <EdenPie data={grailPieData} title="Diamond per Mibera (Grails)" />
+          <EdenPie data={nftStatusPie} title="NFT Status" />
           <EdenPie data={salesDistPie} title="Nb Sales per Mibera" />
           <EdenPie data={diamondMiberaPie} title="Diamond Mibera" />
         </div>
@@ -365,9 +369,9 @@ export function EdenContent() {
                           <td style={{ padding: '0.5rem 0.75rem', color: '#555' }}>{i + 1}</td>
                           <td style={{ padding: '0.35rem' }}>
                             {sale.imageUrl ? (
-                              <Image src={sale.imageUrl} alt={`#${sale.tokenId}`} width={28} height={28} className="rounded object-cover shrink-0" />
+                              <Image src={sale.imageUrl} alt={`#${sale.tokenId}`} width={48} height={48} className="rounded object-cover shrink-0" style={{ cursor: 'pointer' }} onClick={() => setLightboxUrl(sale.imageUrl)} />
                             ) : (
-                              <div style={{ width: 28, height: 28, borderRadius: '0.25rem', background: '#1a1a1a' }} />
+                              <div style={{ width: 48, height: 48, borderRadius: '0.25rem', background: '#1a1a1a' }} />
                             )}
                           </td>
                           <td style={{ padding: '0.5rem 0.75rem' }}>
@@ -395,7 +399,7 @@ export function EdenContent() {
           {/* Most Sold */}
           {eden.mostSold.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Most Sold Miberas</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Most Sold Miberas — Top 30</span>
               <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
                   <table className="w-full text-sm">
@@ -406,6 +410,7 @@ export function EdenContent() {
                         <th style={{ padding: '0.75rem', textAlign: 'left' }}>ID</th>
                         <th style={{ padding: '0.75rem', textAlign: 'left' }}>Rank</th>
                         <th style={{ padding: '0.75rem', textAlign: 'center' }}>Sales</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'center' }}>Transfers</th>
                         <th style={{ padding: '0.75rem', textAlign: 'right' }}>Max</th>
                         <th style={{ padding: '0.75rem', textAlign: 'right' }}>Last</th>
                       </tr>
@@ -416,9 +421,9 @@ export function EdenContent() {
                           <td style={{ padding: '0.5rem 0.75rem', color: '#555' }}>{i + 1}</td>
                           <td style={{ padding: '0.35rem' }}>
                             {token.imageUrl ? (
-                              <Image src={token.imageUrl} alt={`#${token.tokenId}`} width={28} height={28} className="rounded object-cover shrink-0" />
+                              <Image src={token.imageUrl} alt={`#${token.tokenId}`} width={48} height={48} className="rounded object-cover shrink-0" style={{ cursor: 'pointer' }} onClick={() => setLightboxUrl(token.imageUrl)} />
                             ) : (
-                              <div style={{ width: 28, height: 28, borderRadius: '0.25rem', background: '#1a1a1a' }} />
+                              <div style={{ width: 48, height: 48, borderRadius: '0.25rem', background: '#1a1a1a' }} />
                             )}
                           </td>
                           <td style={{ padding: '0.5rem 0.75rem' }}>
@@ -427,6 +432,9 @@ export function EdenContent() {
                           <td style={{ padding: '0.5rem 0.75rem' }}><SwagRankBadge rank={token.swagRank} size="sm" /></td>
                           <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>
                             <span style={{ background: 'rgba(255,215,0,0.15)', color: '#ffd700', padding: '0.15rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.75rem', fontWeight: 700 }}>{token.saleCount}</span>
+                          </td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>
+                            <span style={{ color: '#8b949e', fontSize: '0.75rem' }}>{token.transferCount}</span>
                           </td>
                           <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', fontWeight: 500, color: '#fff' }}>{token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}</td>
                           <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', color: '#888' }}>{token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}</td>
@@ -438,6 +446,25 @@ export function EdenContent() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Lightbox modal */}
+      {lightboxUrl && (
+        <div
+          onClick={() => setLightboxUrl(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <img
+            src={lightboxUrl}
+            alt="Enlarged"
+            style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: '0.5rem', imageRendering: 'pixelated' }}
+          />
         </div>
       )}
     </div>
