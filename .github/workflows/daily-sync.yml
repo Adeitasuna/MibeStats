@@ -1,0 +1,48 @@
+name: Daily Data Sync
+
+on:
+  schedule:
+    - cron: '30 0 * * *'   # 00:30 UTC every day
+  workflow_dispatch:        # allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mibestats
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mibestats/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL:   ${{ secrets.DIRECT_URL }}
+
+      - name: Sync sales (on-chain)
+        run: npx tsx scripts/sync-sales-onchain.ts
+        env:
+          DATABASE_URL:       ${{ secrets.DATABASE_URL }}
+          DIRECT_URL:         ${{ secrets.DIRECT_URL }}
+          BERACHAIN_RPC_URL:  ${{ secrets.BERACHAIN_RPC_URL }}
+          NEXT_PUBLIC_CONTRACT_ADDRESS: '0x6666397DFe9a8c469BF65dc744CB1C733416c420'
+
+      - name: Sync owner addresses
+        run: npx tsx scripts/sync-owners.ts
+        env:
+          DATABASE_URL:       ${{ secrets.DATABASE_URL }}
+          DIRECT_URL:         ${{ secrets.DIRECT_URL }}
+          BERACHAIN_RPC_URL:  ${{ secrets.BERACHAIN_RPC_URL }}
+          NEXT_PUBLIC_CONTRACT_ADDRESS: '0x6666397DFe9a8c469BF65dc744CB1C733416c420'
