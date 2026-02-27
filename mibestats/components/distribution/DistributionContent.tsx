@@ -101,20 +101,8 @@ export function DistributionContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-6">
-        {Array.from({ length: 4 }).map((_, g) => (
-          <div key={g}>
-            <div className="h-5 bg-white/5 rounded w-32 mb-3 animate-pulse" />
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {Array.from({ length: g === 2 ? 8 : 4 }).map((_, i) => (
-                <div key={i} className="card p-4 h-[260px] animate-pulse">
-                  <div className="h-3 bg-white/5 rounded w-24 mb-3" />
-                  <div className="h-[200px] bg-white/5 rounded" />
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
+        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
       </div>
     )
   }

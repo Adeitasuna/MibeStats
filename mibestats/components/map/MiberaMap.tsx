@@ -189,36 +189,45 @@ export function MiberaMap() {
     return FILTER_KEYS.find((f) => f.key === key)?.label ?? key
   }
 
+  // Show loading gif until data is ready
+  if (initialLoad.current && loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
+        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col gap-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       {/* Stats bar + filter toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-mibe-text-2">
-            <strong className="text-white text-lg tabular-nums">{data?.total?.toLocaleString() ?? '...'}</strong>{' '}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem' }}>
+          <span style={{ color: '#8b949e' }}>
+            <strong style={{ color: '#fff', fontSize: '1.125rem' }}>{data?.total?.toLocaleString() ?? '...'}</strong>{' '}
             miberas
           </span>
           {loading && (
-            <span className="inline-flex items-center gap-1.5 text-mibe-gold text-xs">
-              <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', color: '#ffd700', fontSize: '0.75rem' }}>
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
+                <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
               Loading...
             </span>
           )}
-          {error && <span className="text-mibe-red text-xs">{error}</span>}
+          {error && <span style={{ color: '#f85149', fontSize: '0.75rem' }}>{error}</span>}
         </div>
         <button
           onClick={() => setFiltersOpen((o) => !o)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-mibe-card border border-mibe-border text-sm text-mibe-text-2 hover:text-white hover:border-mibe-gold transition-colors"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', padding: '0.375rem 0.75rem', borderRadius: '0.5rem', background: '#161b22', border: '1px solid #30363d', fontSize: '0.875rem', color: '#8b949e', cursor: 'pointer' }}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
           Filters
           {filterCount > 0 && (
-            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-mibe-gold text-black text-[10px] font-bold">
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: '#ffd700', color: '#000', fontSize: '10px', fontWeight: 700 }}>
               {filterCount}
             </span>
           )}
@@ -276,17 +285,8 @@ export function MiberaMap() {
       )}
 
       {/* Map */}
-      <div className="card overflow-hidden h-[400px] md:h-[550px] lg:h-[650px]">
-        {initialLoad.current && loading ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-mibe-card gap-3">
-            <svg className="w-8 h-8 text-mibe-gold animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <span className="text-mibe-text-2 text-sm">Loading 10,000 birth locations...</span>
-          </div>
-        ) : (
-          <MapContainer
+      <div className="stat-card" style={{ overflow: 'hidden', height: '500px', padding: 0 }}>
+        <MapContainer
             center={[20, 0]}
             zoom={2}
             preferCanvas={true}
@@ -326,7 +326,6 @@ export function MiberaMap() {
             ))}
             {data?.points && data.points.length > 0 && <FitBounds points={data.points} />}
           </MapContainer>
-        )}
       </div>
 
       {/* Legend */}

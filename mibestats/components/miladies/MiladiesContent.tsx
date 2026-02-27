@@ -121,16 +121,8 @@ export function MiladiesContent() {
 
       {/* Grid — 7 columns */}
       {loading && !response ? (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
-          {Array.from({ length: 21 }).map((_, i) => (
-            <div key={i} className="card overflow-hidden animate-pulse">
-              <div className="aspect-square bg-white/5" />
-              <div className="p-2">
-                <div className="h-3 bg-white/5 rounded w-16 mb-1" />
-                <div className="h-2.5 bg-white/5 rounded w-full" />
-              </div>
-            </div>
-          ))}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
+          <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
         </div>
       ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
