@@ -12,6 +12,9 @@ const prisma     = new PrismaClient()
 const BATCH_BLOCKS = 2000n
 const SLEEP_MS     = 500
 
+// Contract deployed at block 3,837,808 — no point scanning before that
+const CONTRACT_DEPLOY_BLOCK = 3_837_808n
+
 async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
 }
@@ -20,7 +23,7 @@ async function main() {
   console.log('=== Daily owner sync ===')
 
   const syncState = await prisma.syncState.findUnique({ where: { key: 'owners_last_block' } })
-  const startBlock  = syncState ? BigInt(syncState.value) + 1n : 0n
+  const startBlock  = syncState ? BigInt(syncState.value) + 1n : CONTRACT_DEPLOY_BLOCK
   const latestBlock = await getLatestBlock()
 
   if (startBlock > latestBlock) {
