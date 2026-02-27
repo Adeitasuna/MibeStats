@@ -97,11 +97,11 @@ export async function GET(req: NextRequest) {
         _sum: { priceBera: true },
       }),
 
-      // Last 24h lowest and highest sale
+      // Last 24h lowest and highest sale (>= 5 BERA to exclude false WBERA detections)
       prisma.sale.aggregate({
         _min: { priceBera: true },
         _max: { priceBera: true },
-        where: { soldAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+        where: { soldAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }, priceBera: { gte: 5 } },
       }),
 
       // Grail count from DB

@@ -127,6 +127,10 @@ async function main() {
       let pricePer: bigint | null = null
       let marketplace = 'onchain'
 
+      // Collect NFT buyer/seller addresses for WBERA filtering
+      const nftBuyers  = new Set(transfers.map((t) => t.to))
+      const nftSellers = new Set(transfers.map((t) => t.from))
+
       if (tx.value > 0n) {
         // Native BERA sale
         pricePer = tx.value / BigInt(nftCount)
@@ -140,6 +144,12 @@ async function main() {
           if (log.address.toLowerCase() !== WBERA_ADDRESS.toLowerCase()) continue
           if (log.topics[0] !== '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') continue
           // ERC-20 Transfer: topics[1]=from, topics[2]=to, data=value
+          // Only count WBERA transfers involving the NFT buyer or seller
+          const wberaFrom = log.topics[1] ? ('0x' + log.topics[1].slice(26)).toLowerCase() : ''
+          const wberaTo   = log.topics[2] ? ('0x' + log.topics[2].slice(26)).toLowerCase() : ''
+          const involvesParty = nftBuyers.has(wberaFrom) || nftSellers.has(wberaTo)
+          if (!involvesParty) continue
+
           if (log.data && log.data !== '0x') {
             wberaTotal += BigInt(log.data)
           }
