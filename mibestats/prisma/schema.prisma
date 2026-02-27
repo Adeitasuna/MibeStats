@@ -86,7 +86,7 @@ model Token {
 }
 
 // ─────────────────────────────────────────────
-// sales — all Magic Eden sales history
+// sales — marketplace-agnostic sales history
 // ─────────────────────────────────────────────
 model Sale {
   id            BigInt   @id @default(autoincrement())
@@ -96,13 +96,14 @@ model Sale {
   soldAt        DateTime @map("sold_at")
   buyerAddress  String?  @map("buyer_address")
   sellerAddress String?  @map("seller_address")
-  txHash        String?  @unique @map("tx_hash")      // dedup guard
+  txHash        String?  @map("tx_hash")
   marketplace   String   @default("magic_eden")
 
   createdAt DateTime @default(now()) @map("created_at")
 
   token Token @relation(fields: [tokenId], references: [tokenId])
 
+  @@unique([txHash, tokenId], name: "sales_tx_token_unique")
   @@index([tokenId])
   @@index([soldAt(sort: Desc)])
   @@index([priceBera(sort: Desc)])

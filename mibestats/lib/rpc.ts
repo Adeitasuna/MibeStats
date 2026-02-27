@@ -1,4 +1,6 @@
-import { createPublicClient, http, parseAbiItem } from 'viem'
+import { createPublicClient, http, parseAbiItem, formatEther } from 'viem'
+
+export { formatEther }
 
 // Berachain Mainnet chain definition
 const berachain = {
@@ -37,7 +39,25 @@ export async function getTransferLogs(fromBlock: bigint, toBlock: bigint) {
   })
 }
 
+/** WBERA token address on Berachain */
+export const WBERA_ADDRESS = '0x6969696969696969696969696969696969696969' as const
+
 /** Get the current block number */
 export async function getLatestBlock(): Promise<bigint> {
   return publicClient.getBlockNumber()
+}
+
+/** Fetch a transaction by hash */
+export async function getTransaction(hash: `0x${string}`) {
+  return publicClient.getTransaction({ hash })
+}
+
+/** Fetch a transaction receipt by hash */
+export async function getTransactionReceipt(hash: `0x${string}`) {
+  return publicClient.getTransactionReceipt({ hash })
+}
+
+/** Fetch a block by number */
+export async function getBlock(blockNumber: bigint) {
+  return publicClient.getBlock({ blockNumber })
 }

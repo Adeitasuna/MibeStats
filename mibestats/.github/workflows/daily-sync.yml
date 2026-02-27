@@ -27,13 +27,13 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL:   ${{ secrets.DIRECT_URL }}
 
-      - name: Sync new sales
-        run: npx tsx scripts/sync-sales.ts
+      - name: Sync sales (on-chain)
+        run: npx tsx scripts/sync-sales-onchain.ts
         env:
-          DATABASE_URL:    ${{ secrets.DATABASE_URL }}
-          DIRECT_URL:      ${{ secrets.DIRECT_URL }}
-          ME_BEARER_TOKEN: ${{ secrets.ME_BEARER_TOKEN }}
-          NEXT_PUBLIC_ME_COLLECTION_SLUG: mibera333
+          DATABASE_URL:       ${{ secrets.DATABASE_URL }}
+          DIRECT_URL:         ${{ secrets.DIRECT_URL }}
+          BERACHAIN_RPC_URL:  ${{ secrets.BERACHAIN_RPC_URL }}
+          NEXT_PUBLIC_CONTRACT_ADDRESS: '0x6666397DFe9a8c469BF65dc744CB1C733416c420'
 
       - name: Sync owner addresses
         run: npx tsx scripts/sync-owners.ts
