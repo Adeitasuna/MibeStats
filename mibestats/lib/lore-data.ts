@@ -26,6 +26,7 @@ export interface FractureStage {
   contract: string
   description: string
   label: string
+  imageUrl: string
 }
 
 export const LORE_DOCUMENTS: LoreLink[] = [
@@ -89,6 +90,7 @@ export const FBI_FUGITIVES: FugitiveCard[] = [
   { handle: '@mibera_grails', displayName: 'mibera_grails', description: 'Tracking the 42 hand-drawn 1/1 grail masterpieces', avatarUrl: 'https://unavatar.io/twitter/mibera_grails' },
 ]
 
+// Example images from Mibera #2474 across all reveal phases
 export const FRACTURE_STAGES: FractureStage[] = [
   {
     phase: 1,
@@ -97,6 +99,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0x6956dae88C00372B1A0b2dfBfE5Eed19F85b0D4B',
     description: 'Sealed envelopes — labels, stickers, lore scrawl',
     label: 'Phase 1',
+    imageUrl: 'https://ipfs.io/ipfs/bafybeiexd3lj53j4gpm7rcvnvprlfaa5kqj7bi4zlh4tlj5og23j6fyese/2474.png',
   },
   {
     phase: 2,
@@ -105,6 +108,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0x8D4972bd5D2df474e71da6676a365fB549853991',
     description: 'Flipped Milady Maker art with toilet graffiti',
     label: 'Phase 2',
+    imageUrl: 'https://ipfs.io/ipfs/bafybeie26hxmg7vdrokv7lxdyrumykj5rkgwabklckdmiyrdsc2hu3crgq/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 3,
@@ -113,6 +117,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0x77ec6B83495974a5B2C5BEf943b0f2e5aCd8Fc26',
     description: 'Colors and scenery — first hints, rare foregrounds',
     label: 'Phase 3',
+    imageUrl: 'https://ipfs.io/ipfs/bafybeid5cjlzpabdziixqw4g6bi57bj4b27egpsxag6pjet2i34o4ph3fq/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 4,
@@ -121,6 +126,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0xc557Bf6C7d21BA98A40dDfE2BEAbA682C49D17A9',
     description: 'Scene clears, molecule placed, silhouette appears',
     label: 'Phase 4',
+    imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase3/reveal_phase3_images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 5,
@@ -129,6 +135,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0xbcb082bB41E892f29d9c600eaadEA698d5f712Ef',
     description: 'Form takes shape, astrology revealed, eyes closed',
     label: 'Phase 5',
+    imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase4/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 6,
@@ -137,6 +144,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0x2030f226Bf9a0c886887e83AcCdcEfb7Dae26009',
     description: 'Moon appears, hat placed if applicable',
     label: 'Phase 6',
+    imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase5/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 7,
@@ -145,6 +153,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0xcc426F9375c5edcef5CA6bDb0449c071133348cF',
     description: 'Mibera awakens — rising sign, face finalized',
     label: 'Phase 7',
+    imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase6/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 8,
@@ -153,6 +162,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0xF68f402230E39067Ee7c98Fe9A86641fC124c5BE',
     description: 'Head takes final form, ancient emblem appears',
     label: 'Phase 8',
+    imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase7/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 9,
@@ -161,6 +171,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0xFc79B1BcCa172FF5a8F7425C82F5CBB0125Dd10',
     description: 'Tattoos added — calm before the storm',
     label: 'Phase 9',
+    imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase8/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
   {
     phase: 10,
@@ -169,5 +180,6 @@ export const FRACTURE_STAGES: FractureStage[] = [
     contract: '0xa3d3EF45712631A6Fb50c677762b8653f932cf71',
     description: 'Final reveal — the current Mibera collection',
     label: 'Phase 10',
+    imageUrl: 'https://gateway.irys.xyz/7rpvwFYcB5t7S1HziaBAr4RgfAFpqCwCYbFUbkFqpbAq/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
 ]

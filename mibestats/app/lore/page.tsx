@@ -56,70 +56,128 @@ export default function LorePage() {
         </div>
       </section>
 
-      {/* ── Fractures — Horizontal Timeline ── */}
+      {/* ── Fractures — Alternating Timeline with Images ── */}
       <section>
         <h2 className="section-title" style={{ fontSize: '1.2rem' }}>Fractures — The Reveal Timeline</h2>
         <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '0.5rem' }} />
-        <p style={{ color: '#888', fontSize: '0.75rem', marginBottom: '1rem' }}>
-          10 soulbound ERC-721 collections marking each phase of Mibera&apos;s progressive reveal
+        <p style={{ color: '#888', fontSize: '0.75rem', marginBottom: '1.5rem' }}>
+          10 soulbound ERC-721 collections marking each phase of Mibera&apos;s progressive reveal — example: Mibera #2474
         </p>
 
-        {/* Horizontal scrollable timeline */}
-        <div style={{ overflowX: 'auto', paddingBottom: '0.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', minWidth: 'max-content', position: 'relative' }}>
-            {/* Connecting line */}
-            <div style={{
-              position: 'absolute',
-              top: '1.1rem',
-              left: '1.5rem',
-              right: '1.5rem',
-              height: '2px',
-              background: 'linear-gradient(90deg, #ffd700, #ffd700 80%, #2a2a2a)',
-            }} />
+        <div style={{ overflowX: 'auto', paddingBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'stretch', minWidth: 'max-content', position: 'relative' }}>
+            {FRACTURE_STAGES.map((stage, i) => {
+              const isTop = i % 2 === 0
+              const cardHeight = '220px'
 
-            {FRACTURE_STAGES.map((stage, i) => (
-              <div key={stage.phase} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '130px', flexShrink: 0, position: 'relative' }}>
-                {/* Phase dot */}
-                <div style={{
-                  width: '2.2rem',
-                  height: '2.2rem',
-                  borderRadius: '50%',
-                  background: '#0a0a0a',
-                  border: '2px solid #ffd700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 1,
-                }}>
-                  <span className="font-terminal" style={{ fontSize: '0.7rem', fontWeight: 700, color: '#ffd700' }}>
-                    {stage.phase}
-                  </span>
+              return (
+                <div key={stage.phase} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '140px', flexShrink: 0, position: 'relative' }}>
+                  {/* Top card area */}
+                  <div style={{ height: cardHeight, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: isTop ? '0' : '0' }}>
+                    {isTop && (
+                      <div className="card" style={{ padding: '0.4rem', width: '130px', textAlign: 'center' }}>
+                        <div style={{ width: '100px', height: '100px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a' }}>
+                          <Image
+                            src={stage.imageUrl}
+                            alt={stage.name}
+                            width={100}
+                            height={100}
+                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            unoptimized
+                          />
+                        </div>
+                        <p className="font-terminal" style={{ fontSize: '0.65rem', fontWeight: 600, color: '#fff', margin: '0 0 0.15rem 0' }}>
+                          {stage.name}
+                        </p>
+                        <p style={{ fontSize: '0.55rem', color: '#888', lineHeight: 1.3, margin: '0 0 0.2rem 0' }}>
+                          {stage.description}
+                        </p>
+                        <a
+                          href={`https://beratrail.io/address/${stage.contract}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-terminal"
+                          style={{ fontSize: '0.55rem', color: '#58a6ff', textDecoration: 'none' }}
+                          title={stage.contract}
+                        >
+                          {truncateAddress(stage.contract)}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Vertical connector (top) */}
+                  <div style={{ width: '2px', height: '0.5rem', background: isTop ? '#ffd700' : 'transparent' }} />
+
+                  {/* Phase dot + horizontal line */}
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Horizontal line segment */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: i === 0 ? '50%' : '-70px',
+                      right: i === FRACTURE_STAGES.length - 1 ? '50%' : '-70px',
+                      height: '2px',
+                      background: '#ffd700',
+                      transform: 'translateY(-50%)',
+                    }} />
+                    <div style={{
+                      width: '2rem',
+                      height: '2rem',
+                      borderRadius: '50%',
+                      background: '#0a0a0a',
+                      border: '2px solid #ffd700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                      zIndex: 2,
+                    }}>
+                      <span className="font-terminal" style={{ fontSize: '0.7rem', fontWeight: 700, color: '#ffd700' }}>
+                        {stage.phase}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Vertical connector (bottom) */}
+                  <div style={{ width: '2px', height: '0.5rem', background: !isTop ? '#ffd700' : 'transparent' }} />
+
+                  {/* Bottom card area */}
+                  <div style={{ height: cardHeight, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                    {!isTop && (
+                      <div className="card" style={{ padding: '0.4rem', width: '130px', textAlign: 'center' }}>
+                        <div style={{ width: '100px', height: '100px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a' }}>
+                          <Image
+                            src={stage.imageUrl}
+                            alt={stage.name}
+                            width={100}
+                            height={100}
+                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            unoptimized
+                          />
+                        </div>
+                        <p className="font-terminal" style={{ fontSize: '0.65rem', fontWeight: 600, color: '#fff', margin: '0 0 0.15rem 0' }}>
+                          {stage.name}
+                        </p>
+                        <p style={{ fontSize: '0.55rem', color: '#888', lineHeight: 1.3, margin: '0 0 0.2rem 0' }}>
+                          {stage.description}
+                        </p>
+                        <a
+                          href={`https://beratrail.io/address/${stage.contract}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-terminal"
+                          style={{ fontSize: '0.55rem', color: '#58a6ff', textDecoration: 'none' }}
+                          title={stage.contract}
+                        >
+                          {truncateAddress(stage.contract)}
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                {/* Vertical connector */}
-                <div style={{ width: '2px', height: '0.5rem', background: '#2a2a2a' }} />
-
-                {/* Card */}
-                <div className="card" style={{ padding: '0.5rem', width: '120px', textAlign: 'center' }}>
-                  <p className="font-terminal" style={{ fontSize: '0.65rem', fontWeight: 600, color: '#fff', margin: '0 0 0.2rem 0' }}>
-                    {stage.name}
-                  </p>
-                  <p style={{ fontSize: '0.55rem', color: '#888', lineHeight: 1.3, margin: '0 0 0.3rem 0' }}>
-                    {stage.description}
-                  </p>
-                  <a
-                    href={`https://beratrail.io/address/${stage.contract}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-terminal"
-                    style={{ fontSize: '0.55rem', color: '#58a6ff', textDecoration: 'none' }}
-                    title={stage.contract}
-                  >
-                    {truncateAddress(stage.contract)}
-                  </a>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
