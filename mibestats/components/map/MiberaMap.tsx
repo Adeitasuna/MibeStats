@@ -192,8 +192,7 @@ export function MiberaMap() {
   }
 
   const clearFilters = () => setActiveFilters({})
-  const activeFilterEntries = Object.entries(activeFilters).filter(([, v]) => v)
-  const filterCount = activeFilterEntries.length
+  const filterCount = Object.values(activeFilters).filter(Boolean).length
 
   const getOptions = (key: FilterKey): string[] => {
     if (!filterOptions) return []
@@ -207,10 +206,6 @@ export function MiberaMap() {
       case 'moonSign':      return filterOptions.moonSigns
       case 'ascendingSign': return filterOptions.ascendingSigns
     }
-  }
-
-  const getFilterLabel = (key: string): string => {
-    return FILTER_KEYS.find((f) => f.key === key)?.label ?? key
   }
 
   // Build color map + legend from current points
@@ -243,24 +238,6 @@ export function MiberaMap() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Stats bar */}
-      <div className="flex items-center gap-3 text-sm">
-        <span className="text-mibe-text-2">
-          <strong className="text-white text-lg tabular-nums">{data?.total?.toLocaleString() ?? '...'}</strong>{' '}
-          miberas
-        </span>
-        {loading && (
-          <span className="inline-flex items-center gap-1.5 text-mibe-gold text-xs">
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
-              <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Loading...
-          </span>
-        )}
-        {error && <span className="text-mibe-red text-xs">{error}</span>}
-      </div>
-
       {/* Color-by selector */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '0.65rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -287,8 +264,8 @@ export function MiberaMap() {
         ))}
       </div>
 
-      {/* Filters */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
+      {/* Filters — extra top spacing */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
         {FILTER_KEYS.map((def) => (
           <div key={def.key} style={{ flex: '1 1 0', minWidth: '100px' }}>
             <label
@@ -334,24 +311,6 @@ export function MiberaMap() {
         )}
       </div>
 
-      {/* Active filter pills */}
-      {filterCount > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {activeFilterEntries.map(([key, value]) => (
-            <button
-              key={key}
-              onClick={() => setFilter(key as FilterKey, '')}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mibe-gold/15 text-mibe-gold text-xs font-medium hover:bg-mibe-gold/25 transition-colors"
-            >
-              <span className="text-mibe-text-2">{getFilterLabel(key)}:</span> {value}
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Legend (1/6) + Map (5/6) */}
       <div style={{ display: 'flex', gap: '0.5rem', height: '500px' }}>
         {/* Legend sidebar */}
@@ -365,39 +324,67 @@ export function MiberaMap() {
             flexShrink: 0,
           }}
         >
-          <div style={{ fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.5rem' }}>
+          {/* Count + loading */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
+            <strong className="font-terminal" style={{ color: '#fff', fontSize: '0.85rem' }}>
+              {data?.total?.toLocaleString() ?? '...'}
+            </strong>
+            <span className="font-terminal" style={{ color: '#888', fontSize: '0.65rem' }}>miberas</span>
+            {loading && (
+              <svg width="10" height="10" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite', color: '#ffd700' }}>
+                <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+          </div>
+          {error && <div className="font-terminal" style={{ color: '#f85149', fontSize: '0.6rem', marginBottom: '0.3rem' }}>{error}</div>}
+
+          {/* Separator */}
+          <div style={{ borderTop: '1px solid #2a2a2a', marginBottom: '0.4rem' }} />
+
+          {/* Category title */}
+          <div style={{ fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.35rem' }}>
             {COLOR_BY_OPTIONS.find((o) => o.key === colorBy)?.label}
           </div>
+
+          {/* Legend items */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            {legendEntries.map((entry) => (
-              <div
-                key={entry.value}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}
-                onClick={() => setFilter(colorBy, activeFilters[colorBy] === entry.value ? '' : entry.value)}
-              >
-                <span style={{
-                  display: 'inline-block',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: entry.color,
-                  flexShrink: 0,
-                }} />
-                <span
-                  className="font-terminal"
-                  style={{
-                    fontSize: '0.6rem',
-                    color: activeFilters[colorBy] === entry.value ? '#fff' : '#888',
-                    fontWeight: activeFilters[colorBy] === entry.value ? 600 : 400,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
+            {legendEntries.map((entry) => {
+              const isActive = activeFilters[colorBy] === entry.value
+              return (
+                <div
+                  key={entry.value}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}
+                  onClick={() => setFilter(colorBy, isActive ? '' : entry.value)}
                 >
-                  {entry.value}
-                </span>
-              </div>
-            ))}
+                  <span style={{
+                    display: 'inline-block',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: entry.color,
+                    flexShrink: 0,
+                  }} />
+                  <span
+                    className="font-terminal"
+                    style={{
+                      fontSize: '0.6rem',
+                      color: isActive ? '#fff' : '#888',
+                      fontWeight: isActive ? 600 : 400,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flex: 1,
+                    }}
+                  >
+                    {entry.value}
+                  </span>
+                  {isActive && (
+                    <span style={{ color: '#f85149', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0, lineHeight: 1 }}>×</span>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 
