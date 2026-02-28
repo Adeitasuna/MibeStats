@@ -199,39 +199,56 @@ export function MiberaMap() {
       </div>
 
       {/* Filter map — always visible */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
-            Filter map
-          </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span className="section-title" style={{ fontSize: '1.1rem' }}>Filter map</span>
           {filterCount > 0 && (
             <button
               onClick={clearFilters}
-              className="text-[10px] text-mibe-muted hover:text-white transition-colors"
+              style={{ fontSize: '0.65rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none' }}
+              onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
+              onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
             >
               Clear all filters
             </button>
           )}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {FILTER_KEYS.map((def) => (
-            <div key={def.key}>
-              <label htmlFor={`map-filter-${def.key}`} className="text-[10px] text-mibe-text-2 uppercase tracking-wider block mb-1 font-medium">
-                {def.label}
-              </label>
-              <select
-                id={`map-filter-${def.key}`}
-                value={activeFilters[def.key] ?? ''}
-                onChange={(e) => setFilter(def.key, e.target.value)}
-                className="w-full px-2 py-1.5 rounded-lg bg-mibe-bg border border-mibe-border text-white text-xs focus:border-mibe-gold focus:outline-none appearance-none cursor-pointer"
-              >
-                <option value="">All</option>
-                {getOptions(def.key).map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-          ))}
+        <div className="stat-card" style={{ padding: '0.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+            {FILTER_KEYS.map((def) => (
+              <div key={def.key}>
+                <label
+                  htmlFor={`map-filter-${def.key}`}
+                  style={{ display: 'block', fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
+                >
+                  {def.label}
+                </label>
+                <select
+                  id={`map-filter-${def.key}`}
+                  value={activeFilters[def.key] ?? ''}
+                  onChange={(e) => setFilter(def.key, e.target.value)}
+                  className="font-terminal"
+                  style={{
+                    width: '100%',
+                    padding: '0.3rem 0.4rem',
+                    fontSize: '0.7rem',
+                    color: activeFilters[def.key] ? '#ffd700' : '#e0e0e0',
+                    background: '#0a0a0a',
+                    border: '1px solid',
+                    borderColor: activeFilters[def.key] ? 'rgba(255,215,0,0.4)' : '#2a2a2a',
+                    borderRadius: '0.25rem',
+                    cursor: 'pointer',
+                    outline: 'none',
+                  }}
+                >
+                  <option value="">All</option>
+                  {getOptions(def.key).map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -255,14 +272,16 @@ export function MiberaMap() {
 
       {/* Map — continental view, no poles */}
       <div className="stat-card" style={{ overflow: 'hidden', height: '500px', padding: 0 }}>
+        <style>{`.mibemap .leaflet-tile-pane { filter: brightness(1.6) saturate(0.7); }`}</style>
         <MapContainer
+          className="mibemap"
           center={[25, 20]}
           zoom={3}
           minZoom={2}
           maxBounds={[[-60, -180], [75, 180]]}
           maxBoundsViscosity={0.8}
           preferCanvas={true}
-          style={{ height: '100%', width: '100%', background: '#0d1117' }}
+          style={{ height: '100%', width: '100%', background: '#151d2b' }}
           scrollWheelZoom={true}
         >
           <TileLayer
