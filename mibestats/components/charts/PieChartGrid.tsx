@@ -55,17 +55,17 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
           </Pie>
           <Tooltip
             contentStyle={{
-              background: '#21262d',
+              background: '#000',
               border: '1px solid #ffd700',
               borderRadius: 8,
               fontSize: 11,
               color: '#fff',
             }}
             itemStyle={{ color: '#fff' }}
-            labelStyle={{ color: '#888' }}
+            labelStyle={{ color: '#fff' }}
             formatter={(value: number, name: string) => {
               const pct = ((value / total) * 100).toFixed(1)
-              return [`${value.toLocaleString()} (${pct}%)`, name]
+              return [`${pct}% (${value.toLocaleString()})`, name]
             }}
           />
         </PieChart>

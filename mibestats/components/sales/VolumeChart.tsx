@@ -46,7 +46,9 @@ export function VolumeChart({ data }: Props) {
           width={64}
         />
         <Tooltip
-          contentStyle={{ background: '#111', border: '1px solid #222', borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 12, color: '#fff' }}
+          itemStyle={{ color: '#fff' }}
+          labelStyle={{ color: '#fff' }}
           formatter={(v: number) => [`${v.toFixed(2)} BERA`, 'Volume']}
         />
         <Bar dataKey="volume" fill="#EAB308" opacity={0.8} radius={[3, 3, 0, 0]} maxBarSize={32} />

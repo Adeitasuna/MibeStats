@@ -96,9 +96,11 @@ export function TraitDistributionChart({ traits, activeCategory, currentFilters 
             <Tooltip
               cursor={{ fill: 'rgba(255,255,255,0.04)' }}
               contentStyle={{
-                background: '#111', border: '1px solid #222',
-                borderRadius: 8, fontSize: 12,
+                background: '#000', border: '1px solid #ffd700',
+                borderRadius: 8, fontSize: 12, color: '#fff',
               }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#fff' }}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: number, _: string, props: any) => [
                 `${value.toLocaleString()} (${props.payload.pct}%)`,

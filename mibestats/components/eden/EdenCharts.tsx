@@ -43,15 +43,19 @@ export function EdenPieChart({ data, title }: EdenPieChartProps) {
           </Pie>
           <Tooltip
             contentStyle={{
-              background: '#21262d',
+              background: '#000',
               border: '1px solid #ffd700',
               borderRadius: 8,
               fontSize: 12,
               color: '#fff',
             }}
             itemStyle={{ color: '#fff' }}
-            labelStyle={{ color: '#888' }}
-            formatter={(value: number) => [value.toLocaleString(), 'Count']}
+            labelStyle={{ color: '#fff' }}
+            formatter={(value: number) => {
+              const total = data.reduce((s, d) => s + d.value, 0)
+              const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
+              return [`${pct}% (${value.toLocaleString()})`, 'Count']
+            }}
           />
           <Legend
             wrapperStyle={{ fontSize: 11, color: '#8b949e' }}

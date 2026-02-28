@@ -188,8 +188,9 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
                 width={45}
               />
               <Tooltip
-                contentStyle={{ background: '#21262d', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
-                labelStyle={{ color: '#8b949e' }}
+                contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 12, color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
+                labelStyle={{ color: '#fff' }}
                 formatter={(v: number) => [`${v} BERA`, 'Floor']}
               />
               <Area type="monotone" dataKey="price" stroke="#ffd700" strokeWidth={2} fill="url(#floorGradient)" dot={false} />
@@ -216,8 +217,14 @@ function EdenPie({ data, title }: { data: { name: string; value: number }[]; tit
               ))}
             </Pie>
             <Tooltip
-              contentStyle={{ background: '#21262d', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
-              formatter={(value: number) => [value.toLocaleString(), 'Count']}
+              contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 12, color: '#fff' }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#fff' }}
+              formatter={(value: number) => {
+                const total = data.reduce((s, d) => s + d.value, 0)
+                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
+                return [`${pct}% (${value.toLocaleString()})`, 'Count']
+              }}
             />
             <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />
           </PieChart>

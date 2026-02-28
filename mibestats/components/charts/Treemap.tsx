@@ -112,14 +112,14 @@ export function TimelineTreemap({ data }: TreemapProps) {
           >
             <Tooltip
               contentStyle={{
-                background: '#21262d',
+                background: '#000',
                 border: '1px solid #ffd700',
                 borderRadius: 8,
                 fontSize: 12,
                 color: '#fff',
               }}
               itemStyle={{ color: '#fff' }}
-              labelStyle={{ color: '#888' }}
+              labelStyle={{ color: '#fff' }}
               formatter={(value: number) => [
                 `${value.toLocaleString()} miberas`,
                 'Born this year',

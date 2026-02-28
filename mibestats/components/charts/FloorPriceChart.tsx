@@ -81,13 +81,13 @@ export function FloorPriceChart({ data }: Props) {
             />
             <Tooltip
               contentStyle={{
-                background: '#21262d',
+                background: '#000',
                 border: '1px solid #ffd700',
                 borderRadius: 8,
                 color: '#fff',
               }}
               itemStyle={{ color: '#fff' }}
-              labelStyle={{ color: '#888' }}
+              labelStyle={{ color: '#fff' }}
               formatter={(v: number) => [`${v} BERA`, 'Floor']}
             />
             <Area
