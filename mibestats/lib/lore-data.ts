@@ -9,6 +9,7 @@ export interface LoreLink {
 export interface TorLink {
   label: string
   url: string
+  description: string
 }
 
 export interface FugitiveCard {
@@ -66,26 +67,26 @@ export const LORE_DOCUMENTS: LoreLink[] = [
 ]
 
 export const TOR_LINKS: TorLink[] = [
-  { label: 'Official Site', url: 'https://mibera333.com' },
-  { label: 'Messages', url: 'https://mibera333.com/messages' },
-  { label: 'Orders', url: 'https://mibera333.com/orders' },
-  { label: 'Forum', url: 'https://mibera333.com/forum' },
-  { label: 'MagicEden Collection', url: 'https://magiceden.io/collections/berachain/mibera333' },
+  { label: 'Official Site', url: 'https://mibera333.com', description: 'Main portal of the Mibera333 darknet marketplace' },
+  { label: 'Messages', url: 'https://mibera333.com/messages', description: 'Encrypted communications between agents' },
+  { label: 'Orders', url: 'https://mibera333.com/orders', description: 'Track your parcel delivery status' },
+  { label: 'Forum', url: 'https://mibera333.com/forum', description: 'Community discussions and lore theories' },
+  { label: 'MagicEden Collection', url: 'https://magiceden.io/collections/berachain/mibera333', description: 'Browse and trade Mibera333 NFTs on MagicEden' },
 ]
 
 export const FBI_FUGITIVES: FugitiveCard[] = [
-  { handle: '@maboroshi_xyz', displayName: 'maboroshi', description: 'Creator & Artist' },
-  { handle: '@janitooor', displayName: 'janitooor', description: 'Community lead' },
-  { handle: '@0xHoneyJar', displayName: 'HoneyJar', description: 'The Jar' },
-  { handle: '@beaboroshi', displayName: 'beaboroshi', description: 'Berachain liaison' },
-  { handle: '@maboroshi333', displayName: 'maboroshi333', description: 'Alt dimension' },
-  { handle: '@MiberaBot', displayName: 'MiberaBot', description: 'Automated updates' },
-  { handle: '@Mibera333', displayName: 'Mibera333', description: 'Official account' },
-  { handle: '@bera_foundation', displayName: 'Berachain Foundation', description: 'The chain' },
-  { handle: '@beaboroshi_art', displayName: 'beaboroshi_art', description: 'Art account' },
-  { handle: '@mibeRA_stats', displayName: 'MibeStats', description: 'Analytics' },
-  { handle: '@mibera_lore', displayName: 'mibera_lore', description: 'Lore keeper' },
-  { handle: '@mibera_grails', displayName: 'mibera_grails', description: 'Grail tracker' },
+  { handle: '@maboroshi_xyz', displayName: 'maboroshi', description: 'Creator & artist behind the Mibera333 universe', avatarUrl: 'https://unavatar.io/twitter/maboroshi_xyz' },
+  { handle: '@janitooor', displayName: 'janitooor', description: 'Community lead, orchestrating the Mibera movement', avatarUrl: 'https://unavatar.io/twitter/janitooor' },
+  { handle: '@0xHoneyJar', displayName: 'HoneyJar', description: 'The Jar — Berachain ecosystem hub partnered with Mibera', avatarUrl: 'https://unavatar.io/twitter/0xHoneyJar' },
+  { handle: '@beaboroshi', displayName: 'beaboroshi', description: 'Berachain liaison, bridging Mibera to the chain', avatarUrl: 'https://unavatar.io/twitter/beaboroshi' },
+  { handle: '@maboroshi333', displayName: 'maboroshi333', description: 'Alt dimension persona of the creator', avatarUrl: 'https://unavatar.io/twitter/maboroshi333' },
+  { handle: '@MiberaBot', displayName: 'MiberaBot', description: 'Automated bot posting sales, listings and updates', avatarUrl: 'https://unavatar.io/twitter/MiberaBot' },
+  { handle: '@Mibera333', displayName: 'Mibera333', description: 'Official Mibera333 project account', avatarUrl: 'https://unavatar.io/twitter/Mibera333' },
+  { handle: '@bera_foundation', displayName: 'Berachain Foundation', description: 'Foundation behind the Berachain L1', avatarUrl: 'https://unavatar.io/twitter/bera_foundation' },
+  { handle: '@beaboroshi_art', displayName: 'beaboroshi_art', description: 'Art-focused account showcasing Mibera artwork', avatarUrl: 'https://unavatar.io/twitter/beaboroshi_art' },
+  { handle: '@mibeRA_stats', displayName: 'MibeStats', description: 'Analytics and statistics for the Mibera collection', avatarUrl: 'https://unavatar.io/twitter/mibeRA_stats' },
+  { handle: '@mibera_lore', displayName: 'mibera_lore', description: 'Deep dives into the Mibera333 mythology and lore', avatarUrl: 'https://unavatar.io/twitter/mibera_lore' },
+  { handle: '@mibera_grails', displayName: 'mibera_grails', description: 'Tracking the 42 hand-drawn 1/1 grail masterpieces', avatarUrl: 'https://unavatar.io/twitter/mibera_grails' },
 ]
 
 export const FRACTURE_STAGES: FractureStage[] = [
