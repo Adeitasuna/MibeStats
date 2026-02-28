@@ -240,7 +240,7 @@ export function MiberaMap() {
     <div className="flex flex-col gap-3">
       {/* Color-by selector */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.65rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span style={{ fontSize: '0.85rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Color by
         </span>
         {COLOR_BY_OPTIONS.map((opt) => (
@@ -249,8 +249,8 @@ export function MiberaMap() {
             onClick={() => setColorBy(opt.key)}
             className="font-terminal"
             style={{
-              padding: '0.2rem 0.5rem',
-              fontSize: '0.7rem',
+              padding: '0.25rem 0.6rem',
+              fontSize: '0.85rem',
               borderRadius: '0.25rem',
               border: '1px solid',
               borderColor: colorBy === opt.key ? '#ffd700' : '#2a2a2a',
@@ -270,7 +270,7 @@ export function MiberaMap() {
           <div key={def.key} style={{ flex: '1 1 0', minWidth: '100px' }}>
             <label
               htmlFor={`map-filter-${def.key}`}
-              style={{ display: 'block', fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
+              style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
             >
               {def.label}
             </label>
@@ -281,8 +281,8 @@ export function MiberaMap() {
               className="font-terminal"
               style={{
                 width: '100%',
-                padding: '0.3rem 0.4rem',
-                fontSize: '0.7rem',
+                padding: '0.35rem 0.5rem',
+                fontSize: '0.85rem',
                 color: activeFilters[def.key] ? '#ffd700' : '#e0e0e0',
                 background: '#0a0a0a',
                 border: '1px solid',
@@ -302,7 +302,7 @@ export function MiberaMap() {
         {filterCount > 0 && (
           <button
             onClick={clearFilters}
-            style={{ fontSize: '0.65rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none', paddingBottom: '0.3rem' }}
+            style={{ fontSize: '0.8rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none', paddingBottom: '0.3rem' }}
             onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
             onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
           >
@@ -326,10 +326,10 @@ export function MiberaMap() {
         >
           {/* Count + loading */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
-            <strong className="font-terminal" style={{ color: '#fff', fontSize: '0.85rem' }}>
+            <strong className="font-terminal" style={{ color: '#fff', fontSize: '1rem' }}>
               {data?.total?.toLocaleString() ?? '...'}
             </strong>
-            <span className="font-terminal" style={{ color: '#888', fontSize: '0.65rem' }}>miberas</span>
+            <span className="font-terminal" style={{ color: '#888', fontSize: '0.8rem' }}>miberas</span>
             {loading && (
               <svg width="10" height="10" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite', color: '#ffd700' }}>
                 <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -337,13 +337,13 @@ export function MiberaMap() {
               </svg>
             )}
           </div>
-          {error && <div className="font-terminal" style={{ color: '#f85149', fontSize: '0.6rem', marginBottom: '0.3rem' }}>{error}</div>}
+          {error && <div className="font-terminal" style={{ color: '#f85149', fontSize: '0.8rem', marginBottom: '0.3rem' }}>{error}</div>}
 
           {/* Separator */}
           <div style={{ borderTop: '1px solid #2a2a2a', marginBottom: '0.4rem' }} />
 
           {/* Category title */}
-          <div style={{ fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.35rem' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.35rem' }}>
             {COLOR_BY_OPTIONS.find((o) => o.key === colorBy)?.label}
           </div>
 
@@ -368,7 +368,7 @@ export function MiberaMap() {
                   <span
                     className="font-terminal"
                     style={{
-                      fontSize: '0.6rem',
+                      fontSize: '0.75rem',
                       color: isActive ? '#fff' : '#888',
                       fontWeight: isActive ? 600 : 400,
                       whiteSpace: 'nowrap',
@@ -380,7 +380,7 @@ export function MiberaMap() {
                     {entry.value}
                   </span>
                   {isActive && (
-                    <span style={{ color: '#f85149', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0, lineHeight: 1 }}>×</span>
+                    <span style={{ color: '#f85149', fontSize: '0.85rem', fontWeight: 700, flexShrink: 0, lineHeight: 1 }}>×</span>
                   )}
                 </div>
               )
