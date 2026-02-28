@@ -198,58 +198,51 @@ export function MiberaMap() {
         {error && <span className="text-mibe-red text-xs">{error}</span>}
       </div>
 
-      {/* Filter map — always visible */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span className="section-title" style={{ fontSize: '1.1rem' }}>Filter map</span>
-          {filterCount > 0 && (
-            <button
-              onClick={clearFilters}
-              style={{ fontSize: '0.65rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none' }}
-              onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
-              onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+      {/* Filters */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
+        {FILTER_KEYS.map((def) => (
+          <div key={def.key} style={{ flex: '1 1 0', minWidth: '100px' }}>
+            <label
+              htmlFor={`map-filter-${def.key}`}
+              style={{ display: 'block', fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
             >
-              Clear all filters
-            </button>
-          )}
-        </div>
-        <div className="stat-card" style={{ padding: '0.75rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
-            {FILTER_KEYS.map((def) => (
-              <div key={def.key}>
-                <label
-                  htmlFor={`map-filter-${def.key}`}
-                  style={{ display: 'block', fontSize: '0.6rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
-                >
-                  {def.label}
-                </label>
-                <select
-                  id={`map-filter-${def.key}`}
-                  value={activeFilters[def.key] ?? ''}
-                  onChange={(e) => setFilter(def.key, e.target.value)}
-                  className="font-terminal"
-                  style={{
-                    width: '100%',
-                    padding: '0.3rem 0.4rem',
-                    fontSize: '0.7rem',
-                    color: activeFilters[def.key] ? '#ffd700' : '#e0e0e0',
-                    background: '#0a0a0a',
-                    border: '1px solid',
-                    borderColor: activeFilters[def.key] ? 'rgba(255,215,0,0.4)' : '#2a2a2a',
-                    borderRadius: '0.25rem',
-                    cursor: 'pointer',
-                    outline: 'none',
-                  }}
-                >
-                  <option value="">All</option>
-                  {getOptions(def.key).map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            ))}
+              {def.label}
+            </label>
+            <select
+              id={`map-filter-${def.key}`}
+              value={activeFilters[def.key] ?? ''}
+              onChange={(e) => setFilter(def.key, e.target.value)}
+              className="font-terminal"
+              style={{
+                width: '100%',
+                padding: '0.3rem 0.4rem',
+                fontSize: '0.7rem',
+                color: activeFilters[def.key] ? '#ffd700' : '#e0e0e0',
+                background: '#0a0a0a',
+                border: '1px solid',
+                borderColor: activeFilters[def.key] ? 'rgba(255,215,0,0.4)' : '#2a2a2a',
+                borderRadius: '0.25rem',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <option value="">All</option>
+              {getOptions(def.key).map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
-        </div>
+        ))}
+        {filterCount > 0 && (
+          <button
+            onClick={clearFilters}
+            style={{ fontSize: '0.65rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none', paddingBottom: '0.3rem' }}
+            onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
+            onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       {/* Active filter pills */}
