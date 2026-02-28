@@ -87,7 +87,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <style dangerouslySetInnerHTML={{ __html: `
         @media (min-width: 1024px) {
           #desktop-sidebar { display: block !important; }
-          #main-content { margin-left: calc(100vw / 6) !important; }
+          #main-content { margin-left: calc(100vw / 6) !important; padding-left: 2rem !important; padding-right: 2rem !important; }
         }
       `}} />
     </>
