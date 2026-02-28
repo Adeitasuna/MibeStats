@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         style={{
           position: 'fixed',
           left: 0,
-          top: '3rem',
+          top: '3.5rem',
           bottom: 0,
           width: 'calc(100vw / 6)',
           zIndex: 40,
@@ -55,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             style={{
               position: 'fixed',
               left: 0,
-              top: '3rem',
+              top: '3.5rem',
               bottom: 0,
               width: '14rem',
               zIndex: 40,
@@ -73,9 +73,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         id="main-content"
         className="p-4 lg:p-6"
         style={{
-          marginTop: '3rem',
+          marginTop: '3.5rem',
           marginLeft: 0,
-          minHeight: 'calc(100vh - 3rem)',
+          minHeight: 'calc(100vh - 3.5rem)',
         }}
       >
         <div className="max-w-6xl w-full">
