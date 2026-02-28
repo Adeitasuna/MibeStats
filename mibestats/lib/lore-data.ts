@@ -6,7 +6,7 @@ export interface LoreLink {
   description?: string
 }
 
-export interface TorLink {
+export interface SitePageLink {
   label: string
   url: string
   description: string
@@ -15,7 +15,9 @@ export interface TorLink {
 export interface FugitiveCard {
   handle: string
   displayName: string
-  description: string
+  alias?: string
+  profile: string
+  facts: string
   avatarUrl?: string
 }
 
@@ -67,27 +69,94 @@ export const LORE_DOCUMENTS: LoreLink[] = [
   },
 ]
 
-export const TOR_LINKS: TorLink[] = [
-  { label: 'Official Site', url: 'https://mibera333.com', description: 'Main portal of the Mibera333 darknet marketplace' },
-  { label: 'Messages', url: 'https://mibera333.com/messages', description: 'Encrypted communications between agents' },
-  { label: 'Orders', url: 'https://mibera333.com/orders', description: 'Track your parcel delivery status' },
-  { label: 'Forum', url: 'https://mibera333.com/forum', description: 'Community discussions and lore theories' },
-  { label: 'MagicEden Collection', url: 'https://magiceden.io/collections/berachain/mibera333', description: 'Browse and trade Mibera333 NFTs on MagicEden' },
+export const OFFICIAL_SITE_PAGES: SitePageLink[] = [
+  { label: 'Honey Road', url: 'https://mibera.0xhoneyjar.xyz/', description: 'Main portal — the Mibera darknet marketplace homepage' },
+  { label: 'Messages', url: 'https://mibera.0xhoneyjar.xyz/messages', description: 'Encrypted communications between agents and operators' },
+  { label: 'Orders', url: 'https://mibera.0xhoneyjar.xyz/orders', description: 'Track your parcel delivery status across the network' },
+  { label: 'Fractures', url: 'https://mibera.0xhoneyjar.xyz/fractures', description: 'Soulbound reveal timeline — track the progressive unveiling' },
+  { label: 'Stash', url: 'https://mibera.0xhoneyjar.xyz/stash', description: 'Your personal inventory of collected items and assets' },
+  { label: 'Gallery', url: 'https://mibera.0xhoneyjar.xyz/gallery', description: 'Browse the full Mibera art collection and trait explorer' },
+  { label: 'Forum', url: 'https://mibera.0xhoneyjar.xyz/forum', description: 'Community discussions, lore theories and agent intel' },
+  { label: 'Vending Machine', url: 'https://mibera.0xhoneyjar.xyz/vm', description: 'Automated dispensary for special items and drops' },
+  { label: 'Backing', url: 'https://mibera.0xhoneyjar.xyz/backing', description: 'Support and backing information for the project' },
+  { label: 'Quiz', url: 'https://mibera.0xhoneyjar.xyz/quiz', description: 'Test your knowledge of the Mibera333 universe' },
+  { label: 'Maker', url: 'https://mibera.0xhoneyjar.xyz/maker', description: 'Create and customize your own Mibera content' },
+  { label: 'MagicEden', url: 'https://magiceden.io/collections/berachain/mibera333', description: 'Browse and trade Mibera333 NFTs on MagicEden marketplace' },
 ]
 
 export const FBI_FUGITIVES: FugitiveCard[] = [
-  { handle: '@maboroshi_xyz', displayName: 'maboroshi', description: 'Creator & artist behind the Mibera333 universe', avatarUrl: 'https://unavatar.io/twitter/maboroshi_xyz' },
-  { handle: '@janitooor', displayName: 'janitooor', description: 'Community lead, orchestrating the Mibera movement', avatarUrl: 'https://unavatar.io/twitter/janitooor' },
-  { handle: '@0xHoneyJar', displayName: 'HoneyJar', description: 'The Jar — Berachain ecosystem hub partnered with Mibera', avatarUrl: 'https://unavatar.io/twitter/0xHoneyJar' },
-  { handle: '@beaboroshi', displayName: 'beaboroshi', description: 'Berachain liaison, bridging Mibera to the chain', avatarUrl: 'https://unavatar.io/twitter/beaboroshi' },
-  { handle: '@maboroshi333', displayName: 'maboroshi333', description: 'Alt dimension persona of the creator', avatarUrl: 'https://unavatar.io/twitter/maboroshi333' },
-  { handle: '@MiberaBot', displayName: 'MiberaBot', description: 'Automated bot posting sales, listings and updates', avatarUrl: 'https://unavatar.io/twitter/MiberaBot' },
-  { handle: '@Mibera333', displayName: 'Mibera333', description: 'Official Mibera333 project account', avatarUrl: 'https://unavatar.io/twitter/Mibera333' },
-  { handle: '@bera_foundation', displayName: 'Berachain Foundation', description: 'Foundation behind the Berachain L1', avatarUrl: 'https://unavatar.io/twitter/bera_foundation' },
-  { handle: '@beaboroshi_art', displayName: 'beaboroshi_art', description: 'Art-focused account showcasing Mibera artwork', avatarUrl: 'https://unavatar.io/twitter/beaboroshi_art' },
-  { handle: '@mibeRA_stats', displayName: 'MibeStats', description: 'Analytics and statistics for the Mibera collection', avatarUrl: 'https://unavatar.io/twitter/mibeRA_stats' },
-  { handle: '@mibera_lore', displayName: 'mibera_lore', description: 'Deep dives into the Mibera333 mythology and lore', avatarUrl: 'https://unavatar.io/twitter/mibera_lore' },
-  { handle: '@mibera_grails', displayName: 'mibera_grails', description: 'Tracking the 42 hand-drawn 1/1 grail masterpieces', avatarUrl: 'https://unavatar.io/twitter/mibera_grails' },
+  {
+    handle: '@maboroshi_xyz', displayName: 'maboroshi', alias: 'The Architect',
+    profile: 'Mastermind behind the creation of an entire underground universe',
+    facts: 'Hand-drew 3333 unique characters, designed the drug-tarot system, built the lore from scratch',
+    avatarUrl: 'https://unavatar.io/twitter/maboroshi_xyz',
+  },
+  {
+    handle: '@janitooor', displayName: 'janitooor', alias: 'The Janitor',
+    profile: 'Suspected of orchestrating community operations at industrial scale',
+    facts: 'Leads community coordination, organizes events, keeps the Mibera movement alive daily',
+    avatarUrl: 'https://unavatar.io/twitter/janitooor',
+  },
+  {
+    handle: '@0xHoneyJar', displayName: 'HoneyJar', alias: 'The Jar',
+    profile: 'Running a massive Berachain ecosystem hub with suspected Mibera ties',
+    facts: 'Partnered with Mibera for distribution, built the Honey Road marketplace infrastructure',
+    avatarUrl: 'https://unavatar.io/twitter/0xHoneyJar',
+  },
+  {
+    handle: '@beaboroshi', displayName: 'beaboroshi', alias: 'The Liaison',
+    profile: 'Double agent bridging between Berachain core and the Mibera underground',
+    facts: 'Bridges Mibera to the Berachain ecosystem, facilitates chain-level integrations',
+    avatarUrl: 'https://unavatar.io/twitter/beaboroshi',
+  },
+  {
+    handle: '@maboroshi333', displayName: 'maboroshi333', alias: 'The Shadow',
+    profile: 'Alternate identity operating in a parallel dimension of the creator',
+    facts: 'Alt persona channeling cryptic lore drops and experimental content',
+    avatarUrl: 'https://unavatar.io/twitter/maboroshi333',
+  },
+  {
+    handle: '@MiberaBot', displayName: 'MiberaBot', alias: 'The Machine',
+    profile: 'Automated surveillance unit reporting all marketplace activity',
+    facts: 'Posts real-time sales, listings and collection updates 24/7 without rest',
+    avatarUrl: 'https://unavatar.io/twitter/MiberaBot',
+  },
+  {
+    handle: '@Mibera333', displayName: 'Mibera333', alias: 'The Voice',
+    profile: 'Official propaganda channel of the Mibera333 operation',
+    facts: 'Official project account — announcements, reveals, and public communications',
+    avatarUrl: 'https://unavatar.io/twitter/Mibera333',
+  },
+  {
+    handle: '@bera_foundation', displayName: 'Berachain Foundation', alias: 'The Foundation',
+    profile: 'Suspected of providing the entire blockchain infrastructure for operations',
+    facts: 'Built the Berachain L1 where the entire Mibera economy operates',
+    avatarUrl: 'https://unavatar.io/twitter/bera_foundation',
+  },
+  {
+    handle: '@beaboroshi_art', displayName: 'beaboroshi_art', alias: 'The Curator',
+    profile: 'Running an underground art gallery showcasing illicit visual works',
+    facts: 'Showcases Mibera artwork, curates visual content and art-focused drops',
+    avatarUrl: 'https://unavatar.io/twitter/beaboroshi_art',
+  },
+  {
+    handle: '@mibeRA_stats', displayName: 'MibeStats', alias: 'The Analyst',
+    profile: 'Intelligence unit tracking all metrics and financial flows',
+    facts: 'Provides analytics, floor tracking, sales data and collection statistics',
+    avatarUrl: 'https://unavatar.io/twitter/mibeRA_stats',
+  },
+  {
+    handle: '@mibera_lore', displayName: 'mibera_lore', alias: 'The Archivist',
+    profile: 'Keeper of forbidden knowledge and mythological records',
+    facts: 'Deep dives into Mibera333 mythology, decodes lore and connects universe threads',
+    avatarUrl: 'https://unavatar.io/twitter/mibera_lore',
+  },
+  {
+    handle: '@mibera_grails', displayName: 'mibera_grails', alias: 'The Collector',
+    profile: 'Tracking the location of 42 priceless stolen masterpieces',
+    facts: 'Monitors the 42 hand-drawn 1/1 grail pieces — rarest items in the collection',
+    avatarUrl: 'https://unavatar.io/twitter/mibera_grails',
+  },
 ]
 
 // Example images from Mibera #2474 across all reveal phases
