@@ -221,7 +221,7 @@ export default function LorePage() {
       {/* ── FBI Top 12 Fugitives — Prison-style wanted cards ── */}
       <section>
         <h2 className="section-title" style={{ fontSize: '1.4rem' }}>
-          Searched by the FBI: Twitter TOP 12 fugitives
+          Searched by the FBI: TOP 7 fugitives
         </h2>
         <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '0.5rem' }} />
         <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1rem' }}>
