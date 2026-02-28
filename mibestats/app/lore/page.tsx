@@ -68,7 +68,7 @@ export default function LorePage() {
           <div style={{ display: 'flex', alignItems: 'stretch', minWidth: 'max-content', position: 'relative' }}>
             {FRACTURE_STAGES.map((stage, i) => {
               const isTop = i % 2 === 0
-              const cardHeight = '240px'
+              const cardHeight = '260px'
 
               return (
                 <div key={stage.phase} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '150px', flexShrink: 0, position: 'relative' }}>
@@ -76,13 +76,13 @@ export default function LorePage() {
                   <div style={{ height: cardHeight, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                     {isTop && (
                       <div className="card" style={{ padding: '0.5rem', width: '140px', textAlign: 'center' }}>
-                        <div style={{ width: '110px', height: '110px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a' }}>
+                        <div style={{ width: '120px', height: '120px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Image
                             src={stage.imageUrl}
                             alt={stage.name}
-                            width={110}
-                            height={110}
-                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            width={120}
+                            height={120}
+                            style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '100%' }}
                             unoptimized
                           />
                         </div>
@@ -146,13 +146,13 @@ export default function LorePage() {
                   <div style={{ height: cardHeight, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                     {!isTop && (
                       <div className="card" style={{ padding: '0.5rem', width: '140px', textAlign: 'center' }}>
-                        <div style={{ width: '110px', height: '110px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a' }}>
+                        <div style={{ width: '120px', height: '120px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Image
                             src={stage.imageUrl}
                             alt={stage.name}
-                            width={110}
-                            height={110}
-                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            width={120}
+                            height={120}
+                            style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '100%' }}
                             unoptimized
                           />
                         </div>
