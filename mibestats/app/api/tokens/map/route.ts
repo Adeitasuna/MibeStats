@@ -86,6 +86,9 @@ export async function GET(req: NextRequest) {
           element: r.element,
           timePeriod: r.time_period,
           swagRank: r.swag_rank,
+          sunSign: r.sun_sign,
+          moonSign: r.moon_sign,
+          ascendingSign: r.ascending_sign,
           isGrail: r.is_grail,
         }
       })
