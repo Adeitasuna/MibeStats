@@ -27,7 +27,8 @@ export default function LorePage() {
 
       {/* Lore Documents */}
       <section>
-        <h2 className="section-title text-xl mb-4">Lore</h2>
+        <h2 className="section-title text-xl">Lore</h2>
+        <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {LORE_DOCUMENTS.map((doc) => (
             <a
@@ -38,7 +39,7 @@ export default function LorePage() {
               className="card p-4 hover:border-mibe-gold transition-colors group flex flex-col gap-1"
             >
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-mibe-gold shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg width="16" height="16" style={{ color: '#ffd700', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 <h3 className="text-mibe-gold font-semibold group-hover:text-yellow-300 transition-colors text-sm">
@@ -55,7 +56,8 @@ export default function LorePage() {
 
       {/* Fractures — The Reveal Timeline */}
       <section>
-        <h2 className="section-title text-xl mb-2">Fractures — The Reveal Timeline</h2>
+        <h2 className="section-title text-xl">Fractures — The Reveal Timeline</h2>
+        <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '0.5rem' }} />
         <p className="text-mibe-text-2 text-xs mb-4">
           10 soulbound ERC-721 collections marking each phase of Mibera&apos;s progressive reveal
         </p>
@@ -90,7 +92,8 @@ export default function LorePage() {
 
       {/* On TOR */}
       <section>
-        <h2 className="section-title text-xl mb-4">On TOR</h2>
+        <h2 className="section-title text-xl">On TOR</h2>
+        <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
         <div className="flex flex-wrap gap-2">
           {TOR_LINKS.map((link) => (
             <a
@@ -100,7 +103,7 @@ export default function LorePage() {
               rel="noreferrer"
               className="card px-4 py-2.5 text-sm font-medium text-mibe-cyan hover:text-white hover:border-mibe-cyan hover:bg-mibe-hover/50 transition-all flex items-center gap-1.5"
             >
-              <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg width="14" height="14" style={{ flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
               {link.label}
@@ -111,9 +114,10 @@ export default function LorePage() {
 
       {/* FBI Top 12 Fugitives */}
       <section>
-        <h2 className="section-title text-xl mb-2">
+        <h2 className="section-title text-xl">
           Searched by the FBI: Twitter TOP 12 fugitives
         </h2>
+        <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '0.5rem' }} />
         <p className="text-mibe-text-2 text-xs mb-4">The most wanted accounts in the Mibera ecosystem</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {FBI_FUGITIVES.map((fugitive) => (
@@ -126,7 +130,7 @@ export default function LorePage() {
             >
               {/* Avatar placeholder — SVG silhouette */}
               <div className="w-14 h-14 rounded-full bg-mibe-hover flex items-center justify-center">
-                <svg className="w-7 h-7 text-mibe-muted group-hover:text-mibe-magenta transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <svg width="28" height="28" style={{ color: '#555' }} fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
               </div>
