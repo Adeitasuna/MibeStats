@@ -265,7 +265,7 @@ export function MiberaMap() {
       </div>
 
       {/* Filters — extra top spacing */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
         {FILTER_KEYS.map((def) => (
           <div key={def.key} style={{ flex: '1 1 0', minWidth: '100px' }}>
             <label
@@ -312,7 +312,7 @@ export function MiberaMap() {
       </div>
 
       {/* Legend (1/6) + Map (5/6) */}
-      <div style={{ display: 'flex', gap: '0.5rem', height: '500px' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', height: '500px', marginTop: '1rem' }}>
         {/* Legend sidebar */}
         <div
           className="stat-card"
