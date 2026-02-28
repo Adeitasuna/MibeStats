@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Ancestor color palette (33 ancestors in codex)
@@ -87,25 +87,6 @@ const FILTER_KEYS = [
 
 type FilterKey = typeof FILTER_KEYS[number]['key']
 
-// Component to fit map bounds to points — only on first load
-function FitBounds({ points }: { points: MapPoint[] }) {
-  const map = useMap()
-  const hasFitted = useRef(false)
-  useEffect(() => {
-    if (hasFitted.current || points.length === 0) return
-    let minLat = Infinity, maxLat = -Infinity
-    let minLng = Infinity, maxLng = -Infinity
-    for (const p of points) {
-      if (p.lat < minLat) minLat = p.lat
-      if (p.lat > maxLat) maxLat = p.lat
-      if (p.lng < minLng) minLng = p.lng
-      if (p.lng > maxLng) maxLng = p.lng
-    }
-    map.fitBounds([[minLat, minLng], [maxLat, maxLng]], { padding: [20, 20] })
-    hasFitted.current = true
-  }, [map, points])
-  return null
-}
 
 export function MiberaMap() {
   const [data, setData] = useState<MapResponse | null>(null)
@@ -113,7 +94,6 @@ export function MiberaMap() {
   const [error, setError] = useState<string | null>(null)
   const [activeFilters, setActiveFilters] = useState<Partial<Record<FilterKey, string>>>({})
   const [filterOptions, setFilterOptions] = useState<MapFilters | null>(null)
-  const [filtersOpen, setFiltersOpen] = useState(false)
   const initialLoad = useRef(true)
 
   // Fetch filter options once
@@ -199,39 +179,60 @@ export function MiberaMap() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      {/* Stats bar + filter toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem' }}>
-          <span style={{ color: '#8b949e' }}>
-            <strong style={{ color: '#fff', fontSize: '1.125rem' }}>{data?.total?.toLocaleString() ?? '...'}</strong>{' '}
-            miberas
+    <div className="flex flex-col gap-3">
+      {/* Stats bar */}
+      <div className="flex items-center gap-3 text-sm">
+        <span className="text-mibe-text-2">
+          <strong className="text-white text-lg tabular-nums">{data?.total?.toLocaleString() ?? '...'}</strong>{' '}
+          miberas
+        </span>
+        {loading && (
+          <span className="inline-flex items-center gap-1.5 text-mibe-gold text-xs">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
+              <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Loading...
           </span>
-          {loading && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', color: '#ffd700', fontSize: '0.75rem' }}>
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
-                <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Loading...
-            </span>
-          )}
-          {error && <span style={{ color: '#f85149', fontSize: '0.75rem' }}>{error}</span>}
-        </div>
-        <button
-          onClick={() => setFiltersOpen((o) => !o)}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', padding: '0.375rem 0.75rem', borderRadius: '0.5rem', background: '#161b22', border: '1px solid #30363d', fontSize: '0.875rem', color: '#8b949e', cursor: 'pointer' }}
-        >
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          Filters
+        )}
+        {error && <span className="text-mibe-red text-xs">{error}</span>}
+      </div>
+
+      {/* Filter map — always visible */}
+      <div className="card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+            Filter map
+          </h3>
           {filterCount > 0 && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: '#ffd700', color: '#000', fontSize: '10px', fontWeight: 700 }}>
-              {filterCount}
-            </span>
+            <button
+              onClick={clearFilters}
+              className="text-[10px] text-mibe-muted hover:text-white transition-colors"
+            >
+              Clear all filters
+            </button>
           )}
-        </button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {FILTER_KEYS.map((def) => (
+            <div key={def.key}>
+              <label htmlFor={`map-filter-${def.key}`} className="text-[10px] text-mibe-text-2 uppercase tracking-wider block mb-1 font-medium">
+                {def.label}
+              </label>
+              <select
+                id={`map-filter-${def.key}`}
+                value={activeFilters[def.key] ?? ''}
+                onChange={(e) => setFilter(def.key, e.target.value)}
+                className="w-full px-2 py-1.5 rounded-lg bg-mibe-bg border border-mibe-border text-white text-xs focus:border-mibe-gold focus:outline-none appearance-none cursor-pointer"
+              >
+                <option value="">All</option>
+                {getOptions(def.key).map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Active filter pills */}
@@ -244,116 +245,58 @@ export function MiberaMap() {
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mibe-gold/15 text-mibe-gold text-xs font-medium hover:bg-mibe-gold/25 transition-colors"
             >
               <span className="text-mibe-text-2">{getFilterLabel(key)}:</span> {value}
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           ))}
-          <button
-            onClick={clearFilters}
-            className="text-[10px] text-mibe-muted hover:text-white transition-colors px-1.5 py-0.5"
-          >
-            Clear all
-          </button>
         </div>
       )}
 
-      {/* Collapsible Filters */}
-      {filtersOpen && (
-        <div className="card p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {FILTER_KEYS.map((def) => (
-              <div key={def.key}>
-                <label htmlFor={`map-filter-${def.key}`} className="text-[10px] text-mibe-text-2 uppercase tracking-wider block mb-1 font-medium">
-                  {def.label}
-                </label>
-                <select
-                  id={`map-filter-${def.key}`}
-                  value={activeFilters[def.key] ?? ''}
-                  onChange={(e) => setFilter(def.key, e.target.value)}
-                  className="w-full px-2 py-1.5 rounded-lg bg-mibe-bg border border-mibe-border text-white text-xs focus:border-mibe-gold focus:outline-none appearance-none cursor-pointer"
-                >
-                  <option value="">All</option>
-                  {getOptions(def.key).map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Map */}
+      {/* Map — continental view, no poles */}
       <div className="stat-card" style={{ overflow: 'hidden', height: '500px', padding: 0 }}>
         <MapContainer
-            center={[20, 0]}
-            zoom={2}
-            preferCanvas={true}
-            style={{ height: '100%', width: '100%', background: '#0d1117' }}
-            scrollWheelZoom={true}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            />
-            {(data?.points ?? []).map((point) => (
-              <CircleMarker
-                key={point.id}
-                center={[point.lat, point.lng]}
-                radius={point.isGrail ? 5 : 2.5}
-                pathOptions={{
-                  color: getAncestorColor(point.ancestor),
-                  fillColor: getAncestorColor(point.ancestor),
-                  fillOpacity: point.isGrail ? 1 : 0.7,
-                  weight: point.isGrail ? 2 : 0,
-                  stroke: point.isGrail,
-                }}
-              >
-                <Popup>
-                  <div className="text-xs" style={{ color: '#333' }}>
-                    <strong>Mibera #{point.id}</strong>
-                    {point.isGrail && <span style={{ color: '#ffd700' }}> GRAIL</span>}
-                    <br />
-                    Ancestor: {point.ancestor}<br />
-                    Archetype: {point.archetype}<br />
-                    {point.element && <>Element: {point.element}<br /></>}
-                    Period: {point.timePeriod}<br />
-                    Rank: {point.swagRank}
-                  </div>
-                </Popup>
-              </CircleMarker>
-            ))}
-            {data?.points && data.points.length > 0 && <FitBounds points={data.points} />}
-          </MapContainer>
-      </div>
-
-      {/* Legend */}
-      <div className="card p-3">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-[10px] font-semibold text-mibe-gold uppercase tracking-wider">
-            Ancestors — click to filter
-          </h3>
-          <span className="text-[10px] text-mibe-muted">{data?.ancestors?.length ?? Object.keys(ANCESTOR_COLORS).length} ancestors</span>
-        </div>
-        <div className="flex flex-wrap gap-x-3 gap-y-1">
-          {(data?.ancestors ?? Object.keys(ANCESTOR_COLORS)).map((ancestor) => (
-            <button
-              key={ancestor}
-              onClick={() => setFilter('ancestor', activeFilters.ancestor === ancestor ? '' : ancestor)}
-              className="flex items-center gap-1 text-[11px] text-mibe-text-2 hover:text-white transition-colors py-0.5"
-              aria-label={`Filter by ancestor: ${ancestor}`}
+          center={[25, 20]}
+          zoom={3}
+          minZoom={2}
+          maxBounds={[[-60, -180], [75, 180]]}
+          maxBoundsViscosity={0.8}
+          preferCanvas={true}
+          style={{ height: '100%', width: '100%', background: '#0d1117' }}
+          scrollWheelZoom={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          />
+          {(data?.points ?? []).map((point) => (
+            <CircleMarker
+              key={point.id}
+              center={[point.lat, point.lng]}
+              radius={point.isGrail ? 5 : 2.5}
+              pathOptions={{
+                color: getAncestorColor(point.ancestor),
+                fillColor: getAncestorColor(point.ancestor),
+                fillOpacity: point.isGrail ? 1 : 0.7,
+                weight: point.isGrail ? 2 : 0,
+                stroke: point.isGrail,
+              }}
             >
-              <span
-                className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-                style={{ backgroundColor: getAncestorColor(ancestor) }}
-              />
-              <span className={activeFilters.ancestor === ancestor ? 'text-white font-semibold' : ''}>
-                {ancestor}
-              </span>
-            </button>
+              <Popup>
+                <div className="text-xs" style={{ color: '#333' }}>
+                  <strong>Mibera #{point.id}</strong>
+                  {point.isGrail && <span style={{ color: '#ffd700' }}> GRAIL</span>}
+                  <br />
+                  Ancestor: {point.ancestor}<br />
+                  Archetype: {point.archetype}<br />
+                  {point.element && <>Element: {point.element}<br /></>}
+                  Period: {point.timePeriod}<br />
+                  Rank: {point.swagRank}
+                </div>
+              </Popup>
+            </CircleMarker>
           ))}
-        </div>
+        </MapContainer>
       </div>
     </div>
   )
