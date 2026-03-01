@@ -93,8 +93,8 @@ export const FBI_FUGITIVES: FugitiveCard[] = [
   },
   {
     handle: '@gumibera_', displayName: 'Gumi', alias: 'The MibeDesigner',
-    profile: 'Suspected of flipping Milady from the white side to the dark — what an artist',
-    facts: 'Original artist behind the Mibera collection. Created the Mibera-codex. Mastermind who took Milady aesthetics and twisted them into something beautifully dark and underground.',
+    profile: 'Left Milady behind, built something darker and realer from scratch',
+    facts: 'Original artist behind the Mibera collection. Created the Mibera-codex. Walked away from Milady because it no longer aligned with her vision — Mibera is the counterpoint, not the copy. Pure underground art.',
     avatarUrl: '/images/fugitives/gumi.jpg',
   },
   {
@@ -145,7 +145,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     name: 'Miladies',
     symbol: 'MILADIES',
     contract: '0x8D4972bd5D2df474e71da6676a365fB549853991',
-    description: 'Flipped Milady Maker art with toilet graffiti',
+    description: 'Milady parody — a counter-statement, not a tribute',
     label: 'Phase 2',
     imageUrl: 'https://ipfs.io/ipfs/bafybeie26hxmg7vdrokv7lxdyrumykj5rkgwabklckdmiyrdsc2hu3crgq/f26ad2e658e11c72249ce100389e398815a03e1c.png',
   },
