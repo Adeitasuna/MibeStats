@@ -94,7 +94,7 @@ export const FBI_FUGITIVES: FugitiveCard[] = [
   {
     handle: '@gumibera_', displayName: 'Gumi', alias: 'The MibeDesigner',
     profile: 'Wanted for creating an entire underground art universe from the depths of her drawing cave',
-    facts: 'MibeDesigner: how to flip Milady, from the white to the dark, wot an artist! Careful she could be abusive.',
+    facts: 'Lives in the drawing cave wif original Mibera... actively search by FED\'s cuz she use LOA in order to stay in a loop of time trying to abuse ur soul!',
     avatarUrl: '/images/fugitives/gumi.jpg',
   },
   {
