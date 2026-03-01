@@ -138,3 +138,24 @@ export const TOKEN_COUNT = 10000
 export function magicEdenUrl(tokenId: number): string {
   return `https://magiceden.io/item-details/berachain/${CONTRACT_ADDRESS}/${tokenId}`
 }
+
+/* ── BubbleMap types ── */
+
+export interface BubbleMapNode {
+  id: string
+  count: number
+  tier: string
+}
+
+export interface BubbleMapLink {
+  source: string
+  target: string
+  weight: number
+  volume: number
+  bidirectional: boolean
+}
+
+export interface BubbleMapResponse {
+  nodes: BubbleMapNode[]
+  links: BubbleMapLink[]
+}
