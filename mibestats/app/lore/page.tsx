@@ -77,6 +77,9 @@ export default function LorePage() {
                   <div style={{ height: cardHeight, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                     {isTop && (
                       <div className="card" style={{ padding: '0.5rem', width: '140px', textAlign: 'center' }}>
+                        <p className="font-terminal" style={{ fontSize: '0.65rem', fontWeight: 600, color: '#888', margin: '0 0 0.25rem 0', letterSpacing: '0.05em' }}>
+                          Phase {stage.phase}
+                        </p>
                         <div style={{ width: '120px', height: '120px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Image
                             src={stage.imageUrl}
@@ -87,7 +90,7 @@ export default function LorePage() {
                             unoptimized
                           />
                         </div>
-                        <p className="font-terminal" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', margin: '0 0 0.15rem 0' }}>
+                        <p className="font-terminal" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffd700', margin: '0 0 0.15rem 0' }}>
                           {stage.name}
                         </p>
                         <p style={{ fontSize: '0.75rem', color: '#888', lineHeight: 1.3, margin: '0 0 0.2rem 0' }}>
@@ -103,11 +106,6 @@ export default function LorePage() {
                         >
                           {truncateAddress(stage.contract)}
                         </a>
-                        {stage.date && (
-                          <p className="font-terminal" style={{ fontSize: '0.7rem', color: '#ffd700', margin: '0.2rem 0 0 0' }}>
-                            {stage.date}
-                          </p>
-                        )}
                       </div>
                     )}
                   </div>
@@ -115,8 +113,8 @@ export default function LorePage() {
                   {/* Vertical connector (top) */}
                   <div style={{ width: '2px', height: '0.5rem', background: isTop ? '#ffd700' : 'transparent' }} />
 
-                  {/* Phase dot + horizontal line */}
-                  <div style={{ position: 'relative', zIndex: 1 }}>
+                  {/* Phase dot + date label + horizontal line */}
+                  <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     {/* Horizontal line segment */}
                     <div style={{
                       position: 'absolute',
@@ -143,6 +141,32 @@ export default function LorePage() {
                         {stage.phase}
                       </span>
                     </div>
+                    {/* Date label on the timeline dot */}
+                    {stage.date ? (
+                      <span className="font-terminal" style={{
+                        position: 'absolute',
+                        top: '100%',
+                        marginTop: '0.15rem',
+                        fontSize: '0.6rem',
+                        color: '#888',
+                        whiteSpace: 'nowrap',
+                        zIndex: 3,
+                      }}>
+                        {stage.date}
+                      </span>
+                    ) : (
+                      <span className="font-terminal" style={{
+                        position: 'absolute',
+                        top: '100%',
+                        marginTop: '0.15rem',
+                        fontSize: '0.6rem',
+                        color: '#555',
+                        whiteSpace: 'nowrap',
+                        zIndex: 3,
+                      }}>
+                        TBD
+                      </span>
+                    )}
                   </div>
 
                   {/* Vertical connector (bottom) */}
@@ -152,6 +176,9 @@ export default function LorePage() {
                   <div style={{ height: cardHeight, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                     {!isTop && (
                       <div className="card" style={{ padding: '0.5rem', width: '140px', textAlign: 'center' }}>
+                        <p className="font-terminal" style={{ fontSize: '0.65rem', fontWeight: 600, color: '#888', margin: '0 0 0.25rem 0', letterSpacing: '0.05em' }}>
+                          Phase {stage.phase}
+                        </p>
                         <div style={{ width: '120px', height: '120px', margin: '0 auto 0.3rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Image
                             src={stage.imageUrl}
@@ -162,7 +189,7 @@ export default function LorePage() {
                             unoptimized
                           />
                         </div>
-                        <p className="font-terminal" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', margin: '0 0 0.15rem 0' }}>
+                        <p className="font-terminal" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffd700', margin: '0 0 0.15rem 0' }}>
                           {stage.name}
                         </p>
                         <p style={{ fontSize: '0.75rem', color: '#888', lineHeight: 1.3, margin: '0 0 0.2rem 0' }}>
@@ -178,11 +205,6 @@ export default function LorePage() {
                         >
                           {truncateAddress(stage.contract)}
                         </a>
-                        {stage.date && (
-                          <p className="font-terminal" style={{ fontSize: '0.7rem', color: '#ffd700', margin: '0.2rem 0 0 0' }}>
-                            {stage.date}
-                          </p>
-                        )}
                       </div>
                     )}
                   </div>
