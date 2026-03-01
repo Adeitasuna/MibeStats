@@ -288,6 +288,17 @@ a.link-cyan:hover {
   margin-left: 2px;
 }
 
+/* ── Mint button (fracture timeline) ── */
+
+.mint-btn {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mint-btn:hover {
+  background-color: #ffd700 !important;
+  color: #000 !important;
+}
+
 /* ── FBI Fugitive — Old TV Signal Loss Effect ── */
 
 .fugitive-card {

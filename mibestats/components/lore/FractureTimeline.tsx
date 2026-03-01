@@ -4,10 +4,6 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { FRACTURE_STAGES } from '@/lib/lore-data'
 
-function truncateAddress(addr: string) {
-  return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-}
-
 function FractureCard({
   stage,
   onImageClick,
@@ -29,8 +25,26 @@ function FractureCard({
       <p style={{ fontSize: '0.7rem', color: '#888', lineHeight: 1.25, margin: '0 0 0.15rem 0' }}>
         {stage.description}
       </p>
-      <a href={`https://beratrail.io/address/${stage.contract}`} target="_blank" rel="noreferrer" className="font-terminal" style={{ fontSize: '0.7rem', color: '#58a6ff', textDecoration: 'none' }} title={stage.contract}>
-        {truncateAddress(stage.contract)}
+      <a
+        href={stage.mintUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="font-terminal mint-btn"
+        style={{
+          display: 'inline-block',
+          fontSize: '0.65rem',
+          fontWeight: 700,
+          color: '#ffd700',
+          background: 'transparent',
+          border: '1px solid #ffd700',
+          borderRadius: '3px',
+          padding: '0.15rem 0.5rem',
+          textDecoration: 'none',
+          letterSpacing: '0.05em',
+          marginTop: '0.2rem',
+        }}
+      >
+        Mint
       </a>
     </div>
   )
