@@ -8,7 +8,21 @@ interface FugitiveGridProps {
   fugitives: FugitiveCard[]
 }
 
-function FugitiveCardEl({ fugitive, idx }: { fugitive: FugitiveCard; idx: number }) {
+/** Per-card state exposed to the parent scheduler */
+interface CardHandle {
+  isHovered: boolean
+  triggerGlitch: (durationMs: number) => void
+}
+
+function FugitiveCardEl({
+  fugitive,
+  idx,
+  registerHandle,
+}: {
+  fugitive: FugitiveCard
+  idx: number
+  registerHandle: (idx: number, handle: CardHandle) => void
+}) {
   const ref = useRef<HTMLAnchorElement>(null)
   const isHovered = useRef(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
@@ -23,43 +37,26 @@ function FugitiveCardEl({ fugitive, idx }: { fugitive: FugitiveCard; idx: number
     }, durationMs)
   }, [])
 
-  // Hover: glitch for 0.5–1.5s then stop
+  // Register this card's handle with parent on mount
+  useEffect(() => {
+    registerHandle(idx, { isHovered: false, triggerGlitch })
+  }, [idx, registerHandle, triggerGlitch])
+
   const onMouseEnter = useCallback(() => {
     isHovered.current = true
+    // Update the handle so the scheduler sees it
+    registerHandle(idx, { isHovered: true, triggerGlitch })
     const duration = 500 + Math.random() * 1000
     triggerGlitch(duration)
-  }, [triggerGlitch])
+  }, [idx, registerHandle, triggerGlitch])
 
   const onMouseLeave = useCallback(() => {
     isHovered.current = false
+    registerHandle(idx, { isHovered: false, triggerGlitch })
     const el = ref.current
     if (el) el.classList.remove('glitching')
     clearTimeout(timeoutRef.current)
-  }, [])
-
-  // Random idle glitch — only when NOT hovered
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>
-
-    function scheduleRandom() {
-      const delay = 4000 + Math.random() * 12000 // 4–16s between random glitches
-      timer = setTimeout(() => {
-        if (!isHovered.current) {
-          const duration = 500 + Math.random() * 500 // 0.5–1s
-          triggerGlitch(duration)
-        }
-        scheduleRandom()
-      }, delay)
-    }
-
-    // Stagger initial start per card
-    const initialDelay = 2000 + Math.random() * 8000
-    timer = setTimeout(() => {
-      scheduleRandom()
-    }, initialDelay)
-
-    return () => clearTimeout(timer)
-  }, [triggerGlitch])
+  }, [idx, registerHandle, triggerGlitch])
 
   return (
     <a
@@ -153,6 +150,55 @@ function FugitiveCardEl({ fugitive, idx }: { fugitive: FugitiveCard; idx: number
 }
 
 export function FugitiveGrid({ fugitives }: FugitiveGridProps) {
+  const handlesRef = useRef<Map<number, CardHandle>>(new Map())
+
+  const registerHandle = useCallback((idx: number, handle: CardHandle) => {
+    handlesRef.current.set(idx, handle)
+  }, [])
+
+  // Centralized random glitch scheduler — one card at a time, 2s+ gap
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>
+    let lastGlitchEnd = 0
+
+    function scheduleNext() {
+      // Random delay: 3–10s between glitches (organic feel)
+      const delay = 3000 + Math.random() * 7000
+      timer = setTimeout(() => {
+        const now = Date.now()
+        // Enforce minimum 2s since last glitch finished
+        if (now - lastGlitchEnd < 2000) {
+          scheduleNext()
+          return
+        }
+
+        // Pick a random non-hovered card
+        const candidates: number[] = []
+        handlesRef.current.forEach((handle, idx) => {
+          if (!handle.isHovered) candidates.push(idx)
+        })
+
+        if (candidates.length > 0) {
+          const pick = candidates[Math.floor(Math.random() * candidates.length)]
+          const handle = handlesRef.current.get(pick)
+          if (handle) {
+            const duration = 500 + Math.random() * 500 // 0.5–1s
+            handle.triggerGlitch(duration)
+            lastGlitchEnd = now + duration
+          }
+        }
+
+        scheduleNext()
+      }, delay)
+    }
+
+    // Initial delay before first random glitch
+    const initialDelay = 3000 + Math.random() * 4000
+    timer = setTimeout(scheduleNext, initialDelay)
+
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <section>
       <h2 className="section-title" style={{ fontSize: '1.4rem' }}>
@@ -164,7 +210,12 @@ export function FugitiveGrid({ fugitives }: FugitiveGridProps) {
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.75rem' }}>
         {fugitives.map((fugitive, idx) => (
-          <FugitiveCardEl key={fugitive.handle} fugitive={fugitive} idx={idx} />
+          <FugitiveCardEl
+            key={fugitive.handle}
+            fugitive={fugitive}
+            idx={idx}
+            registerHandle={registerHandle}
+          />
         ))}
       </div>
     </section>
