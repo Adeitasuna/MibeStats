@@ -57,13 +57,23 @@ export async function GET(req: NextRequest) {
         ORDER BY sale_count ASC
       `,
 
-      // Most sold miberas (top 30 by sale count)
+      // Most sold miberas (top 30 by real sale count — price >= 5 BERA)
       prisma.$queryRaw<TopSoldRow[]>`
-        SELECT token_id, sale_count, transfer_count, image_url, swag_rank, is_grail,
-               grail_name, max_sale_price::text, last_sale_price::text
-        FROM tokens
-        WHERE sale_count > 0
-        ORDER BY sale_count DESC, token_id ASC
+        SELECT t.token_id, agg.real_sale_count AS sale_count, t.transfer_count,
+               t.image_url, t.swag_rank, t.is_grail, t.grail_name,
+               agg.max_price::text AS max_sale_price,
+               agg.last_price::text AS last_sale_price
+        FROM tokens t
+        INNER JOIN (
+          SELECT token_id,
+                 COUNT(*)::int AS real_sale_count,
+                 MAX(price_bera) AS max_price,
+                 (ARRAY_AGG(price_bera ORDER BY sold_at DESC))[1] AS last_price
+          FROM sales
+          WHERE price_bera >= 5
+          GROUP BY token_id
+        ) agg ON t.token_id = agg.token_id
+        ORDER BY agg.real_sale_count DESC, t.token_id ASC
         LIMIT 30
       `,
 
