@@ -49,12 +49,21 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // Sales distribution: how many tokens have 0, 1, 2, 3... sales
+      // Sales distribution: how many tokens have 0, 1, 2... real sales (>= 5 BERA)
       prisma.$queryRaw<SaleCountBucket[]>`
-        SELECT sale_count, COUNT(*) AS token_count
-        FROM tokens
-        GROUP BY sale_count
-        ORDER BY sale_count ASC
+        SELECT real_sale_count AS sale_count, COUNT(*)::bigint AS token_count
+        FROM (
+          SELECT t.token_id, COALESCE(agg.cnt, 0)::int AS real_sale_count
+          FROM tokens t
+          LEFT JOIN (
+            SELECT token_id, COUNT(*)::int AS cnt
+            FROM sales
+            WHERE price_bera >= 5
+            GROUP BY token_id
+          ) agg ON t.token_id = agg.token_id
+        ) sub
+        GROUP BY real_sale_count
+        ORDER BY real_sale_count ASC
       `,
 
       // Most sold miberas (top 30 by real sale count — price >= 5 BERA)

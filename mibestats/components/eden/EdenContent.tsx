@@ -205,14 +205,24 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
 /* ── Pie chart ── */
 
 function EdenPie({ data, title }: { data: { name: string; value: number }[]; title: string }) {
+  // Sort desc, limit to 12 with "Other"
+  const sorted = [...data].sort((a, b) => b.value - a.value)
+  const top = sorted.slice(0, 11)
+  const restValue = sorted.slice(11).reduce((s, d) => s + d.value, 0)
+  const chartData = [
+    ...top,
+    ...(restValue > 0 ? [{ name: 'Other', value: restValue }] : []),
+  ]
+  const total = chartData.reduce((s, d) => s + d.value, 0)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{title}</span>
       <div className="stat-card" style={{ padding: '0.75rem' }}>
         <ResponsiveContainer width="100%" height={240}>
           <PieChart>
-            <Pie data={data} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
-              {data.map((_, i) => (
+            <Pie data={chartData} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
+              {chartData.map((_, i) => (
                 <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
               ))}
             </Pie>
@@ -220,10 +230,9 @@ function EdenPie({ data, title }: { data: { name: string; value: number }[]; tit
               contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 12, color: '#fff' }}
               itemStyle={{ color: '#fff' }}
               labelStyle={{ color: '#fff' }}
-              formatter={(value: number) => {
-                const total = data.reduce((s, d) => s + d.value, 0)
+              formatter={(value: number, name: string) => {
                 const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
-                return [`${pct}% (${value.toLocaleString()})`, 'Count']
+                return [`${pct}% (${value.toLocaleString()})`, name]
               }}
             />
             <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />
@@ -277,7 +286,6 @@ export function EdenContent() {
     ? eden.salesDistribution
         .filter((d) => d.saleCount > 0)
         .map((d) => ({ name: d.saleCount === 1 ? '1 sale' : `${d.saleCount} sales`, value: d.tokenCount }))
-        .slice(0, 8)
     : []
 
   // Diamond Mibera: never sold vs at least 1 sale

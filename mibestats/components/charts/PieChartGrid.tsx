@@ -21,9 +21,10 @@ interface PieChartCardProps {
 function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
   if (data.length === 0) return null
 
-  // Take top N and group the rest as "Other"
-  const top = data.slice(0, maxSlices)
-  const restCount = data.slice(maxSlices).reduce((sum, d) => sum + d.count, 0)
+  // Sort desc by count, take top N and group the rest as "Other"
+  const sorted = [...data].sort((a, b) => b.count - a.count)
+  const top = sorted.slice(0, maxSlices)
+  const restCount = sorted.slice(maxSlices).reduce((sum, d) => sum + d.count, 0)
   const chartData = [
     ...top.map((d) => ({ name: d.value, value: d.count, pct: d.pct })),
     ...(restCount > 0 ? [{ name: 'Other', value: restCount, pct: +(restCount / 100).toFixed(1) }] : []),

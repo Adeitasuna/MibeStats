@@ -19,6 +19,16 @@ interface EdenPieChartProps {
 }
 
 export function EdenPieChart({ data, title }: EdenPieChartProps) {
+  // Sort desc, limit to 12 with "Other"
+  const sorted = [...data].sort((a, b) => b.value - a.value)
+  const top = sorted.slice(0, 11)
+  const restValue = sorted.slice(11).reduce((s, d) => s + d.value, 0)
+  const chartData = [
+    ...top,
+    ...(restValue > 0 ? [{ name: 'Other', value: restValue }] : []),
+  ]
+  const total = chartData.reduce((s, d) => s + d.value, 0)
+
   return (
     <div className="card p-4">
       <h3 className="text-sm font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
@@ -27,7 +37,7 @@ export function EdenPieChart({ data, title }: EdenPieChartProps) {
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             cx="50%"
             cy="50%"
             outerRadius={80}
@@ -37,7 +47,7 @@ export function EdenPieChart({ data, title }: EdenPieChartProps) {
             paddingAngle={2}
             stroke="none"
           >
-            {data.map((_, i) => (
+            {chartData.map((_, i) => (
               <Cell key={i} fill={COLORS[i % COLORS.length]} opacity={0.85} />
             ))}
           </Pie>
@@ -51,10 +61,9 @@ export function EdenPieChart({ data, title }: EdenPieChartProps) {
             }}
             itemStyle={{ color: '#fff' }}
             labelStyle={{ color: '#fff' }}
-            formatter={(value: number) => {
-              const total = data.reduce((s, d) => s + d.value, 0)
+            formatter={(value: number, name: string) => {
               const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
-              return [`${pct}% (${value.toLocaleString()})`, 'Count']
+              return [`${pct}% (${value.toLocaleString()})`, name]
             }}
           />
           <Legend
