@@ -61,7 +61,7 @@ function FugitiveCardEl({
   return (
     <a
       ref={ref}
-      href={`https://x.com/${fugitive.handle.replace('@', '')}`}
+      href={fugitive.url || `https://x.com/${fugitive.handle.replace('@', '')}`}
       target="_blank"
       rel="noreferrer"
       className="fugitive-card"

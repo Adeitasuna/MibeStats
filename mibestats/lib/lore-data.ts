@@ -19,6 +19,7 @@ export interface FugitiveCard {
   profile: string
   facts: string
   avatarUrl?: string
+  url?: string
 }
 
 export interface FractureStage {
@@ -92,6 +93,7 @@ export const FBI_FUGITIVES: FugitiveCard[] = [
     profile: 'Wanted for orchestrating chaos, disorder and illegal rave operations across the chain',
     facts: 'Mibera Chief Operator. Cypherpunk spirit, liberty advocate, helps people find their own fire. Also MCO of LOA framework. Likes chaos as a feature, not a bug.',
     avatarUrl: '/images/fugitives/janitooor.gif',
+    url: 'https://github.com/janitooor',
   },
   {
     handle: '@gumibera_', displayName: 'Gumi', alias: 'The MibeDesigner',
