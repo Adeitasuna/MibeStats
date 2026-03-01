@@ -102,6 +102,11 @@ export default function LorePage() {
                         >
                           {truncateAddress(stage.contract)}
                         </a>
+                        {stage.date && (
+                          <p className="font-terminal" style={{ fontSize: '0.7rem', color: '#ffd700', margin: '0.2rem 0 0 0' }}>
+                            {stage.date}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -172,6 +177,11 @@ export default function LorePage() {
                         >
                           {truncateAddress(stage.contract)}
                         </a>
+                        {stage.date && (
+                          <p className="font-terminal" style={{ fontSize: '0.7rem', color: '#ffd700', margin: '0.2rem 0 0 0' }}>
+                            {stage.date}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
