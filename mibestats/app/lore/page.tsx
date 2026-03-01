@@ -244,12 +244,12 @@ export default function LorePage() {
               href={`https://x.com/${fugitive.handle.replace('@', '')}`}
               target="_blank"
               rel="noreferrer"
+              className="fugitive-card"
               style={{
                 textDecoration: 'none',
                 background: '#111',
                 border: '1px solid #f85149',
                 borderRadius: '4px',
-                overflow: 'hidden',
               }}
             >
               {/* Header bar */}
