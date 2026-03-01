@@ -288,97 +288,89 @@ a.link-cyan:hover {
   margin-left: 2px;
 }
 
-/* ── FBI Fugitive — Signal Glitch on Hover ── */
+/* ── FBI Fugitive — Old TV Signal Loss Effect ── */
 
 .fugitive-card {
   position: relative;
   overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Red/cyan chromatic aberration band */
+/* Static noise / snow overlay */
 .fugitive-card::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
   opacity: 0;
   pointer-events: none;
   z-index: 10;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+/* Horizontal rolling band — the classic "bad signal" bar */
+.fugitive-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 11;
   background: linear-gradient(
-    0deg,
+    180deg,
     transparent 0%,
-    rgba(255, 0, 50, 0.12) 15%,
-    transparent 30%,
-    rgba(0, 200, 255, 0.10) 50%,
-    transparent 65%,
-    rgba(255, 0, 50, 0.08) 80%,
+    rgba(255, 255, 255, 0.06) 20%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.06) 80%,
     transparent 100%
   );
 }
 
-/* Horizontal scan-line tear bars */
-.fugitive-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 11;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 3px,
-      rgba(255, 255, 255, 0.04) 3px,
-      rgba(255, 255, 255, 0.04) 4px
-    );
-}
-
-.fugitive-card:hover::before {
-  animation: glitch-chroma 0.6s steps(3, end) infinite;
-}
-
-.fugitive-card:hover::after {
-  animation: glitch-scan 0.3s steps(4, end) infinite;
-}
-
-.fugitive-card:hover {
-  animation: glitch-jitter 0.5s steps(5, end) infinite;
+/* Glitch active — triggered by JS adding .glitching class */
+.fugitive-card.glitching {
+  animation: tv-signal-loss 0.8s ease-in-out;
   border-color: #ff2020 !important;
-  box-shadow: 0 0 12px rgba(248, 81, 73, 0.3), inset 0 0 8px rgba(248, 81, 73, 0.05);
+  box-shadow: 0 0 15px rgba(248, 81, 73, 0.25);
 }
 
-/* Card jitters horizontally + brief opacity dips */
-@keyframes glitch-jitter {
-  0%   { transform: translate(0, 0);      opacity: 1;    }
-  10%  { transform: translate(-3px, 0);    opacity: 0.85; }
-  20%  { transform: translate(2px, 1px);   opacity: 1;    }
-  30%  { transform: translate(0, 0);       opacity: 1;    }
-  40%  { transform: translate(4px, 0);     opacity: 0.75; }
-  50%  { transform: translate(-1px, -1px); opacity: 1;    }
-  60%  { transform: translate(0, 0);       opacity: 1;    }
-  70%  { transform: translate(-2px, 0);    opacity: 0.9;  }
-  80%  { transform: translate(3px, 1px);   opacity: 0.7;  }
-  85%  { transform: translate(0, 0);       opacity: 1;    }
-  100% { transform: translate(0, 0);       opacity: 1;    }
+.fugitive-card.glitching::before {
+  animation: tv-static 0.15s steps(3) infinite;
 }
 
-/* Chromatic layers shift and pulse */
-@keyframes glitch-chroma {
-  0%   { opacity: 0;   transform: translateX(0);   }
-  15%  { opacity: 0.7; transform: translateX(4px);  }
-  30%  { opacity: 0;   transform: translateX(0);    }
-  50%  { opacity: 0.5; transform: translateX(-3px); }
-  70%  { opacity: 0;   transform: translateX(0);    }
-  85%  { opacity: 0.8; transform: translateX(2px);  }
-  100% { opacity: 0;   transform: translateX(0);    }
+.fugitive-card.glitching::after {
+  animation: tv-rolling-bar 1.2s linear infinite;
 }
 
-/* Scan-lines flicker in and out */
-@keyframes glitch-scan {
-  0%   { opacity: 0;   }
-  25%  { opacity: 0.6; }
-  50%  { opacity: 0;   }
-  75%  { opacity: 0.4; }
-  100% { opacity: 0;   }
+/* Card wobbles, tears, fades — then recovers */
+@keyframes tv-signal-loss {
+  0%   { transform: translate(0, 0) skewX(0deg);    opacity: 1;   filter: none; }
+  8%   { transform: translate(-4px, 0) skewX(-1deg); opacity: 0.7; filter: saturate(2) brightness(1.3); }
+  15%  { transform: translate(6px, 2px) skewX(2deg); opacity: 0.4; filter: saturate(0) brightness(1.5); }
+  22%  { transform: translate(-2px, -1px) skewX(0deg);opacity: 0.8; filter: saturate(0.5); }
+  30%  { transform: translate(3px, 0) skewX(-1deg);  opacity: 0.3; filter: saturate(0) brightness(2); }
+  40%  { transform: translate(0, 1px) skewX(0deg);   opacity: 0.6; filter: saturate(0.3); }
+  55%  { transform: translate(-3px, 0) skewX(1deg);  opacity: 0.5; filter: saturate(0) brightness(1.2); }
+  65%  { transform: translate(2px, -1px) skewX(0deg); opacity: 0.75;filter: saturate(0.6); }
+  78%  { transform: translate(0, 0) skewX(0deg);     opacity: 0.9; filter: saturate(0.8); }
+  90%  { transform: translate(0, 0) skewX(0deg);     opacity: 0.95;filter: saturate(0.95); }
+  100% { transform: translate(0, 0) skewX(0deg);     opacity: 1;   filter: none; }
+}
+
+/* Static noise jitters position */
+@keyframes tv-static {
+  0%   { opacity: 0.4; transform: translate(0, 0); }
+  33%  { opacity: 0.6; transform: translate(-5%, -3%); }
+  66%  { opacity: 0.3; transform: translate(3%, 5%); }
+  100% { opacity: 0.5; transform: translate(-2%, -1%); }
+}
+
+/* Horizontal bar rolls down the card */
+@keyframes tv-rolling-bar {
+  0%   { top: -30%; opacity: 0.6; }
+  100% { top: 130%; opacity: 0.6; }
 }
