@@ -92,11 +92,14 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
 
 interface PieChartGridProps {
   sections: Array<{ title: string; data: TraitCount[] }>
+  columns?: number
 }
 
-export function PieChartGrid({ sections }: PieChartGridProps) {
+export function PieChartGrid({ sections, columns }: PieChartGridProps) {
+  const cols = columns ?? (sections.length <= 6 ? sections.length : 4)
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '0.75rem' }}>
       {sections.map((section) => (
         <PieChartCard
           key={section.title}
