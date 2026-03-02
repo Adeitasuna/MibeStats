@@ -149,7 +149,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
                     itemStyle={{ color: '#fff' }}
                     formatter={(value: number, name: string) => {
                       const pct = walletCount > 0 ? ((value / walletCount) * 100).toFixed(1) : '0.0'
-                      return [`${pct}% (${value.toLocaleString()})`, name]
+                      return [`${pct}%`, name]
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
@@ -176,7 +176,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
                     itemStyle={{ color: '#fff' }}
                     formatter={(value: number, name: string) => {
                       const pct = totalNfts > 0 ? ((value / totalNfts) * 100).toFixed(1) : '0.0'
-                      return [`${value} NFTs (${pct}%)`, name]
+                      return [`${pct}%`, name]
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
