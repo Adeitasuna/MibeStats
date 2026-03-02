@@ -216,9 +216,12 @@ export function BubbleMapContent() {
         <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
           Wallets by NFT Count
         </span>
-        <div className="stat-card p-0 overflow-hidden flex flex-col">
-          <div className="overflow-y-auto" style={{ maxHeight: 380 }}>
-            <table className="w-full">
+        <div
+          className="stat-card"
+          style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: 420 }}
+        >
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            <table style={{ width: '100%' }}>
               <thead>
                 <tr className="border-b border-white/10 text-[0.5625rem] uppercase tracking-wider text-mibe-text-2">
                   <th className="px-2 py-1.5 text-left" style={{ width: 30 }}>#</th>
@@ -242,7 +245,10 @@ export function BubbleMapContent() {
             </table>
           </div>
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-2 py-1.5 border-t border-white/10 text-[0.5625rem] text-mibe-text-2">
+            <div
+              className="flex items-center justify-between text-[0.5625rem] text-mibe-text-2"
+              style={{ padding: '6px 8px', borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}
+            >
               <span>{sortedWallets.length} wallets</span>
               <div className="flex items-center gap-1">
                 <button
