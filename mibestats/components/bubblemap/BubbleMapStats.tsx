@@ -1,32 +1,52 @@
 'use client'
 
+import { useMemo } from 'react'
 import type { BubbleMapNode, BubbleMapLink } from '@/types'
 
 interface Props {
   nodes: BubbleMapNode[]
   links: BubbleMapLink[]
+  totalNodes: number
+  totalLinks: number
 }
 
-export function BubbleMapStats({ nodes, links }: Props) {
-  const totalWallets = nodes.length
-  const totalConnections = links.length
-  const bidirectionalPairs = links.filter((l) => l.bidirectional).length / 2
-  const topHolders = [...nodes].sort((a, b) => b.count - a.count).slice(0, 5)
+const TIER_ORDER = ['whale', 'dolphin', 'shark', 'fish', 'shrimp'] as const
 
-  const tierCounts = nodes.reduce<Record<string, number>>((acc, n) => {
-    acc[n.tier] = (acc[n.tier] ?? 0) + 1
-    return acc
-  }, {})
+export function BubbleMapStats({ nodes, links, totalNodes, totalLinks }: Props) {
+  const { walletCount, connectionCount, bidirectionalPairs, tierCounts, topHolders } = useMemo(() => {
+    const tierCounts = nodes.reduce<Record<string, number>>((acc, n) => {
+      acc[n.tier] = (acc[n.tier] ?? 0) + 1
+      return acc
+    }, {})
+
+    return {
+      walletCount: nodes.length,
+      connectionCount: links.length,
+      bidirectionalPairs: Math.floor(links.filter((l) => l.bidirectional).length / 2),
+      tierCounts,
+      topHolders: [...nodes].sort((a, b) => b.count - a.count).slice(0, 10),
+    }
+  }, [nodes, links])
+
+  const isFiltered = walletCount !== totalNodes
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-      <StatCard label="Wallets" value={totalWallets.toLocaleString()} />
-      <StatCard label="Connections" value={totalConnections.toLocaleString()} />
-      <StatCard label="Bidirectional Pairs" value={Math.floor(bidirectionalPairs).toLocaleString()} color="#f85149" />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <StatCard
+        label="Wallets"
+        value={walletCount.toLocaleString()}
+        sub={isFiltered ? `/ ${totalNodes.toLocaleString()} total` : undefined}
+      />
+      <StatCard
+        label="Connections"
+        value={connectionCount.toLocaleString()}
+        sub={isFiltered ? `/ ${totalLinks.toLocaleString()} total` : undefined}
+      />
+      <StatCard label="Bidirectional Pairs" value={bidirectionalPairs.toLocaleString()} color="text-mibe-red" />
       <StatCard
         label="By Tier"
         value={
-          ['whale', 'dolphin', 'shark', 'fish', 'shrimp']
+          TIER_ORDER
             .filter((t) => tierCounts[t])
             .map((t) => `${t}: ${tierCounts[t]}`)
             .join(' / ')
@@ -34,15 +54,15 @@ export function BubbleMapStats({ nodes, links }: Props) {
       />
 
       {/* Top holders row */}
-      <div style={{ gridColumn: '1 / -1' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <span style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
-            Top Holders
+      <div className="col-span-full">
+        <div className="flex flex-col gap-1">
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">
+            Top Holders{isFiltered ? ' (filtered)' : ''}
           </span>
-          <div className="stat-card" style={{ padding: '0.5rem 0.75rem' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.75rem' }}>
+          <div className="stat-card px-3 py-2">
+            <div className="flex flex-wrap gap-2 text-xs">
               {topHolders.map((h, i) => (
-                <span key={h.id} style={{ color: i === 0 ? '#ffd700' : '#ccc' }}>
+                <span key={h.id} className={i === 0 ? 'text-mibe-gold' : 'text-gray-300'}>
                   {h.id.slice(0, 6)}...{h.id.slice(-4)}: <strong>{h.count}</strong>
                 </span>
               ))}
@@ -50,24 +70,19 @@ export function BubbleMapStats({ nodes, links }: Props) {
           </div>
         </div>
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media (min-width: 768px) {
-          #bubblemap-stats { grid-template-columns: repeat(4, 1fr) !important; }
-        }
-      `}} />
     </div>
   )
 }
 
-function StatCard({ label, value, color }: { label: string; value: string; color?: string }) {
+function StatCard({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: color ?? '#ffd700' }}>
+    <div className="flex flex-col gap-1">
+      <span className={`text-[0.6875rem] font-semibold uppercase tracking-wider ${color ?? 'text-mibe-gold'}`}>
         {label}
       </span>
       <div className="stat-card">
-        <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{value}</span>
+        <span className="text-lg font-bold text-white">{value}</span>
+        {sub && <span className="text-[0.625rem] text-mibe-text-2 ml-1.5">{sub}</span>}
       </div>
     </div>
   )

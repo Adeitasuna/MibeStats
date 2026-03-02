@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const [wallets, edges] = await Promise.all([
-      // Wallet nodes: address + NFT count
+      // All wallet nodes: address + NFT count (official collection only)
       prisma.$queryRaw<WalletRow[]>`
         SELECT owner_address AS address, COUNT(*)::bigint AS count
         FROM tokens
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
         GROUP BY owner_address
       `,
 
-      // Wallet-to-wallet edges from sales
+      // All wallet-to-wallet edges from sales
       prisma.$queryRaw<EdgeRow[]>`
         SELECT seller_address AS source,
                buyer_address AS target,
@@ -51,39 +51,38 @@ export async function GET(req: NextRequest) {
       `,
     ])
 
-    // Build wallet set for node lookup
+    // Wallet lookup
     const walletMap = new Map<string, number>()
     for (const w of wallets) {
       walletMap.set(w.address, Number(w.count))
     }
 
-    // Detect bidirectional edges (A→B and B→A both exist)
+    // Detect bidirectional edges
     const edgeKeys = new Set<string>()
     for (const e of edges) {
       edgeKeys.add(`${e.source}→${e.target}`)
     }
 
-    // Build nodes — only include wallets that participate in at least one edge,
-    // plus all wallets (isolated nodes are also shown)
-    const nodes = wallets.map((w) => ({
-      id: w.address,
-      count: Number(w.count),
-      tier: tierFromCount(Number(w.count)),
-    }))
+    // Build all nodes
+    const nodes = wallets.map((w) => {
+      const count = Number(w.count)
+      return {
+        id: w.address,
+        count,
+        tier: tierFromCount(count),
+      }
+    })
 
-    // Build links — ensure both source and target exist as nodes
+    // Build all links (only where both endpoints exist as nodes)
     const links = edges
       .filter((e) => walletMap.has(e.source) && walletMap.has(e.target))
-      .map((e) => {
-        const reverseKey = `${e.target}→${e.source}`
-        return {
-          source: e.source,
-          target: e.target,
-          weight: Number(e.weight),
-          volume: Number(e.volume),
-          bidirectional: edgeKeys.has(reverseKey),
-        }
-      })
+      .map((e) => ({
+        source: e.source,
+        target: e.target,
+        weight: Number(e.weight),
+        volume: Number(e.volume),
+        bidirectional: edgeKeys.has(`${e.target}→${e.source}`),
+      }))
 
     return NextResponse.json({ nodes, links })
   } catch (err) {

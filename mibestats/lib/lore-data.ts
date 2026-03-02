@@ -143,7 +143,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Sealed envelopes — labels, stickers, lore scrawl',
     label: 'Phase 1',
     imageUrl: 'https://ipfs.io/ipfs/bafybeiexd3lj53j4gpm7rcvnvprlfaa5kqj7bi4zlh4tlj5og23j6fyese/2474.png',
-    date: 'Apr 24, 2025',
+    date: 'Apr 20, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures',
   },
   {
@@ -154,7 +154,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Milady parody — a counter-statement, not a tribute',
     label: 'Phase 2',
     imageUrl: 'https://ipfs.io/ipfs/bafybeiercl3ttqjmyxgaao2wbblqjkvs4awj24miqbnk3t5mgn2e4eqpde/2474.png',
-    date: 'Apr 29, 2025',
+    date: 'Apr 24, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/miladies',
   },
   {
@@ -165,7 +165,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Colors and scenery — first hints, rare foregrounds',
     label: 'Phase 3',
     imageUrl: 'https://ipfs.io/ipfs/bafybeie26hxmg7vdrokv7lxdyrumykj5rkgwabklckdmiyrdsc2hu3crgq/f26ad2e658e11c72249ce100389e398815a03e1c.png',
-    date: 'May 1, 2025',
+    date: 'Apr 29, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal1.1',
   },
   {
@@ -176,7 +176,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Scene clears, molecule placed, silhouette appears',
     label: 'Phase 4',
     imageUrl: 'https://ipfs.io/ipfs/bafybeid5cjlzpabdziixqw4g6bi57bj4b27egpsxag6pjet2i34o4ph3fq/f26ad2e658e11c72249ce100389e398815a03e1c.png',
-    date: 'May 6, 2025',
+    date: 'May 1, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal2.2',
   },
   {
@@ -187,7 +187,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Form takes shape, astrology revealed, eyes closed',
     label: 'Phase 5',
     imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase3/reveal_phase3_images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
-    date: 'May 8, 2025',
+    date: 'May 6, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal3.3',
   },
   {
@@ -198,7 +198,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Moon appears, hat placed if applicable',
     label: 'Phase 6',
     imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase4/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
-    date: 'May 13, 2025',
+    date: 'May 8, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal4.20',
   },
   {
@@ -209,7 +209,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Mibera awakens — rising sign, face finalized',
     label: 'Phase 7',
     imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase5/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
-    date: 'May 15, 2025',
+    date: 'May 13, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal5.5',
   },
   {
@@ -220,7 +220,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Head takes final form, ancient emblem appears',
     label: 'Phase 8',
     imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase6/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
-    date: 'May 20, 2025',
+    date: 'May 15, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal6.9',
   },
   {
@@ -231,6 +231,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Tattoos added — calm before the storm',
     label: 'Phase 9',
     imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase7/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
+    date: 'May 20, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal7.7',
   },
   {
@@ -241,6 +242,7 @@ export const FRACTURE_STAGES: FractureStage[] = [
     description: 'Final reveal — the current Mibera collection',
     label: 'Phase 10',
     imageUrl: 'https://d163aeqznbc6js.cloudfront.net/images/reveal_phase8/images/f26ad2e658e11c72249ce100389e398815a03e1c.png',
+    date: 'Jun 3, 2025',
     mintUrl: 'https://mibera.0xhoneyjar.xyz/fractures/mireveal8.8',
   },
 ]
