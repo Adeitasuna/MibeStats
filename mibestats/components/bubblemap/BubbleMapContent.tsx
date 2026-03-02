@@ -6,7 +6,14 @@ import { ForceGraph } from './ForceGraph'
 import { BubbleMapStats } from './BubbleMapStats'
 
 const TIERS = ['whale', 'dolphin', 'shark', 'fish', 'shrimp'] as const
-const DISPLAY_LIMIT = 200 // max nodes rendered in graph for performance
+const TIER_COLORS: Record<string, string> = {
+  whale: '#ffd700',
+  dolphin: '#ff69b4',
+  shark: '#58a6ff',
+  fish: '#3fb950',
+  shrimp: '#555',
+}
+const DISPLAY_LIMIT = 200
 
 export function BubbleMapContent() {
   const [data, setData] = useState<BubbleMapResponse | null>(null)
@@ -45,7 +52,6 @@ export function BubbleMapContent() {
     return () => controller.abort()
   }, [fetchData])
 
-  // Toggle a tier filter
   const toggleTier = useCallback((tier: string) => {
     setActiveTiers((prev) => {
       const next = new Set(prev)
@@ -55,14 +61,9 @@ export function BubbleMapContent() {
     })
   }, [])
 
-  // Handle address search
   const handleSearch = useCallback(() => {
     const addr = searchAddr.trim().toLowerCase()
-    if (!addr) {
-      setFocusedAddr(null)
-      return
-    }
-    // Find matching address (partial match)
+    if (!addr) { setFocusedAddr(null); return }
     const match = data?.nodes.find((n) => n.id.toLowerCase().includes(addr))
     setFocusedAddr(match?.id ?? null)
   }, [searchAddr, data])
@@ -72,44 +73,56 @@ export function BubbleMapContent() {
     setSearchAddr('')
   }, [])
 
-  // Filter nodes and links
-  const { filteredNodes, filteredLinks, allFilteredNodes, allFilteredLinks } = useMemo(() => {
-    if (!data) return { filteredNodes: [], filteredLinks: [], allFilteredNodes: [], allFilteredLinks: [] }
+  // Called when user clicks a node in the graph
+  const handleNodeFocus = useCallback((address: string) => {
+    setFocusedAddr((prev) => prev === address ? null : address)
+    setSearchAddr(address)
+  }, [])
 
-    let nodes: BubbleMapNode[]
-    let links: BubbleMapLink[]
+  // Filter and limit for graph display
+  const { graphNodes, graphLinks, allFilteredNodes, allFilteredLinks } = useMemo(() => {
+    if (!data) return { graphNodes: [], graphLinks: [], allFilteredNodes: [], allFilteredLinks: [] }
 
-    if (focusedAddr) {
-      // Focused mode: show target address + all its direct neighbors
-      const neighborIds = new Set<string>()
-      neighborIds.add(focusedAddr)
-      for (const l of data.links) {
-        if (l.source === focusedAddr) neighborIds.add(l.target)
-        if (l.target === focusedAddr) neighborIds.add(l.source)
-      }
-      nodes = data.nodes.filter((n) => neighborIds.has(n.id))
-      links = data.links.filter((l) => neighborIds.has(l.source) && neighborIds.has(l.target))
-    } else {
-      // Tier filter
-      nodes = data.nodes.filter((n) => activeTiers.has(n.tier))
-      const nodeIds = new Set(nodes.map((n) => n.id))
-      links = data.links.filter((l) => nodeIds.has(l.source) && nodeIds.has(l.target))
-    }
+    // Apply tier filter to get full filtered set
+    const tierNodes = data.nodes.filter((n) => activeTiers.has(n.tier))
+    const tierNodeIds = new Set(tierNodes.map((n) => n.id))
+    const tierLinks = data.links.filter((l) => tierNodeIds.has(l.source) && tierNodeIds.has(l.target))
 
-    // All filtered (for stats — no display limit)
-    const allFilteredNodes = nodes
-    const allFilteredLinks = links
+    // For stats: all filtered (no display limit)
+    const allFilteredNodes = tierNodes
+    const allFilteredLinks = tierLinks
 
-    // Limit displayed nodes for graph performance (keep top by count)
-    if (nodes.length > DISPLAY_LIMIT) {
-      const sorted = [...nodes].sort((a, b) => b.count - a.count)
+    // For graph: limit displayed nodes (keep top by count)
+    let graphNodes: BubbleMapNode[] = tierNodes
+    let graphLinks: BubbleMapLink[] = tierLinks
+
+    if (graphNodes.length > DISPLAY_LIMIT) {
+      const sorted = [...graphNodes].sort((a, b) => b.count - a.count)
       const displayNodes = sorted.slice(0, DISPLAY_LIMIT)
       const displayIds = new Set(displayNodes.map((n) => n.id))
-      nodes = displayNodes
-      links = links.filter((l) => displayIds.has(l.source) && displayIds.has(l.target))
+
+      // If focused address is outside top N, add it + its neighbors
+      if (focusedAddr && !displayIds.has(focusedAddr)) {
+        const focusNode = tierNodes.find((n) => n.id === focusedAddr)
+        if (focusNode) displayNodes.push(focusNode)
+        displayIds.add(focusedAddr)
+        for (const l of tierLinks) {
+          if (l.source === focusedAddr && !displayIds.has(l.target)) {
+            const nb = tierNodes.find((n) => n.id === l.target)
+            if (nb) { displayNodes.push(nb); displayIds.add(l.target) }
+          }
+          if (l.target === focusedAddr && !displayIds.has(l.source)) {
+            const nb = tierNodes.find((n) => n.id === l.source)
+            if (nb) { displayNodes.push(nb); displayIds.add(l.source) }
+          }
+        }
+      }
+
+      graphNodes = displayNodes
+      graphLinks = tierLinks.filter((l) => displayIds.has(l.source) && displayIds.has(l.target))
     }
 
-    return { filteredNodes: nodes, filteredLinks: links, allFilteredNodes, allFilteredLinks }
+    return { graphNodes, graphLinks, allFilteredNodes, allFilteredLinks }
   }, [data, activeTiers, focusedAddr])
 
   if (loading) {
@@ -124,27 +137,25 @@ export function BubbleMapContent() {
     return (
       <div className="card p-3 border-mibe-red text-red-400 text-sm flex items-center justify-between">
         <span>{error ?? 'No data available'}</span>
-        <button
-          onClick={() => fetchData()}
-          className="ml-3 px-3 py-1 rounded text-xs font-semibold bg-mibe-gold/15 text-mibe-gold hover:bg-mibe-gold/25 transition-colors"
-        >
+        <button onClick={() => fetchData()} className="ml-3 px-3 py-1 rounded text-xs font-semibold bg-mibe-gold/15 text-mibe-gold hover:bg-mibe-gold/25 transition-colors">
           Retry
         </button>
       </div>
     )
   }
 
-  const isLimited = allFilteredNodes.length > DISPLAY_LIMIT && !focusedAddr
+  const isLimited = allFilteredNodes.length > DISPLAY_LIMIT
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Controls row */}
-      <div className="flex flex-col sm:flex-row gap-3">
+    <div className="flex flex-col gap-5">
+      {/* 1. Stats: gold cards + table + pie */}
+      <BubbleMapStats nodes={allFilteredNodes} links={allFilteredLinks} />
+
+      {/* 2. Filters row — directly above graph */}
+      <div className="flex flex-col sm:flex-row sm:items-end gap-3">
         {/* Tier filter */}
         <div className="flex flex-col gap-1">
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">
-            Filter by Tier
-          </span>
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">Filter by Tier</span>
           <div className="flex gap-1.5 flex-wrap">
             {TIERS.map((tier) => {
               const active = activeTiers.has(tier)
@@ -152,15 +163,10 @@ export function BubbleMapContent() {
                 <button
                   key={tier}
                   onClick={() => toggleTier(tier)}
-                  disabled={!!focusedAddr}
                   className={`px-2.5 py-1 rounded text-xs font-semibold capitalize transition-colors ${
-                    focusedAddr
-                      ? 'opacity-40 cursor-not-allowed bg-white/5 text-gray-500'
-                      : active
-                        ? 'bg-white/10 text-white'
-                        : 'bg-white/5 text-gray-500 hover:bg-white/10'
+                    active ? 'bg-white/10 text-white' : 'bg-white/5 text-gray-500 hover:bg-white/10'
                   }`}
-                  style={active && !focusedAddr ? { borderBottom: `2px solid ${TIER_COLORS[tier]}` } : undefined}
+                  style={active ? { borderBottom: `2px solid ${TIER_COLORS[tier]}` } : undefined}
                 >
                   {tier}
                 </button>
@@ -171,9 +177,7 @@ export function BubbleMapContent() {
 
         {/* Address search */}
         <div className="flex flex-col gap-1 sm:ml-auto">
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">
-            Search Address
-          </span>
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">Search Address</span>
           <div className="flex gap-1.5">
             <input
               type="text"
@@ -183,24 +187,18 @@ export function BubbleMapContent() {
               placeholder="0x..."
               className="bg-mibe-bg border border-mibe-border rounded px-2.5 py-1 text-xs text-white w-48 focus:border-mibe-gold focus:outline-none"
             />
-            <button
-              onClick={handleSearch}
-              className="px-2.5 py-1 rounded text-xs font-semibold bg-mibe-gold/15 text-mibe-gold hover:bg-mibe-gold/25 transition-colors"
-            >
+            <button onClick={handleSearch} className="px-2.5 py-1 rounded text-xs font-semibold bg-mibe-gold/15 text-mibe-gold hover:bg-mibe-gold/25 transition-colors">
               Go
             </button>
             {focusedAddr && (
-              <button
-                onClick={handleClearFocus}
-                className="px-2.5 py-1 rounded text-xs font-semibold bg-mibe-red/15 text-mibe-red hover:bg-mibe-red/25 transition-colors"
-              >
+              <button onClick={handleClearFocus} className="px-2.5 py-1 rounded text-xs font-semibold bg-mibe-red/15 text-mibe-red hover:bg-mibe-red/25 transition-colors">
                 Clear
               </button>
             )}
           </div>
           {focusedAddr && (
             <span className="text-[0.625rem] text-mibe-cyan">
-              Showing {focusedAddr.slice(0, 8)}...{focusedAddr.slice(-4)} + neighbors
+              Focused: {focusedAddr.slice(0, 8)}...{focusedAddr.slice(-4)}
             </span>
           )}
           {searchAddr && !focusedAddr && searchAddr.length > 2 && (
@@ -209,26 +207,20 @@ export function BubbleMapContent() {
         </div>
       </div>
 
-      {/* Stats (based on all filtered, not display-limited) */}
-      <BubbleMapStats nodes={allFilteredNodes} links={allFilteredLinks} totalNodes={data.nodes.length} totalLinks={data.links.length} />
-
       {/* Display limit notice */}
-      {isLimited && (
-        <div className="text-[0.6875rem] text-mibe-text-2 bg-white/5 rounded px-3 py-1.5">
-          Showing top {DISPLAY_LIMIT} wallets in graph (out of {allFilteredNodes.length}). Use address search or tier filters to refine.
+      {isLimited && !focusedAddr && (
+        <div className="text-[0.6875rem] text-mibe-text-2 bg-white/5 rounded px-3 py-1.5 -mt-2">
+          Showing top {DISPLAY_LIMIT} wallets in graph (out of {allFilteredNodes.length}). Click a bubble or search an address to focus.
         </div>
       )}
 
-      {/* Graph */}
-      <ForceGraph nodes={filteredNodes} links={filteredLinks} highlightAddress={focusedAddr} />
+      {/* 3. Graph */}
+      <ForceGraph
+        nodes={graphNodes}
+        links={graphLinks}
+        focusedAddress={focusedAddr}
+        onNodeFocus={handleNodeFocus}
+      />
     </div>
   )
-}
-
-const TIER_COLORS: Record<string, string> = {
-  whale: '#ffd700',
-  dolphin: '#ff69b4',
-  shark: '#58a6ff',
-  fish: '#3fb950',
-  shrimp: '#555',
 }

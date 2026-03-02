@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import type { ForceGraphMethods } from 'react-force-graph-2d'
-import { useRouter } from 'next/navigation'
 import type { BubbleMapNode, BubbleMapLink } from '@/types'
 
-/* ── Tier colors ── */
+/* ── Constants ── */
 
 const TIER_COLORS: Record<string, string> = {
   whale: '#ffd700',
@@ -16,12 +15,16 @@ const TIER_COLORS: Record<string, string> = {
   shrimp: '#555',
 }
 
-/* ── Graph object types (library injects d3 position fields at runtime) ── */
+const TIER_LEGEND = [
+  { tier: 'whale', color: '#ffd700', label: 'Whale (20+ NFTs)' },
+  { tier: 'dolphin', color: '#ff69b4', label: 'Dolphin (10-19)' },
+  { tier: 'shark', color: '#58a6ff', label: 'Shark (5-9)' },
+  { tier: 'fish', color: '#3fb950', label: 'Fish (2-4)' },
+  { tier: 'shrimp', color: '#555', label: 'Shrimp (1)' },
+]
 
 type GraphNode = BubbleMapNode & { x?: number; y?: number }
 type GraphLink = BubbleMapLink & { [k: string]: unknown }
-
-/* ── Helpers ── */
 
 function truncAddr(addr: string) {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`
@@ -36,37 +39,58 @@ function nodeRadius(count: number) {
 interface Props {
   nodes: BubbleMapNode[]
   links: BubbleMapLink[]
-  highlightAddress?: string | null
+  focusedAddress?: string | null
+  onNodeFocus?: (address: string) => void
 }
 
-export function ForceGraph({ nodes, links, highlightAddress }: Props) {
-  const router = useRouter()
+export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props) {
   const graphRef = useRef<ForceGraphMethods>()
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
 
-  // Memoize graph data to prevent recreation on every render
   const graphData = useMemo(() => ({
     nodes: nodes.map((n) => ({ ...n })),
     links: links.map((l) => ({ ...l })),
   }), [nodes, links])
 
-  // Resize observer
+  // Set of node IDs connected to focused address (for dimming)
+  const connectedIds = useMemo(() => {
+    if (!focusedAddress) return null
+    const ids = new Set<string>()
+    ids.add(focusedAddress)
+    for (const l of links) {
+      if (l.source === focusedAddress) ids.add(l.target)
+      if (l.target === focusedAddress) ids.add(l.source)
+    }
+    return ids
+  }, [focusedAddress, links])
+
+  // Set of link keys connected to focused address
+  const connectedLinkKeys = useMemo(() => {
+    if (!focusedAddress) return null
+    const keys = new Set<string>()
+    for (const l of links) {
+      if (l.source === focusedAddress || l.target === focusedAddress) {
+        keys.add(`${l.source}→${l.target}`)
+      }
+    }
+    return keys
+  }, [focusedAddress, links])
+
+  // Resize
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
-
     const update = () => {
       setDimensions({ width: el.clientWidth, height: Math.max(500, window.innerHeight - 300) })
     }
     update()
-
     const ro = new ResizeObserver(update)
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
 
-  // Zoom to fit when data changes
+  // Zoom to fit on data change
   useEffect(() => {
     const timer = setTimeout(() => {
       graphRef.current?.zoomToFit(400, 40)
@@ -74,76 +98,108 @@ export function ForceGraph({ nodes, links, highlightAddress }: Props) {
     return () => clearTimeout(timer)
   }, [nodes, links])
 
+  // Click = focus on node (toggle)
   const handleNodeClick = useCallback(
     (node: GraphNode) => {
-      if (node.id) router.push(`/portfolio?address=${node.id}`)
+      if (node.id && onNodeFocus) onNodeFocus(node.id)
     },
-    [router],
+    [onNodeFocus],
   )
 
-  // Custom canvas node rendering — colored bubble, info in tooltip on hover
+  // Custom node painting
   const paintNode = useCallback((node: GraphNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const x = node.x ?? 0
     const y = node.y ?? 0
     const r = nodeRadius(node.count)
     const color = TIER_COLORS[node.tier] ?? '#555'
-    const isHighlighted = highlightAddress === node.id
+    const isFocused = focusedAddress === node.id
+    const isConnected = !connectedIds || connectedIds.has(node.id)
+    const isDimmed = connectedIds && !isConnected
 
-    // Bubble fill
+    // Bubble
     ctx.beginPath()
     ctx.arc(x, y, r, 0, 2 * Math.PI)
-    ctx.fillStyle = isHighlighted ? color : highlightAddress ? `${color}44` : color
+    if (isFocused) {
+      ctx.fillStyle = color
+    } else if (isDimmed) {
+      ctx.fillStyle = `${color}18` // very faded
+    } else {
+      ctx.fillStyle = color
+    }
     ctx.fill()
 
-    // Border for highlighted node
-    if (isHighlighted) {
+    // White border for focused node
+    if (isFocused) {
       ctx.strokeStyle = '#fff'
       ctx.lineWidth = 2.5
       ctx.stroke()
     }
 
-    // Truncated address below bubble (only at sufficient zoom)
-    if (globalScale > 0.7) {
+    // Address label at sufficient zoom
+    if (globalScale > 0.7 && !isDimmed) {
       const labelSize = Math.max(3, 8 / globalScale)
       ctx.font = `${labelSize}px sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillStyle = isHighlighted ? '#fff' : '#888'
+      ctx.fillStyle = isFocused ? '#fff' : '#888'
       ctx.fillText(truncAddr(node.id), x, y + r + labelSize + 1)
     }
-  }, [highlightAddress])
+  }, [focusedAddress, connectedIds])
 
-  // Hit area for hover/click detection
+  // Hit area
   const paintNodeArea = useCallback((node: GraphNode, color: string, ctx: CanvasRenderingContext2D) => {
     const x = node.x ?? 0
     const y = node.y ?? 0
-    const r = nodeRadius(node.count)
     ctx.beginPath()
-    ctx.arc(x, y, r, 0, 2 * Math.PI)
+    ctx.arc(x, y, nodeRadius(node.count), 0, 2 * Math.PI)
     ctx.fillStyle = color
     ctx.fill()
   }, [])
 
   const nodeLabel = useCallback((node: GraphNode) => `${truncAddr(node.id)} | ${node.count} NFTs | ${node.tier}`, [])
-  const linkColor = useCallback((link: GraphLink) => link.bidirectional ? '#f85149' : '#333', [])
-  const linkWidth = useCallback((link: GraphLink) => Math.min(Math.sqrt(link.weight) * 1.5, 6), [])
-  const arrowColor = useCallback((link: GraphLink) => link.bidirectional ? '#f85149' : '#555', [])
+
+  // Link styling — bidirectional = red & thicker, one-way = gray
+  const linkColor = useCallback((link: GraphLink) => {
+    if (connectedLinkKeys) {
+      const key = `${typeof link.source === 'object' ? (link.source as GraphNode).id : link.source}→${typeof link.target === 'object' ? (link.target as GraphNode).id : link.target}`
+      if (!connectedLinkKeys.has(key)) return 'rgba(255,255,255,0.03)' // nearly invisible
+    }
+    return link.bidirectional ? '#f85149' : 'rgba(255,255,255,0.15)'
+  }, [connectedLinkKeys])
+
+  const linkWidth = useCallback((link: GraphLink) => {
+    if (connectedLinkKeys) {
+      const key = `${typeof link.source === 'object' ? (link.source as GraphNode).id : link.source}→${typeof link.target === 'object' ? (link.target as GraphNode).id : link.target}`
+      if (!connectedLinkKeys.has(key)) return 0.2
+    }
+    return link.bidirectional
+      ? Math.min(Math.sqrt(link.weight) * 2.5, 8)
+      : Math.min(Math.sqrt(link.weight) * 1, 3)
+  }, [connectedLinkKeys])
+
+  const arrowColor = useCallback((link: GraphLink) => {
+    return link.bidirectional ? '#f85149' : 'rgba(255,255,255,0.25)'
+  }, [])
 
   return (
     <div ref={containerRef} className="stat-card p-0 overflow-hidden relative" role="img" aria-label="Wallet relationship graph">
       {/* Legend — left side */}
-      <ul className="absolute top-2 left-2 z-10 bg-black/70 rounded-md px-2.5 py-1.5 text-[0.6875rem] flex flex-col gap-0.5 list-none m-0">
-        {Object.entries(TIER_COLORS).map(([tier, color]) => (
-          <li key={tier} className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ background: color }} />
-            <span className="text-gray-300 capitalize">{tier}</span>
-          </li>
+      <div className="absolute top-2 left-2 z-10 bg-black/80 rounded-md px-2.5 py-2 text-[0.6875rem] flex flex-col gap-1">
+        {TIER_LEGEND.map(({ tier, color, label }) => (
+          <div key={tier} className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+            <span className="text-gray-300">{label}</span>
+          </div>
         ))}
-        <li className="flex items-center gap-1.5 mt-0.5 pt-1 border-t border-gray-700">
-          <span className="w-3 h-0.5 inline-block shrink-0 bg-mibe-red" />
+        <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-700">
+          <span className="shrink-0" style={{ width: 14, height: 3, backgroundColor: '#f85149', display: 'inline-block', borderRadius: 1 }} />
           <span className="text-gray-300">Bidirectional</span>
-        </li>
-      </ul>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="shrink-0" style={{ width: 14, height: 1, backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block' }} />
+          <span className="text-gray-300">One-way</span>
+        </div>
+      </div>
 
       <ForceGraph2D
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -158,6 +214,7 @@ export function ForceGraph({ nodes, links, highlightAddress }: Props) {
         nodeLabel={nodeLabel}
         linkColor={linkColor}
         linkWidth={linkWidth}
+        linkCurvature={0.15}
         linkDirectionalArrowLength={4}
         linkDirectionalArrowRelPos={1}
         linkDirectionalArrowColor={arrowColor}
