@@ -65,14 +65,14 @@ export function BubbleMapStats({ nodes, links }: Props) {
   return (
     <div className="flex flex-col gap-4">
       {/* 3 Gold cards on one line */}
-      <div className="grid grid-cols-3 gap-3">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
         <GoldCard label="Total Wallets" value={walletCount.toLocaleString()} />
         <GoldCard label="Transfers" value={transferCount.toLocaleString()} />
         <GoldCard label="Bidirectional" value={bidirectionalPairs.toLocaleString()} />
       </div>
 
       {/* Table (left 1/2) + Charts (right 1/2) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         {/* Address table */}
         <div className="flex flex-col gap-1">
           <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
