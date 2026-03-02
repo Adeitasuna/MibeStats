@@ -43,7 +43,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'Wallet',
     items: [
       { href: '/portfolio', label: 'Portfolio' },
-      { href: '/bubble-map', label: 'MibeBubble' },
+      { href: '/mibebubble', label: 'MibeBubble' },
     ],
   },
 ]

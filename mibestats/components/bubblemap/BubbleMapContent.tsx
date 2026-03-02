@@ -140,14 +140,30 @@ export function BubbleMapContent() {
       ...(othersCount > 0 ? [{ name: 'Others', value: othersCount }] : []),
     ]
 
-    // Graph display limit
+    // Graph display limit — prioritize connected nodes so links are visible
     let graphNodes: BubbleMapNode[] = tierNodes
     let graphLinks: BubbleMapLink[] = tierLinks
 
     if (graphNodes.length > DISPLAY_LIMIT) {
-      const displayNodes = sorted.slice(0, DISPLAY_LIMIT)
+      // Collect all nodes that participate in at least one link
+      const linkedIds = new Set<string>()
+      for (const l of tierLinks) {
+        linkedIds.add(l.source)
+        linkedIds.add(l.target)
+      }
+
+      // Start with connected nodes (they have links to show)
+      const connectedNodes = tierNodes.filter((n) => linkedIds.has(n.id))
+      // Fill remaining slots with top holders by NFT count
+      const unconnectedTop = sorted.filter((n) => !linkedIds.has(n.id))
+
+      const displayNodes = connectedNodes.length >= DISPLAY_LIMIT
+        ? connectedNodes.slice(0, DISPLAY_LIMIT)
+        : [...connectedNodes, ...unconnectedTop.slice(0, DISPLAY_LIMIT - connectedNodes.length)]
+
       const displayIds = new Set(displayNodes.map((n) => n.id))
 
+      // Always include focused address + its neighbors
       if (focusedAddr && !displayIds.has(focusedAddr)) {
         const focusNode = tierNodes.find((n) => n.id === focusedAddr)
         if (focusNode) displayNodes.push(focusNode)
