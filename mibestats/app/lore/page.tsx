@@ -16,8 +16,8 @@ export default function LorePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
       <div>
-        <h1 className="section-title" style={{ fontSize: '1.8rem' }}>MibeLore</h1>
-        <p style={{ color: '#888', fontSize: '1rem', marginTop: '0.25rem' }}>
+        <h1 className="section-title text-3xl">MibeLore</h1>
+        <p className="text-mibe-text-2 text-sm mt-1">
           Everything you need to know about the Mibera333 universe
         </p>
       </div>

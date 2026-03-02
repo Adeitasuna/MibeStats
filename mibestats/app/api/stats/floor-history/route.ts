@@ -37,18 +37,20 @@ export async function GET(req: NextRequest) {
     fromDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
   }
 
-  // Use daily median sale price from sales table (robust to outliers from false WBERA detections)
+  // Use daily minimum sale price (floor) from sales table, filtering out spam/false prices below 5 BERA
   const rows = fromDate
     ? await prisma.$queryRaw<DailySaleRow[]>`
-        SELECT day, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY price_bera)::text AS min_price
-        FROM (SELECT DATE(sold_at) AS day, price_bera FROM sales WHERE sold_at >= ${fromDate} AND price_bera >= 5) sub
-        GROUP BY day
+        SELECT DATE(sold_at) AS day, MIN(price_bera)::text AS min_price
+        FROM sales
+        WHERE sold_at >= ${fromDate} AND price_bera >= 5
+        GROUP BY DATE(sold_at)
         ORDER BY day ASC
       `.catch(() => [] as DailySaleRow[])
     : await prisma.$queryRaw<DailySaleRow[]>`
-        SELECT day, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY price_bera)::text AS min_price
-        FROM (SELECT DATE(sold_at) AS day, price_bera FROM sales WHERE price_bera >= 5) sub
-        GROUP BY day
+        SELECT DATE(sold_at) AS day, MIN(price_bera)::text AS min_price
+        FROM sales
+        WHERE price_bera >= 5
+        GROUP BY DATE(sold_at)
         ORDER BY day ASC
       `.catch(() => [] as DailySaleRow[])
 

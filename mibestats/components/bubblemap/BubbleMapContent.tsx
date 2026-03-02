@@ -98,13 +98,13 @@ export function BubbleMapContent() {
     graphNodes, graphLinks,
     allFilteredNodes, allFilteredLinks,
     walletCount, transferCount, bidirectionalPairs,
-    tierData, nftDistData, totalNfts, sortedWallets,
+    tierData, nftByTierData, nftDistData, totalNfts, sortedWallets,
   } = useMemo(() => {
     if (!data) return {
       graphNodes: [], graphLinks: [],
       allFilteredNodes: [], allFilteredLinks: [],
       walletCount: 0, transferCount: 0, bidirectionalPairs: 0,
-      tierData: [], nftDistData: [], totalNfts: 0, sortedWallets: [],
+      tierData: [], nftByTierData: [], nftDistData: [], totalNfts: 0, sortedWallets: [],
     }
 
     // Apply tier filter
@@ -129,9 +129,18 @@ export function BubbleMapContent() {
       .filter((t) => tierCounts[t])
       .map((t) => ({ name: `${t} (${tierCounts[t]})`, value: tierCounts[t], color: TIER_COLORS[t] }))
 
+    // NFT count by tier
+    const nftByTier = tierNodes.reduce<Record<string, number>>((acc, n) => {
+      acc[n.tier] = (acc[n.tier] ?? 0) + n.count
+      return acc
+    }, {})
+    const totalNfts = tierNodes.reduce((s, n) => s + n.count, 0)
+    const nftByTierData = TIER_ORDER
+      .filter((t) => nftByTier[t])
+      .map((t) => ({ name: `${TIER_LABELS[t]} (${nftByTier[t]})`, value: nftByTier[t], color: TIER_COLORS[t] }))
+
     // NFT distribution
     const sorted = [...tierNodes].sort((a, b) => b.count - a.count)
-    const totalNfts = tierNodes.reduce((s, n) => s + n.count, 0)
     const top10 = sorted.slice(0, 10)
     const othersCount = sorted.slice(10).reduce((s, n) => s + n.count, 0)
     const nftDistData = [
@@ -189,7 +198,7 @@ export function BubbleMapContent() {
     return {
       graphNodes, graphLinks, allFilteredNodes, allFilteredLinks,
       walletCount, transferCount, bidirectionalPairs,
-      tierData, nftDistData, totalNfts, sortedWallets: sorted,
+      tierData, nftByTierData, nftDistData, totalNfts, sortedWallets: sorted,
     }
   }, [data, activeTiers, focusedAddr])
 
@@ -319,6 +328,36 @@ export function BubbleMapContent() {
                   itemStyle={{ color: '#fff' }}
                   formatter={(value: number, name: string) => {
                     const pct = walletCount > 0 ? ((value / walletCount) * 100).toFixed(1) : '0.0'
+                    return [`${pct}%`, name]
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* NFTs by tier */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
+          <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+            NFTs by Tier ({totalNfts.toLocaleString()} NFTs)
+          </span>
+          <div style={{
+            background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
+          }}>
+            <ResponsiveContainer width="100%" height={170}>
+              <PieChart>
+                <Pie data={nftByTierData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
+                  {nftByTierData.map((d, i) => (
+                    <Cell key={i} fill={d.color} opacity={0.85} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
+                  itemStyle={{ color: '#fff' }}
+                  formatter={(value: number, name: string) => {
+                    const pct = totalNfts > 0 ? ((value / totalNfts) * 100).toFixed(1) : '0.0'
                     return [`${pct}%`, name]
                   }}
                 />
