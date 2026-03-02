@@ -212,15 +212,20 @@ export function BubbleMapContent() {
       </div>
 
       {/* Row 2 left: Wallets table (cols 1-3) */}
-      <div style={{ gridColumn: 'span 3' }} className="flex flex-col gap-1">
+      <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
           Wallets by NFT Count
         </span>
-        <div
-          className="stat-card"
-          style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: 420 }}
-        >
-          <div style={{ overflowY: 'auto', flex: 1 }}>
+        <div style={{
+          background: 'var(--bg-card)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '0.25rem',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          height: 420,
+        }}>
+          <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
             <table style={{ width: '100%' }}>
               <thead>
                 <tr className="border-b border-white/10 text-[0.5625rem] uppercase tracking-wider text-mibe-text-2">
@@ -245,10 +250,11 @@ export function BubbleMapContent() {
             </table>
           </div>
           {totalPages > 1 && (
-            <div
-              className="flex items-center justify-between text-[0.5625rem] text-mibe-text-2"
-              style={{ padding: '6px 8px', borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}
-            >
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '6px 8px', borderTop: '1px solid rgba(255,255,255,0.1)',
+              flexShrink: 0, fontSize: '0.5625rem', color: '#888',
+            }}>
               <span>{sortedWallets.length} wallets</span>
               <div className="flex items-center gap-1">
                 <button
@@ -273,13 +279,16 @@ export function BubbleMapContent() {
       </div>
 
       {/* Row 2 right: Charts stacked (cols 4-6) */}
-      <div style={{ gridColumn: 'span 3' }} className="flex flex-col gap-3">
+      <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {/* Tier distribution */}
-        <div className="flex flex-col gap-1">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
           <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
             Tier Distribution
           </span>
-          <div className="stat-card p-2">
+          <div style={{
+            background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
+          }}>
             <ResponsiveContainer width="100%" height={170}>
               <PieChart>
                 <Pie data={tierData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
@@ -302,11 +311,14 @@ export function BubbleMapContent() {
         </div>
 
         {/* NFT distribution */}
-        <div className="flex flex-col gap-1">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
           <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
             NFT Distribution ({totalNfts.toLocaleString()} NFTs)
           </span>
-          <div className="stat-card p-2">
+          <div style={{
+            background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
+          }}>
             <ResponsiveContainer width="100%" height={170}>
               <PieChart>
                 <Pie data={nftDistData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={1} stroke="none">
