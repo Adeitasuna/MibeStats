@@ -264,7 +264,15 @@ export function BubbleMapContent() {
               </thead>
               <tbody className="text-[0.625rem]">
                 {pagedWallets.map((w, i) => (
-                  <tr key={w.id} className="border-b border-white/5 hover:bg-white/5">
+                  <tr
+                    key={w.id}
+                    onClick={() => handleNodeFocus(w.id)}
+                    style={{
+                      cursor: 'pointer',
+                      background: focusedAddr === w.id ? 'rgba(255,215,0,0.12)' : undefined,
+                    }}
+                    className="border-b border-white/5 hover:bg-white/10"
+                  >
                     <td className="px-2 py-1 text-mibe-muted">{page * PAGE_SIZE + i + 1}</td>
                     <td className="px-2 py-1 font-mono text-[0.5625rem] text-mibe-text break-all">{w.id}</td>
                     <td className="px-2 py-1 text-right font-bold text-white">{w.count}</td>
