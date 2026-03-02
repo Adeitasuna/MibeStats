@@ -51,37 +51,37 @@ export async function GET(req: NextRequest) {
       `,
     ])
 
-    // Wallet lookup
+    // Wallet lookup (normalize addresses to lowercase)
     const walletMap = new Map<string, number>()
     for (const w of wallets) {
-      walletMap.set(w.address, Number(w.count))
+      walletMap.set(w.address.toLowerCase(), Number(w.count))
     }
 
-    // Detect bidirectional edges
+    // Detect bidirectional edges (lowercase keys)
     const edgeKeys = new Set<string>()
     for (const e of edges) {
-      edgeKeys.add(`${e.source}→${e.target}`)
+      edgeKeys.add(`${e.source.toLowerCase()}→${e.target.toLowerCase()}`)
     }
 
-    // Build all nodes
+    // Build all nodes (lowercase IDs)
     const nodes = wallets.map((w) => {
       const count = Number(w.count)
       return {
-        id: w.address,
+        id: w.address.toLowerCase(),
         count,
         tier: tierFromCount(count),
       }
     })
 
-    // Build all links (only where both endpoints exist as nodes)
+    // Build all links (only where both endpoints exist as nodes, lowercase)
     const links = edges
-      .filter((e) => walletMap.has(e.source) && walletMap.has(e.target))
+      .filter((e) => walletMap.has(e.source.toLowerCase()) && walletMap.has(e.target.toLowerCase()))
       .map((e) => ({
-        source: e.source,
-        target: e.target,
+        source: e.source.toLowerCase(),
+        target: e.target.toLowerCase(),
         weight: Number(e.weight),
         volume: Number(e.volume),
-        bidirectional: edgeKeys.has(`${e.target}→${e.source}`),
+        bidirectional: edgeKeys.has(`${e.target.toLowerCase()}→${e.source.toLowerCase()}`),
       }))
 
     return NextResponse.json({ nodes, links })

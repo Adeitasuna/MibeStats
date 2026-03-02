@@ -182,22 +182,22 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
   }, [])
 
   return (
-    <div ref={containerRef} className="stat-card p-0 overflow-hidden relative" role="img" aria-label="Wallet relationship graph">
-      {/* Legend — left side */}
-      <div className="absolute top-2 left-2 z-10 bg-black/80 rounded-md px-2.5 py-2 text-[0.6875rem] flex flex-col gap-1">
+    <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.25rem' }} role="img" aria-label="Wallet relationship graph">
+      {/* Legend — compact overlay */}
+      <div style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, background: 'rgba(0,0,0,0.8)', borderRadius: 6, padding: '6px 8px', fontSize: 10, lineHeight: '16px', fontFamily: 'sans-serif' }}>
         {TIER_LEGEND.map(({ tier, color, label }) => (
-          <div key={tier} className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-            <span className="text-gray-300">{label}</span>
+          <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, backgroundColor: color }} />
+            <span style={{ color: '#ccc' }}>{label}</span>
           </div>
         ))}
-        <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-700">
-          <span className="shrink-0" style={{ width: 14, height: 3, backgroundColor: '#ff4444', display: 'inline-block', borderRadius: 1 }} />
-          <span className="text-gray-300">Bidirectional</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, paddingTop: 3, borderTop: '1px solid #444' }}>
+          <span style={{ width: 14, height: 3, backgroundColor: '#ff4444', display: 'inline-block', borderRadius: 1, flexShrink: 0 }} />
+          <span style={{ color: '#ccc' }}>Bidirectional</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="shrink-0" style={{ width: 14, height: 2, backgroundColor: 'rgba(255,255,255,0.6)', display: 'inline-block' }} />
-          <span className="text-gray-300">One-way</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 14, height: 2, backgroundColor: 'rgba(255,255,255,0.6)', display: 'inline-block', flexShrink: 0 }} />
+          <span style={{ color: '#ccc' }}>One-way</span>
         </div>
       </div>
 
