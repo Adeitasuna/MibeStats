@@ -9,18 +9,20 @@ import type { BubbleMapNode, BubbleMapLink } from '@/types'
 
 const TIER_COLORS: Record<string, string> = {
   whale: '#ffd700',
-  dolphin: '#ff69b4',
-  shark: '#58a6ff',
-  fish: '#3fb950',
-  shrimp: '#555',
+  diamond: '#b9f2ff',
+  gold: '#f0a030',
+  silver: '#c0c0c0',
+  bronze: '#cd7f32',
+  holder: '#555',
 }
 
 const TIER_LEGEND = [
-  { tier: 'whale', color: '#ffd700', label: 'Whale (20+ NFTs)' },
-  { tier: 'dolphin', color: '#ff69b4', label: 'Dolphin (10-19)' },
-  { tier: 'shark', color: '#58a6ff', label: 'Shark (5-9)' },
-  { tier: 'fish', color: '#3fb950', label: 'Fish (2-4)' },
-  { tier: 'shrimp', color: '#555', label: 'Shrimp (1)' },
+  { tier: 'whale', color: '#ffd700', label: 'Whale (100+)' },
+  { tier: 'diamond', color: '#b9f2ff', label: 'Diamond (35-99)' },
+  { tier: 'gold', color: '#f0a030', label: 'Gold (10-34)' },
+  { tier: 'silver', color: '#c0c0c0', label: 'Silver (4-9)' },
+  { tier: 'bronze', color: '#cd7f32', label: 'Bronze (2-3)' },
+  { tier: 'holder', color: '#555', label: 'Holder (1)' },
 ]
 
 type GraphNode = BubbleMapNode & { x?: number; y?: number }

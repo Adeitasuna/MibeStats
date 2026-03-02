@@ -7,22 +7,24 @@ import {
 import type { BubbleMapNode, BubbleMapLink, BubbleMapResponse } from '@/types'
 import { ForceGraph } from './ForceGraph'
 
-const TIERS = ['whale', 'dolphin', 'shark', 'fish', 'shrimp'] as const
+const TIERS = ['whale', 'diamond', 'gold', 'silver', 'bronze', 'holder'] as const
 const TIER_COLORS: Record<string, string> = {
   whale: '#ffd700',
-  dolphin: '#ff69b4',
-  shark: '#58a6ff',
-  fish: '#3fb950',
-  shrimp: '#555',
+  diamond: '#b9f2ff',
+  gold: '#f0a030',
+  silver: '#c0c0c0',
+  bronze: '#cd7f32',
+  holder: '#555',
 }
 const TIER_LABELS: Record<string, string> = {
-  whale: 'Whale (20+)',
-  dolphin: 'Dolphin (10-19)',
-  shark: 'Shark (5-9)',
-  fish: 'Fish (2-4)',
-  shrimp: 'Shrimp (1)',
+  whale: 'Whale (100+)',
+  diamond: 'Diamond (35-99)',
+  gold: 'Gold (10-34)',
+  silver: 'Silver (4-9)',
+  bronze: 'Bronze (2-3)',
+  holder: 'Holder (1)',
 }
-const TIER_ORDER = ['whale', 'dolphin', 'shark', 'fish', 'shrimp'] as const
+const TIER_ORDER = ['whale', 'diamond', 'gold', 'silver', 'bronze', 'holder'] as const
 const PIE_COLORS = ['#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149', '#bc8cff', '#f0883e', '#8b949e', '#a5d6ff', '#ffc658', '#82ca9d']
 const DISPLAY_LIMIT = 200
 const PAGE_SIZE = 20

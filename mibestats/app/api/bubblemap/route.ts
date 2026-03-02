@@ -8,11 +8,12 @@ interface WalletRow { address: string; count: bigint }
 interface EdgeRow { source: string; target: string; weight: bigint; volume: string }
 
 function tierFromCount(count: number): string {
-  if (count >= 20) return 'whale'
-  if (count >= 10) return 'dolphin'
-  if (count >= 5) return 'shark'
-  if (count >= 2) return 'fish'
-  return 'shrimp'
+  if (count >= 100) return 'whale'
+  if (count >= 35) return 'diamond'
+  if (count >= 10) return 'gold'
+  if (count >= 4) return 'silver'
+  if (count >= 2) return 'bronze'
+  return 'holder'
 }
 
 export async function GET(req: NextRequest) {

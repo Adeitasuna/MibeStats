@@ -11,13 +11,14 @@ interface Props {
   links: BubbleMapLink[]
 }
 
-const TIER_ORDER = ['whale', 'dolphin', 'shark', 'fish', 'shrimp'] as const
+const TIER_ORDER = ['whale', 'diamond', 'gold', 'silver', 'bronze', 'holder'] as const
 const TIER_COLORS: Record<string, string> = {
   whale: '#ffd700',
-  dolphin: '#ff69b4',
-  shark: '#58a6ff',
-  fish: '#3fb950',
-  shrimp: '#555',
+  diamond: '#b9f2ff',
+  gold: '#f0a030',
+  silver: '#c0c0c0',
+  bronze: '#cd7f32',
+  holder: '#555',
 }
 const PAGE_SIZE = 20
 
