@@ -164,21 +164,21 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
       const key = `${typeof link.source === 'object' ? (link.source as GraphNode).id : link.source}→${typeof link.target === 'object' ? (link.target as GraphNode).id : link.target}`
       if (!connectedLinkKeys.has(key)) return 'rgba(255,255,255,0.03)' // nearly invisible
     }
-    return link.bidirectional ? '#ff6b6b' : 'rgba(255,255,255,0.35)'
+    return link.bidirectional ? '#ff4444' : 'rgba(255,255,255,0.6)'
   }, [connectedLinkKeys])
 
   const linkWidth = useCallback((link: GraphLink) => {
     if (connectedLinkKeys) {
       const key = `${typeof link.source === 'object' ? (link.source as GraphNode).id : link.source}→${typeof link.target === 'object' ? (link.target as GraphNode).id : link.target}`
-      if (!connectedLinkKeys.has(key)) return 0.2
+      if (!connectedLinkKeys.has(key)) return 0.3
     }
     return link.bidirectional
-      ? Math.min(Math.sqrt(link.weight) * 3, 10)
-      : Math.min(Math.sqrt(link.weight) * 1.5, 4)
+      ? Math.max(2, Math.min(Math.sqrt(link.weight) * 3, 10))
+      : Math.max(1, Math.min(Math.sqrt(link.weight) * 1.5, 4))
   }, [connectedLinkKeys])
 
   const arrowColor = useCallback((link: GraphLink) => {
-    return link.bidirectional ? '#ff6b6b' : 'rgba(255,255,255,0.4)'
+    return link.bidirectional ? '#ff4444' : 'rgba(255,255,255,0.6)'
   }, [])
 
   return (
@@ -192,11 +192,11 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
           </div>
         ))}
         <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-700">
-          <span className="shrink-0" style={{ width: 14, height: 3, backgroundColor: '#ff6b6b', display: 'inline-block', borderRadius: 1 }} />
+          <span className="shrink-0" style={{ width: 14, height: 3, backgroundColor: '#ff4444', display: 'inline-block', borderRadius: 1 }} />
           <span className="text-gray-300">Bidirectional</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="shrink-0" style={{ width: 14, height: 1, backgroundColor: 'rgba(255,255,255,0.3)', display: 'inline-block' }} />
+          <span className="shrink-0" style={{ width: 14, height: 2, backgroundColor: 'rgba(255,255,255,0.6)', display: 'inline-block' }} />
           <span className="text-gray-300">One-way</span>
         </div>
       </div>
