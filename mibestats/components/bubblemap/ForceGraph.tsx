@@ -164,7 +164,7 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
       const key = `${typeof link.source === 'object' ? (link.source as GraphNode).id : link.source}→${typeof link.target === 'object' ? (link.target as GraphNode).id : link.target}`
       if (!connectedLinkKeys.has(key)) return 'rgba(255,255,255,0.03)' // nearly invisible
     }
-    return link.bidirectional ? '#f85149' : 'rgba(255,255,255,0.15)'
+    return link.bidirectional ? '#ff6b6b' : 'rgba(255,255,255,0.35)'
   }, [connectedLinkKeys])
 
   const linkWidth = useCallback((link: GraphLink) => {
@@ -173,12 +173,12 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
       if (!connectedLinkKeys.has(key)) return 0.2
     }
     return link.bidirectional
-      ? Math.min(Math.sqrt(link.weight) * 2.5, 8)
-      : Math.min(Math.sqrt(link.weight) * 1, 3)
+      ? Math.min(Math.sqrt(link.weight) * 3, 10)
+      : Math.min(Math.sqrt(link.weight) * 1.5, 4)
   }, [connectedLinkKeys])
 
   const arrowColor = useCallback((link: GraphLink) => {
-    return link.bidirectional ? '#f85149' : 'rgba(255,255,255,0.25)'
+    return link.bidirectional ? '#ff6b6b' : 'rgba(255,255,255,0.4)'
   }, [])
 
   return (
@@ -192,7 +192,7 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
           </div>
         ))}
         <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-700">
-          <span className="shrink-0" style={{ width: 14, height: 3, backgroundColor: '#f85149', display: 'inline-block', borderRadius: 1 }} />
+          <span className="shrink-0" style={{ width: 14, height: 3, backgroundColor: '#ff6b6b', display: 'inline-block', borderRadius: 1 }} />
           <span className="text-gray-300">Bidirectional</span>
         </div>
         <div className="flex items-center gap-1.5">
