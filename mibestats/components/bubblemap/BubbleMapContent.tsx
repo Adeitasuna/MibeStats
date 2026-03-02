@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
@@ -27,7 +27,8 @@ const TIER_LABELS: Record<string, string> = {
 const TIER_ORDER = ['whale', 'diamond', 'gold', 'silver', 'bronze', 'holder'] as const
 const PIE_COLORS = ['#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149', '#bc8cff', '#f0883e', '#8b949e', '#a5d6ff', '#ffc658', '#82ca9d']
 const DISPLAY_LIMIT = 200
-const PAGE_SIZE = 20
+const ROW_HEIGHT = 28
+const DEFAULT_PAGE_SIZE = 10
 
 export function BubbleMapContent() {
   const [data, setData] = useState<BubbleMapResponse | null>(null)
@@ -39,6 +40,8 @@ export function BubbleMapContent() {
   const [searchAddr, setSearchAddr] = useState('')
   const [focusedAddr, setFocusedAddr] = useState<string | null>(null)
   const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const tableBodyRef = useRef<HTMLDivElement>(null)
 
   const fetchData = useCallback((signal?: AbortSignal) => {
     setLoading(true)
@@ -66,6 +69,20 @@ export function BubbleMapContent() {
     fetchData(controller.signal)
     return () => controller.abort()
   }, [fetchData])
+
+  // Dynamically compute page size based on table body height
+  useEffect(() => {
+    const el = tableBodyRef.current
+    if (!el) return
+    const update = () => {
+      const rows = Math.max(5, Math.floor(el.clientHeight / ROW_HEIGHT))
+      setPageSize(rows)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const toggleTier = useCallback((tier: string) => {
     setActiveTiers((prev) => {
@@ -202,8 +219,8 @@ export function BubbleMapContent() {
     }
   }, [data, activeTiers, focusedAddr])
 
-  const totalPages = Math.ceil(sortedWallets.length / PAGE_SIZE)
-  const pagedWallets = sortedWallets.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+  const totalPages = Math.ceil(sortedWallets.length / pageSize)
+  const pagedWallets = sortedWallets.slice(page * pageSize, (page + 1) * pageSize)
   const isLimited = allFilteredNodes.length > DISPLAY_LIMIT
 
   if (loading) {
@@ -240,7 +257,7 @@ export function BubbleMapContent() {
 
       {/* Row 2 left: Wallets table (cols 1-3) */}
       <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Wallets by NFT Count
         </span>
         <div style={{
@@ -250,15 +267,16 @@ export function BubbleMapContent() {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          height: 420,
+          flex: 1,
+          minHeight: 0,
         }}>
-          <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
+          <div ref={tableBodyRef} style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
             <table style={{ width: '100%' }}>
               <thead>
                 <tr className="border-b border-white/10 text-[0.5625rem] uppercase tracking-wider text-mibe-text-2">
                   <th className="px-2 py-1.5 text-left" style={{ width: 30 }}>#</th>
                   <th className="px-2 py-1.5 text-left">Address</th>
-                  <th className="px-2 py-1.5 text-right" style={{ width: 50 }}>NFTs</th>
+                  <th className="px-2 py-1.5" style={{ width: 50, textAlign: 'right' }}>NFTs</th>
                   <th className="px-2 py-1.5 text-left" style={{ width: 60 }}>Tier</th>
                 </tr>
               </thead>
@@ -273,9 +291,9 @@ export function BubbleMapContent() {
                     }}
                     className="border-b border-white/5 hover:bg-white/10"
                   >
-                    <td className="px-2 py-1 text-mibe-muted">{page * PAGE_SIZE + i + 1}</td>
+                    <td className="px-2 py-1 text-mibe-muted">{page * pageSize + i + 1}</td>
                     <td className="px-2 py-1 font-mono text-[0.5625rem] text-mibe-text break-all">{w.id}</td>
-                    <td className="px-2 py-1 text-right font-bold text-white">{w.count}</td>
+                    <td className="px-2 py-1 font-bold text-white" style={{ textAlign: 'right' }}>{w.count}</td>
                     <td className="px-2 py-1">
                       <span className="capitalize text-[0.5625rem]" style={{ color: TIER_COLORS[w.tier] }}>{w.tier}</span>
                     </td>
@@ -317,7 +335,7 @@ export function BubbleMapContent() {
       <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {/* Tier distribution */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-          <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+          <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Tier Distribution
           </span>
           <div style={{
@@ -347,7 +365,7 @@ export function BubbleMapContent() {
 
         {/* NFTs by tier */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-          <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+          <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             NFTs by Tier ({totalNfts.toLocaleString()} NFTs)
           </span>
           <div style={{
@@ -377,7 +395,7 @@ export function BubbleMapContent() {
 
         {/* NFT distribution */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-          <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+          <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             NFT Distribution ({totalNfts.toLocaleString()} NFTs)
           </span>
           <div style={{

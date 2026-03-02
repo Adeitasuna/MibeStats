@@ -21,6 +21,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: '/lore', label: 'MibeLore' },
       { href: '/eden', label: 'MibeEden' },
+      { href: '/mibebubble', label: 'MibeBubble' },
     ],
   },
   {
@@ -37,13 +38,6 @@ const NAV_SECTIONS: NavSection[] = [
       { href: '/metadatas', label: 'MibeMetadatas' },
       { href: '/grails', label: 'MibeGrails' },
       { href: '/miladies', label: 'Miladies' },
-    ],
-  },
-  {
-    title: 'Wallet',
-    items: [
-      { href: '/portfolio', label: 'Portfolio' },
-      { href: '/mibebubble', label: 'MibeBubble' },
     ],
   },
 ]

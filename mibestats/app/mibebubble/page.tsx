@@ -24,7 +24,7 @@ export default function BubbleMapPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="section-title text-3xl">MibeBubble</h1>
-        <p style={{ color: '#888', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+        <p className="text-mibe-text-2 text-sm mt-1">
           Wallet relationship graph showing trade connections between Mibera333 holders — discover who trades with whom
         </p>
       </div>
