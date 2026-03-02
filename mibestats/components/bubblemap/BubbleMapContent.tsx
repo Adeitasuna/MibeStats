@@ -255,8 +255,8 @@ export function BubbleMapContent() {
         <GoldCard label="Bidirectional" value={bidirectionalPairs.toLocaleString()} />
       </div>
 
-      {/* Row 2 left: Wallets table (cols 1-3) */}
-      <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      {/* Wallets table (cols 1-3, spanning rows 2-3) */}
+      <div style={{ gridColumn: '1 / 4', gridRow: '2 / 4', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Wallets by NFT Count
         </span>
@@ -331,96 +331,92 @@ export function BubbleMapContent() {
         </div>
       </div>
 
-      {/* Row 2 right: Charts stacked (cols 4-6) */}
-      <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        {/* Tier distribution */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-          <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Tier Distribution
-          </span>
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
-          }}>
-            <ResponsiveContainer width="100%" height={170}>
-              <PieChart>
-                <Pie data={tierData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
-                  {tierData.map((d, i) => (
-                    <Cell key={i} fill={d.color} opacity={0.85} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                  formatter={(value: number, name: string) => {
-                    const pct = walletCount > 0 ? ((value / walletCount) * 100).toFixed(1) : '0.0'
-                    return [`${pct}%`, name]
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Row 2 right top: Tier Distribution (col 4-4.5) + NFTs by Tier (col 4.5-6) */}
+      <div style={{ gridColumn: '4 / 5', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Tier Distribution
+        </span>
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
+        }}>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={tierData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
+                {tierData.map((d, i) => (
+                  <Cell key={i} fill={d.color} opacity={0.85} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
+                formatter={(value: number, name: string) => {
+                  const pct = walletCount > 0 ? ((value / walletCount) * 100).toFixed(1) : '0.0'
+                  return [`${pct}%`, name]
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* NFTs by tier */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-          <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            NFTs by Tier ({totalNfts.toLocaleString()} NFTs)
-          </span>
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
-          }}>
-            <ResponsiveContainer width="100%" height={170}>
-              <PieChart>
-                <Pie data={nftByTierData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
-                  {nftByTierData.map((d, i) => (
-                    <Cell key={i} fill={d.color} opacity={0.85} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                  formatter={(value: number, name: string) => {
-                    const pct = totalNfts > 0 ? ((value / totalNfts) * 100).toFixed(1) : '0.0'
-                    return [`${pct}%`, name]
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+      <div style={{ gridColumn: '5 / 7', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          NFTs by Tier ({totalNfts.toLocaleString()} NFTs)
+        </span>
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
+        }}>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={nftByTierData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
+                {nftByTierData.map((d, i) => (
+                  <Cell key={i} fill={d.color} opacity={0.85} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
+                formatter={(value: number, name: string) => {
+                  const pct = totalNfts > 0 ? ((value / totalNfts) * 100).toFixed(1) : '0.0'
+                  return [`${pct}%`, name]
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* NFT distribution */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
-          <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            NFT Distribution ({totalNfts.toLocaleString()} NFTs)
-          </span>
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '0.25rem', padding: '0.5rem', flex: 1,
-          }}>
-            <ResponsiveContainer width="100%" height={170}>
-              <PieChart>
-                <Pie data={nftDistData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={1} stroke="none">
-                  {nftDistData.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                  formatter={(value: number, name: string) => {
-                    const pct = totalNfts > 0 ? ((value / totalNfts) * 100).toFixed(1) : '0.0'
-                    return [`${pct}%`, name]
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Row 3 right: NFT Distribution (cols 4-6) */}
+      <div style={{ gridColumn: '4 / 7', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          NFT Distribution ({totalNfts.toLocaleString()} NFTs)
+        </span>
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '0.25rem', padding: '0.5rem',
+        }}>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={nftDistData} cx="50%" cy="50%" outerRadius={55} innerRadius={25} dataKey="value" nameKey="name" paddingAngle={1} stroke="none">
+                {nftDistData.map((_, i) => (
+                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 11, color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
+                formatter={(value: number, name: string) => {
+                  const pct = totalNfts > 0 ? ((value / totalNfts) * 100).toFixed(1) : '0.0'
+                  return [`${pct}%`, name]
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
