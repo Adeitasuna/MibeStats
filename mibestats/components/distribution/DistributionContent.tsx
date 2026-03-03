@@ -146,7 +146,7 @@ export function DistributionContent() {
         <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
               Time Period Split
             </span>
             <div className="card p-4">
@@ -155,7 +155,7 @@ export function DistributionContent() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
               Element Distribution
             </span>
             <div className="card p-4">

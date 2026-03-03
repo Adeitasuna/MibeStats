@@ -33,9 +33,9 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider truncate">
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
         {title}
-        <span className="text-mibe-muted font-normal ml-1.5">({data.length})</span>
+        <span style={{ color: '#8b949e', fontWeight: 400, marginLeft: '0.375rem' }}>({data.length})</span>
       </span>
       <div className="card p-3 flex flex-col">
       <ResponsiveContainer width="100%" height={180}>
