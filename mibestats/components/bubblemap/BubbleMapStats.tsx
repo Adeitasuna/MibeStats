@@ -76,7 +76,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         {/* Address table */}
         <div className="flex flex-col gap-1">
-          <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+          <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
             Wallets by NFT Count
           </span>
           <div className="stat-card p-0 overflow-hidden flex flex-col">
@@ -134,7 +134,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
         <div className="flex flex-col gap-4">
           {/* Tier distribution */}
           <div className="flex flex-col gap-1">
-            <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+            <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
               Tier Distribution
             </span>
             <div className="stat-card p-2">
@@ -161,7 +161,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
 
           {/* NFT distribution across wallets */}
           <div className="flex flex-col gap-1">
-            <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-mibe-gold">
+            <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
               NFT Distribution ({totalNfts.toLocaleString()} NFTs)
             </span>
             <div className="stat-card p-2">

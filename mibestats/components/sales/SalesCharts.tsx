@@ -46,7 +46,7 @@ export function SalesCharts({ sales, volumeHistory }: Props) {
     <div className="space-y-4">
       {/* Range toggle */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+        <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
           Price History
         </h2>
         <div className="flex gap-1">
@@ -74,7 +74,7 @@ export function SalesCharts({ sales, volumeHistory }: Props) {
 
       {/* Volume bar chart */}
       <div className="card p-4">
-        <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">
+        <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-3">
           Daily Volume
         </h2>
         <VolumeChart data={filteredVolume} />

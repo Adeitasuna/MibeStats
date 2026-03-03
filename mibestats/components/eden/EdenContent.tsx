@@ -109,7 +109,7 @@ function GoldCard({ label, value }: { label: string; value: string }) {
 function MiniCard({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{label}</span>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{label}</span>
       <div className="stat-card">
         <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{value}</span>
       </div>

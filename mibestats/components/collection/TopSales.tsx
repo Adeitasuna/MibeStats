@@ -11,7 +11,7 @@ interface Props {
 export function TopSales({ sales }: Props) {
   return (
     <div className="card p-4">
-      <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">
+      <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-4">
         Top Sales (All-Time)
       </h2>
 

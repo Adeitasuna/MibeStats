@@ -133,7 +133,7 @@ export function DistributionContent() {
 
         return (
           <section key={group.groupTitle}>
-            <h2 className="text-sm font-semibold text-mibe-gold uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-3">
               {group.groupTitle}
             </h2>
             <PieChartGrid sections={sections} />
@@ -149,14 +149,14 @@ export function DistributionContent() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="card p-4">
-            <h3 className="text-[10px] font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
               Time Period Split
             </h3>
             <BarChart data={traits.timePeriods || []} />
           </div>
 
           <div className="card p-4">
-            <h3 className="text-[10px] font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
+            <h3 className="text-xs font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
               Element Distribution
             </h3>
             <BarChart

@@ -34,7 +34,7 @@ export function PortfolioStats({ stats }: Props) {
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
       {cards.map(({ label, value }) => (
         <div key={label} className="card-gold p-3 flex flex-col gap-0.5">
-          <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">{label}</span>
+          <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">{label}</span>
           <span className="text-lg font-bold text-white tabular-nums">{value}</span>
         </div>
       ))}

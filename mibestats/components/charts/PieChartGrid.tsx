@@ -33,7 +33,7 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
 
   return (
     <div className="card p-3 flex flex-col">
-      <h3 className="text-[10px] font-semibold text-mibe-gold mb-1 uppercase tracking-wider truncate">
+      <h3 className="text-xs font-semibold text-mibe-gold mb-1 uppercase tracking-wider truncate">
         {title}
         <span className="text-mibe-muted font-normal ml-1.5">({data.length})</span>
       </h3>

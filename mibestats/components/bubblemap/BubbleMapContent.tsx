@@ -240,7 +240,7 @@ export function BubbleMapContent() {
 
       {/* Wallets table (cols 1-3, spanning rows 2-3) */}
       <div style={{ gridColumn: '1 / 4', gridRow: '2 / 4', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
           Wallets by NFT Count
         </span>
         <div style={{
@@ -315,7 +315,7 @@ export function BubbleMapContent() {
 
       {/* Row 2 right top: Tier Distribution (col 4-4.5) + NFTs by Tier (col 4.5-6) */}
       <div style={{ gridColumn: '4 / 5', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
           Tier Distribution
         </span>
         <div style={{
@@ -344,7 +344,7 @@ export function BubbleMapContent() {
       </div>
 
       <div style={{ gridColumn: '5 / 7', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
           NFTs by Tier ({totalNfts.toLocaleString()} NFTs)
         </span>
         <div style={{
@@ -374,7 +374,7 @@ export function BubbleMapContent() {
 
       {/* Row 3 right: NFT Distribution (cols 4-6) */}
       <div style={{ gridColumn: '4 / 7', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
           NFT Distribution ({totalNfts.toLocaleString()} NFTs)
         </span>
         <div style={{
@@ -404,7 +404,7 @@ export function BubbleMapContent() {
 
       {/* Row 3 left: Tier filters (cols 1-3) */}
       <div style={{ gridColumn: 'span 3' }} className="flex flex-col gap-1">
-        <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">Filter by Tier</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">Filter by Tier</span>
         <div className="flex gap-1.5 flex-wrap">
           {TIERS.map((tier) => {
             const active = activeTiers.has(tier)
@@ -426,7 +426,7 @@ export function BubbleMapContent() {
 
       {/* Row 3 right: Search Address (cols 4-6) */}
       <div style={{ gridColumn: 'span 3' }} className="flex flex-col gap-1">
-        <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">Search Address</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">Search Address</span>
         <div className="flex gap-1.5">
           <input
             type="text"
