@@ -12,7 +12,7 @@ export async function GET(
 ) {
   // ─── Rate limiting: 30 req/min per IP ──────────────────────────────────────
   const ip = getClientIp(req)
-  const rl = checkRateLimit(ip, 30, 60)
+  const rl = checkRateLimit(`portfolio:${ip}`, 30, 60)
   if (!rl.success) {
     return NextResponse.json(
       { error: 'Too many requests' },
