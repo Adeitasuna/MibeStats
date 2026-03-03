@@ -76,7 +76,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         {/* Address table */}
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
+          <span className="card-title-upper">
             Wallets by NFT Count
           </span>
           <div className="stat-card p-0 overflow-hidden flex flex-col">
@@ -134,7 +134,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
         <div className="flex flex-col gap-4">
           {/* Tier distribution */}
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
+            <span className="card-title-upper">
               Tier Distribution
             </span>
             <div className="stat-card p-2">
@@ -161,7 +161,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
 
           {/* NFT distribution across wallets */}
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
+            <span className="card-title-upper">
               NFT Distribution ({totalNfts.toLocaleString()} NFTs)
             </span>
             <div className="stat-card p-2">
@@ -196,7 +196,7 @@ const PIE_COLORS = ['#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149', '#bc8
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+      <span className="card-title-upper">{label}</span>
       <div className="stat-card stat-card--gold">
         <span className="text-xl font-bold text-white">{value}</span>
       </div>

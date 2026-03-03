@@ -28,7 +28,7 @@ function GrailCard({ grail, showCategory }: { grail: GrailToken; showCategory?: 
       {/* Category label */}
       {showCategory && (
         <div className="px-2 pt-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
+          <span className="card-title-upper">
             {grail.grailCategory ?? 'Unknown'}
           </span>
         </div>
@@ -163,7 +163,7 @@ export function GrailsContent() {
         <div className="flex flex-col gap-6">
           {sortedCategories.map(([category, tokens]) => (
             <div key={category}>
-              <h3 className="text-xs font-semibold text-mibe-gold mb-2 uppercase tracking-wider">
+              <h3 className="card-title-upper mb-2">
                 {category} ({tokens.length})
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-3">

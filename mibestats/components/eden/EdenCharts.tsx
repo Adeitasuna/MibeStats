@@ -31,7 +31,7 @@ export function EdenPieChart({ data, title }: EdenPieChartProps) {
 
   return (
     <div className="card p-4">
-      <h3 className="text-xs font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
+      <h3 className="card-title-upper mb-3">
         {title}
       </h3>
       <ResponsiveContainer width="100%" height={240}>

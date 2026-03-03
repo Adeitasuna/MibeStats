@@ -89,7 +89,7 @@ function truncateAddress(addr: string) {
 function MetadataCard({ label, value, isMono }: { label: string; value: string; isMono?: boolean }) {
   return (
     <div className="card p-2.5 flex flex-col gap-0.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
+      <span className="card-title-upper">
         {label}
       </span>
       <span className={`text-sm text-white ${isMono ? 'font-mono text-xs' : ''}`}>
@@ -148,7 +148,7 @@ export default function MetadatasPage() {
       {/* Header */}
       <div>
         <h1 className="section-title text-3xl">MibeMetadatas</h1>
-        <p className="text-mibe-text-2 text-sm mt-1">
+        <p className="chapo-h1">
           Explore individual Mibera metadata
         </p>
       </div>
@@ -290,7 +290,7 @@ export default function MetadatasPage() {
             {/* Owner */}
             {token.ownerAddress && (
               <div className="card p-2.5 flex flex-col gap-0.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">Owner</span>
+                <span className="card-title-upper">Owner</span>
                 <span className="text-xs font-mono text-mibe-cyan" title={token.ownerAddress}>
                   {truncateAddress(token.ownerAddress)}
                 </span>
@@ -317,7 +317,7 @@ export default function MetadatasPage() {
 
               return (
                 <div key={group.title}>
-                  <h3 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-2">
+                  <h3 className="card-title-upper mb-2">
                     {group.title}
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -336,7 +336,7 @@ export default function MetadatasPage() {
             {/* Sales history */}
             {token.salesHistory && token.salesHistory.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-2">
+                <h3 className="card-title-upper mb-2">
                   Sales History ({token.salesHistory.length})
                 </h3>
                 <div className="card overflow-hidden">

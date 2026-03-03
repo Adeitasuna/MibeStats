@@ -33,7 +33,7 @@ export function FloorPriceChart({ data }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+        <span className="card-title-upper">
           Floor Price
         </span>
         <div className="flex gap-1">

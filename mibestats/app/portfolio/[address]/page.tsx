@@ -113,7 +113,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
 
       {/* Holdings */}
       <section>
-        <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-3">
+        <h2 className="card-title-upper mb-3">
           Holdings
         </h2>
         <HoldingsGrid tokens={mappedTokens} />

@@ -98,7 +98,7 @@ type Range = '7d' | '30d' | 'all'
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{label}</span>
+      <span className="card-title-upper">{label}</span>
       <div className="stat-card stat-card--gold">
         <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff' }}>{value}</span>
       </div>
@@ -109,7 +109,7 @@ function GoldCard({ label, value }: { label: string; value: string }) {
 function MiniCard({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{label}</span>
+      <span className="card-title-upper">{label}</span>
       <div className="stat-card">
         <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{value}</span>
       </div>
@@ -136,7 +136,7 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Floor Price</span>
+        <span className="card-title-upper">Floor Price</span>
         <div style={{ display: 'flex', gap: '0.25rem' }}>
           {(['7d', '30d', 'all'] as Range[]).map((r) => (
             <button
@@ -217,7 +217,7 @@ function EdenPie({ data, title }: { data: { name: string; value: number }[]; tit
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>{title}</span>
+      <span className="card-title-upper">{title}</span>
       <div className="stat-card" style={{ padding: '0.75rem' }}>
         <ResponsiveContainer width="100%" height={240}>
           <PieChart>
@@ -363,7 +363,7 @@ export function EdenContent() {
           {/* Best Sales */}
           {eden.bestSales.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Best Sales — Top 30</span>
+              <span className="card-title-upper">Best Sales — Top 30</span>
               <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
                   <table className="w-full text-sm">
@@ -414,7 +414,7 @@ export function EdenContent() {
           {/* Most Sold */}
           {eden.mostSold.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>Most Sold Miberas — Top 30</span>
+              <span className="card-title-upper">Most Sold Miberas — Top 30</span>
               <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
                   <table className="w-full text-sm">

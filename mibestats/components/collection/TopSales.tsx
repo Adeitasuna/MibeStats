@@ -11,7 +11,7 @@ interface Props {
 export function TopSales({ sales }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+      <span className="card-title-upper">
         Top Sales (All-Time)
       </span>
       <div className="card p-4">

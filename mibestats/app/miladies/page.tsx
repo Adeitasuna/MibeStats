@@ -26,7 +26,7 @@ export default function MiladiesPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="section-title text-3xl">Miladies to Mibera</h1>
-        <p className="text-mibe-text-2 text-sm mt-1">
+        <p className="chapo-h1">
           The Milady Maker stage — Phase 2 of the reveal timeline
         </p>
       </div>

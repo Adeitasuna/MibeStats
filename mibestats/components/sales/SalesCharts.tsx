@@ -47,7 +47,7 @@ export function SalesCharts({ sales, volumeHistory }: Props) {
       {/* Price History */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+          <span className="card-title-upper">
             Price History
           </span>
           <div className="flex gap-1">
@@ -74,7 +74,7 @@ export function SalesCharts({ sales, volumeHistory }: Props) {
 
       {/* Daily Volume */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+        <span className="card-title-upper">
           Daily Volume
         </span>
         <div className="card p-4">

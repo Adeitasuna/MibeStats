@@ -251,7 +251,7 @@ export default async function TraitsPage({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="section-title text-3xl">Traits &amp; Rarity Explorer</h1>
-          <p className="text-mibe-text-2 text-sm mt-1">
+          <p className="chapo-h1">
             {tokens.total.toLocaleString()} token{tokens.total !== 1 ? 's' : ''} match your filters
           </p>
         </div>

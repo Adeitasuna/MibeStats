@@ -133,8 +133,7 @@ export function DistributionContent() {
 
         return (
           <section key={group.groupTitle}>
-            <h2 className="section-title" style={{ fontSize: '1.4rem' }}>{group.groupTitle}</h2>
-            <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
+            <h2 className="separator">{group.groupTitle}</h2>
             <PieChartGrid sections={sections} />
           </section>
         )
@@ -142,22 +141,17 @@ export function DistributionContent() {
 
       {/* Chronos Area — Time Period breakdown */}
       <section>
-        <h2 className="section-title" style={{ fontSize: '1.4rem' }}>Chronos Area</h2>
-        <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
+        <h2 className="separator">Chronos Area</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
-              Time Period Split
-            </span>
+            <span className="card-title-upper">Time Period Split</span>
             <div className="card p-4">
               <BarChart data={traits.timePeriods || []} />
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
-              Element Distribution
-            </span>
+            <span className="card-title-upper">Element Distribution</span>
             <div className="card p-4">
               <BarChart
                 data={traits.elements || []}

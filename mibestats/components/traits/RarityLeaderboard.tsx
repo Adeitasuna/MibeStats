@@ -24,7 +24,7 @@ export function RarityLeaderboard({ tokens }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+      <span className="card-title-upper">
         Rarity Leaderboard — Top SSS &amp; SS
       </span>
       <div className="card p-4">

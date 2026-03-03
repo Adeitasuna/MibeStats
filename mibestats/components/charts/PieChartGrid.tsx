@@ -33,7 +33,7 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }}>
+      <span className="card-title-upper">
         {title}
         <span style={{ color: '#8b949e', fontWeight: 400, marginLeft: '0.375rem' }}>({data.length})</span>
       </span>

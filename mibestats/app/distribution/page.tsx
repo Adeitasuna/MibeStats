@@ -34,7 +34,7 @@ export default function DistributionPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="section-title text-3xl">MibeDistribution</h1>
-        <p className="text-mibe-text-2 text-sm mt-1">
+        <p className="chapo-h1">
           Trait distribution across all 10,000 Miberas — ~24 categories
         </p>
       </div>
