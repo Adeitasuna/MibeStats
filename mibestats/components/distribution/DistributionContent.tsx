@@ -133,9 +133,8 @@ export function DistributionContent() {
 
         return (
           <section key={group.groupTitle}>
-            <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-3">
-              {group.groupTitle}
-            </h2>
+            <h2 className="section-title" style={{ fontSize: '1.4rem' }}>{group.groupTitle}</h2>
+            <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
             <PieChartGrid sections={sections} />
           </section>
         )
@@ -143,26 +142,28 @@ export function DistributionContent() {
 
       {/* Chronos Area — Time Period breakdown */}
       <section>
-        <h2 className="section-title text-xl mb-2">Chronos Area</h2>
-        <p className="text-mibe-text-2 text-xs mb-4">
-          Distribution by historical time period and element
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="card p-4">
-            <h3 className="text-xs font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
+        <h2 className="section-title" style={{ fontSize: '1.4rem' }}>Chronos Area</h2>
+        <div style={{ borderTop: '1px solid #2a2a2a', marginTop: '0.4rem', marginBottom: '1rem' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
               Time Period Split
-            </h3>
-            <BarChart data={traits.timePeriods || []} />
+            </span>
+            <div className="card p-4">
+              <BarChart data={traits.timePeriods || []} />
+            </div>
           </div>
 
-          <div className="card p-4">
-            <h3 className="text-xs font-semibold text-mibe-gold mb-3 uppercase tracking-wider">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
               Element Distribution
-            </h3>
-            <BarChart
-              data={traits.elements || []}
-              colorMap={{ Earth: '#3fb950', Fire: '#f85149', Water: '#58a6ff', Air: '#bc8cff' }}
-            />
+            </span>
+            <div className="card p-4">
+              <BarChart
+                data={traits.elements || []}
+                colorMap={{ Earth: '#3fb950', Fire: '#f85149', Water: '#58a6ff', Air: '#bc8cff' }}
+              />
+            </div>
           </div>
         </div>
       </section>

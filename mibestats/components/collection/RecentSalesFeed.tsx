@@ -19,11 +19,11 @@ interface Props {
 
 export function RecentSalesFeed({ sales }: Props) {
   return (
-    <div className="card p-4">
-      <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
         Recent Sales
-      </h2>
-
+      </span>
+      <div className="card p-4">
       <ul className="flex flex-col gap-2">
         {sales.map((sale) => (
           <li key={sale.id} className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
@@ -74,6 +74,7 @@ export function RecentSalesFeed({ sales }: Props) {
           </li>
         ))}
       </ul>
+      </div>
     </div>
   )
 }

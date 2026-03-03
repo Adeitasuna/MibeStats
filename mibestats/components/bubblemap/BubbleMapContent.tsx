@@ -457,7 +457,7 @@ export function BubbleMapContent() {
 
       {/* Row 4: Display limit notice (full width) */}
       {isLimited && !focusedAddr && (
-        <div style={{ gridColumn: 'span 6' }} className="text-[0.6875rem] text-mibe-text-2 bg-white/5 rounded px-3 py-1.5">
+        <div style={{ gridColumn: 'span 6', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700' }} className="bg-white/5 rounded px-3 py-1.5">
           Showing top {DISPLAY_LIMIT} wallets in graph (out of {allFilteredNodes.length}). Click a bubble or search an address to focus.
         </div>
       )}
@@ -478,7 +478,7 @@ export function BubbleMapContent() {
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
       <div className="stat-card stat-card--gold">
         <span className="text-xl font-bold text-white">{value}</span>
       </div>

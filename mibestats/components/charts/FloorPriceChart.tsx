@@ -31,11 +31,11 @@ export function FloorPriceChart({ data }: Props) {
   }))
 
   return (
-    <div className="card p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
           Floor Price
-        </h2>
+        </span>
         <div className="flex gap-1">
           {(['7d', '30d', 'all'] as Range[]).map((r) => (
             <button
@@ -50,6 +50,7 @@ export function FloorPriceChart({ data }: Props) {
           ))}
         </div>
       </div>
+      <div className="card p-4">
 
       {formatted.length === 0 ? (
         <div className="h-48 flex items-center justify-center text-gray-600 text-sm">
@@ -101,6 +102,7 @@ export function FloorPriceChart({ data }: Props) {
           </AreaChart>
         </ResponsiveContainer>
       )}
+      </div>
     </div>
   )
 }

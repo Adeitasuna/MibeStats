@@ -44,40 +44,42 @@ export function SalesCharts({ sales, volumeHistory }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Range toggle */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
-          Price History
-        </h2>
-        <div className="flex gap-1">
-          {(['7d', '30d', 'all'] as Range[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
-                range === r ? 'bg-white/15 text-white' : 'text-gray-500 hover:text-gray-300'
-              }`}
-            >
-              {r === 'all' ? 'All' : r}
-            </button>
-          ))}
+      {/* Price History */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
+            Price History
+          </span>
+          <div className="flex gap-1">
+            {(['7d', '30d', 'all'] as Range[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
+                  range === r ? 'bg-white/15 text-white' : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                {r === 'all' ? 'All' : r}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="card p-4">
+          <p className="text-xs text-gray-500 mb-3">
+            {filteredSales.length} sales · yellow diamonds = Grails
+          </p>
+          <PriceChart data={filteredSales} />
         </div>
       </div>
 
-      {/* Scatter chart */}
-      <div className="card p-4">
-        <p className="text-xs text-gray-500 mb-3">
-          {filteredSales.length} sales · yellow diamonds = Grails
-        </p>
-        <PriceChart data={filteredSales} />
-      </div>
-
-      {/* Volume bar chart */}
-      <div className="card p-4">
-        <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-3">
+      {/* Daily Volume */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
           Daily Volume
-        </h2>
-        <VolumeChart data={filteredVolume} />
+        </span>
+        <div className="card p-4">
+          <VolumeChart data={filteredVolume} />
+        </div>
       </div>
     </div>
   )

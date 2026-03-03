@@ -196,7 +196,7 @@ const PIE_COLORS = ['#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149', '#bc8
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">{label}</span>
       <div className="stat-card stat-card--gold">
         <span className="text-xl font-bold text-white">{value}</span>
       </div>

@@ -23,11 +23,11 @@ export function RarityLeaderboard({ tokens }: Props) {
   if (sorted.length === 0) return null
 
   return (
-    <div className="card p-4">
-      <h2 className="text-xs font-semibold text-mibe-gold uppercase tracking-wider mb-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider">
         Rarity Leaderboard — Top SSS &amp; SS
-      </h2>
-
+      </span>
+      <div className="card p-4">
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[480px]">
           <thead>
@@ -72,6 +72,7 @@ export function RarityLeaderboard({ tokens }: Props) {
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   )

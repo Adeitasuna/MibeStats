@@ -32,11 +32,12 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
   const total = chartData.reduce((s, d) => s + d.value, 0)
 
   return (
-    <div className="card p-3 flex flex-col">
-      <h3 className="text-xs font-semibold text-mibe-gold mb-1 uppercase tracking-wider truncate">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span className="text-xs font-semibold text-mibe-gold uppercase tracking-wider truncate">
         {title}
         <span className="text-mibe-muted font-normal ml-1.5">({data.length})</span>
-      </h3>
+      </span>
+      <div className="card p-3 flex flex-col">
       <ResponsiveContainer width="100%" height={180}>
         <PieChart>
           <Pie
@@ -85,6 +86,7 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
         {chartData.length > 8 && (
           <span className="text-[8px] text-mibe-muted">+{chartData.length - 8}</span>
         )}
+      </div>
       </div>
     </div>
   )

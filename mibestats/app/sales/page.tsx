@@ -90,8 +90,8 @@ export default async function SalesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Sales History</h1>
-        <p className="text-gray-400 text-sm mt-0.5">
+        <h1 className="section-title text-3xl">Sales History</h1>
+        <p className="text-mibe-text-2 text-sm mt-1">
           {totalSales.toLocaleString()} total sales · price chart · daily volume · filterable table
         </p>
       </div>

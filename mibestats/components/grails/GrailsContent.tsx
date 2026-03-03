@@ -28,7 +28,7 @@ function GrailCard({ grail, showCategory }: { grail: GrailToken; showCategory?: 
       {/* Category label */}
       {showCategory && (
         <div className="px-2 pt-1.5">
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-mibe-gold">
+          <span className="text-xs font-semibold uppercase tracking-wider text-mibe-gold">
             {grail.grailCategory ?? 'Unknown'}
           </span>
         </div>
