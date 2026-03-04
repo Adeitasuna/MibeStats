@@ -26,7 +26,7 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
   const top = sorted.slice(0, maxSlices)
   const restCount = sorted.slice(maxSlices).reduce((sum, d) => sum + d.count, 0)
   const chartData = [
-    ...top.map((d) => ({ name: d.value, value: d.count, pct: d.pct })),
+    ...top.map((d) => ({ name: `${d.value} (${d.count.toLocaleString()})`, value: d.count, pct: d.pct })),
     ...(restCount > 0 ? [{ name: 'Other', value: restCount, pct: +(restCount / 100).toFixed(1) }] : []),
   ]
   const total = chartData.reduce((s, d) => s + d.value, 0)
@@ -38,7 +38,7 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
         <span style={{ color: '#8b949e', fontWeight: 400, marginLeft: '0.375rem' }}>({data.length})</span>
       </span>
       <div className="card p-3 flex flex-col">
-      <ResponsiveContainer width="100%" height={180}>
+      <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie
             data={chartData}
@@ -55,6 +55,7 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
               <Cell key={i} fill={COLORS[i % COLORS.length]} opacity={0.85} />
             ))}
           </Pie>
+          <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />
           <Tooltip
             contentStyle={{
               background: '#000',
@@ -72,21 +73,6 @@ function PieChartCard({ title, data, maxSlices = 12 }: PieChartCardProps) {
           />
         </PieChart>
       </ResponsiveContainer>
-      {/* Compact legend — show top items with percentage */}
-      <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5 px-0.5">
-        {chartData.slice(0, 8).map((d, i) => (
-          <span key={d.name} className="flex items-center gap-0.5 text-[8px] text-mibe-text-2 leading-tight">
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: COLORS[i % COLORS.length] }}
-            />
-            <span className="truncate max-w-[70px]">{d.name}</span>
-          </span>
-        ))}
-        {chartData.length > 8 && (
-          <span className="text-[8px] text-mibe-muted">+{chartData.length - 8}</span>
-        )}
-      </div>
       </div>
     </div>
   )
