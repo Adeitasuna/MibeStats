@@ -33,78 +33,74 @@ function flatten(sp: SearchParams): Record<string, string> {
 
 // ─── Cached data fetchers ────────────────────────────────────────────────────
 
+interface TraitRow { category: string; value: string | null; count: bigint }
+
 const getTraits = unstable_cache(
   async (): Promise<TraitDistribution> => {
-    const [
-      archetypes, ancestors, elements, sunSigns, drugs,
-      backgrounds, bodies, eyes, eyebrows, mouths, hairs, hats, glasses, shirts, swagRanks,
-      grailRows,
-    ] = await Promise.all([
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT archetype AS value, COUNT(*) AS count FROM tokens GROUP BY archetype`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT ancestor AS value, COUNT(*) AS count FROM tokens GROUP BY ancestor`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT element AS value, COUNT(*) AS count FROM tokens WHERE element IS NOT NULL GROUP BY element`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT sun_sign AS value, COUNT(*) AS count FROM tokens WHERE sun_sign IS NOT NULL GROUP BY sun_sign`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT drug AS value, COUNT(*) AS count FROM tokens WHERE drug IS NOT NULL GROUP BY drug`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT background AS value, COUNT(*) AS count FROM tokens WHERE background IS NOT NULL GROUP BY background`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT body AS value, COUNT(*) AS count FROM tokens WHERE body IS NOT NULL GROUP BY body`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT eyes AS value, COUNT(*) AS count FROM tokens WHERE eyes IS NOT NULL GROUP BY eyes`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT eyebrows AS value, COUNT(*) AS count FROM tokens WHERE eyebrows IS NOT NULL GROUP BY eyebrows`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT mouth AS value, COUNT(*) AS count FROM tokens WHERE mouth IS NOT NULL GROUP BY mouth`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT hair AS value, COUNT(*) AS count FROM tokens WHERE hair IS NOT NULL GROUP BY hair`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT hat AS value, COUNT(*) AS count FROM tokens WHERE hat IS NOT NULL GROUP BY hat`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT glasses AS value, COUNT(*) AS count FROM tokens WHERE glasses IS NOT NULL GROUP BY glasses`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT shirt AS value, COUNT(*) AS count FROM tokens WHERE shirt IS NOT NULL GROUP BY shirt`,
-      prisma.$queryRaw<{ value: string | null; count: bigint }[]>`
-        SELECT swag_rank AS value, COUNT(*) AS count FROM tokens GROUP BY swag_rank`,
-      prisma.$queryRaw<{ grail_category: string | null; count: bigint }[]>`
-        SELECT grail_category, COUNT(*) AS count FROM tokens WHERE is_grail = TRUE GROUP BY grail_category`,
-    ])
+    // Single UNION ALL query instead of 16 parallel queries
+    const rows = await prisma.$queryRaw<TraitRow[]>`
+      SELECT 'archetype' AS category, archetype AS value, COUNT(*) AS count FROM tokens GROUP BY archetype
+      UNION ALL SELECT 'ancestor', ancestor, COUNT(*) FROM tokens GROUP BY ancestor
+      UNION ALL SELECT 'element', element, COUNT(*) FROM tokens WHERE element IS NOT NULL GROUP BY element
+      UNION ALL SELECT 'timePeriod', time_period, COUNT(*) FROM tokens GROUP BY time_period
+      UNION ALL SELECT 'sunSign', sun_sign, COUNT(*) FROM tokens WHERE sun_sign IS NOT NULL GROUP BY sun_sign
+      UNION ALL SELECT 'moonSign', moon_sign, COUNT(*) FROM tokens WHERE moon_sign IS NOT NULL GROUP BY moon_sign
+      UNION ALL SELECT 'ascendingSign', ascending_sign, COUNT(*) FROM tokens WHERE ascending_sign IS NOT NULL GROUP BY ascending_sign
+      UNION ALL SELECT 'drug', drug, COUNT(*) FROM tokens WHERE drug IS NOT NULL GROUP BY drug
+      UNION ALL SELECT 'background', background, COUNT(*) FROM tokens WHERE background IS NOT NULL GROUP BY background
+      UNION ALL SELECT 'body', body, COUNT(*) FROM tokens WHERE body IS NOT NULL GROUP BY body
+      UNION ALL SELECT 'eyes', eyes, COUNT(*) FROM tokens WHERE eyes IS NOT NULL GROUP BY eyes
+      UNION ALL SELECT 'eyebrows', eyebrows, COUNT(*) FROM tokens WHERE eyebrows IS NOT NULL GROUP BY eyebrows
+      UNION ALL SELECT 'mouth', mouth, COUNT(*) FROM tokens WHERE mouth IS NOT NULL GROUP BY mouth
+      UNION ALL SELECT 'hair', hair, COUNT(*) FROM tokens WHERE hair IS NOT NULL GROUP BY hair
+      UNION ALL SELECT 'hat', hat, COUNT(*) FROM tokens WHERE hat IS NOT NULL GROUP BY hat
+      UNION ALL SELECT 'glasses', glasses, COUNT(*) FROM tokens WHERE glasses IS NOT NULL GROUP BY glasses
+      UNION ALL SELECT 'mask', mask, COUNT(*) FROM tokens WHERE mask IS NOT NULL GROUP BY mask
+      UNION ALL SELECT 'earrings', earrings, COUNT(*) FROM tokens WHERE earrings IS NOT NULL GROUP BY earrings
+      UNION ALL SELECT 'faceAccessory', face_accessory, COUNT(*) FROM tokens WHERE face_accessory IS NOT NULL GROUP BY face_accessory
+      UNION ALL SELECT 'tattoo', tattoo, COUNT(*) FROM tokens WHERE tattoo IS NOT NULL GROUP BY tattoo
+      UNION ALL SELECT 'item', item, COUNT(*) FROM tokens WHERE item IS NOT NULL GROUP BY item
+      UNION ALL SELECT 'shirt', shirt, COUNT(*) FROM tokens WHERE shirt IS NOT NULL GROUP BY shirt
+      UNION ALL SELECT 'swagRank', swag_rank, COUNT(*) FROM tokens GROUP BY swag_rank
+      UNION ALL SELECT 'grail', grail_category, COUNT(*) FROM tokens WHERE is_grail = TRUE GROUP BY grail_category
+    `
+
+    // Group rows by category
+    const grouped = new Map<string, TraitRow[]>()
+    for (const r of rows) {
+      const list = grouped.get(r.category) ?? []
+      list.push(r)
+      grouped.set(r.category, list)
+    }
+
+    const counts = (key: string, total = 10000) => toTraitCounts(grouped.get(key) ?? [], total)
+
     return {
-      archetypes:      toTraitCounts(archetypes),
-      ancestors:       toTraitCounts(ancestors),
-      elements:        toTraitCounts(elements),
-      timePeriods:     [],
-      sunSigns:        toTraitCounts(sunSigns),
-      moonSigns:       [],
-      ascendingSigns:  [],
-      drugs:           toTraitCounts(drugs),
-      backgrounds:     toTraitCounts(backgrounds),
-      bodies:          toTraitCounts(bodies),
-      eyes:            toTraitCounts(eyes),
-      eyebrows:        toTraitCounts(eyebrows),
-      mouths:          toTraitCounts(mouths),
-      hairs:           toTraitCounts(hairs),
-      hats:            toTraitCounts(hats),
-      glasses:         toTraitCounts(glasses),
-      masks:           [],
-      earrings:        [],
-      faceAccessories: [],
-      tattoos:         [],
-      items:           [],
-      shirts:          toTraitCounts(shirts),
-      swagRanks:       toTraitCounts(swagRanks),
-      grailCategories: grailRows
-        .filter((r) => r.grail_category !== null)
-        .map((r) => ({
-          value: r.grail_category as string,
-          count: Number(r.count),
-          pct:   Math.round((Number(r.count) / 42) * 10000) / 100,
-        })),
-      grailCount: 42,
+      archetypes:      counts('archetype'),
+      ancestors:       counts('ancestor'),
+      elements:        counts('element'),
+      timePeriods:     counts('timePeriod'),
+      sunSigns:        counts('sunSign'),
+      moonSigns:       counts('moonSign'),
+      ascendingSigns:  counts('ascendingSign'),
+      drugs:           counts('drug'),
+      backgrounds:     counts('background'),
+      bodies:          counts('body'),
+      eyes:            counts('eyes'),
+      eyebrows:        counts('eyebrows'),
+      mouths:          counts('mouth'),
+      hairs:           counts('hair'),
+      hats:            counts('hat'),
+      glasses:         counts('glasses'),
+      masks:           counts('mask'),
+      earrings:        counts('earrings'),
+      faceAccessories: counts('faceAccessory'),
+      tattoos:         counts('tattoo'),
+      items:           counts('item'),
+      shirts:          counts('shirt'),
+      swagRanks:       counts('swagRank'),
+      grailCategories: counts('grail', 42),
+      grailCount:      42,
     }
   },
   ['traits-distribution'],
