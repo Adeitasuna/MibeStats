@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import { magicEdenUrl } from '@/types'
+import { truncateAddress, fmtDate } from '@/lib/format'
 import type { Sale, PaginatedResponse } from '@/types'
 
 interface Filters {
@@ -30,17 +31,6 @@ const DEFAULT_FILTERS: Filters = {
 interface Props {
   initialSales: Sale[]
   initialTotal: number
-}
-
-function truncateAddr(addr: string | null): string {
-  if (!addr) return '—'
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`
-}
-
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  })
 }
 
 export function SalesTable({ initialSales, initialTotal }: Props) {
@@ -261,7 +251,7 @@ export function SalesTable({ initialSales, initialTotal }: Props) {
 
                   {/* Buyer */}
                   <td className="py-2 pr-3 text-gray-400 text-xs font-mono">
-                    {truncateAddr(sale.buyerAddress)}
+                    {truncateAddress(sale.buyerAddress)}
                   </td>
 
                   {/* TX link */}

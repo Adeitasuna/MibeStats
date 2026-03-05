@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
+import { truncateAddress } from '@/lib/format'
 import type { Token } from '@/types'
 import { magicEdenUrl } from '@/types'
 
@@ -80,11 +81,6 @@ const FIELD_GROUPS = [
   { title: 'Appearance', fields: APPEARANCE_FIELDS },
   { title: 'Grail', fields: GRAIL_FIELDS },
 ]
-
-function truncateAddress(addr: string) {
-  if (addr.length <= 14) return addr
-  return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-}
 
 function MetadataCard({ label, value, isMono }: { label: string; value: string; isMono?: boolean }) {
   return (
