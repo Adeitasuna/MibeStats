@@ -267,6 +267,25 @@ body {
   margin: 0;
 }
 
+/* ── Reusable component classes ── */
+
+@layer components {
+  /* Ghost button — error pages, secondary actions */
+  .btn-ghost {
+    @apply px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-sm transition-colors;
+  }
+
+  /* Pagination button */
+  .btn-page {
+    @apply px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white transition-colors;
+  }
+
+  /* Grail badge — inline label on sales/leaderboard rows */
+  .badge-grail {
+    @apply text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded;
+  }
+}
+
 /* ── Scrollbar ── */
 
 ::-webkit-scrollbar {

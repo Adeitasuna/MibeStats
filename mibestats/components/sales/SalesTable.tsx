@@ -239,7 +239,7 @@ export function SalesTable({ initialSales, initialTotal }: Props) {
                             <SwagRankBadge rank={sale.token.swagRank} size="sm" />
                           )}
                           {sale.token?.isGrail && (
-                            <span className="text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1 py-0.5 rounded">
+                            <span className="badge-grail">
                               GRAIL
                             </span>
                           )}
@@ -297,7 +297,7 @@ export function SalesTable({ initialSales, initialTotal }: Props) {
             {filters.page > 1 && (
               <button
                 onClick={() => changePage(filters.page - 1)}
-                className="px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-white transition-colors"
+                className="btn-page"
               >
                 ← Prev
               </button>
@@ -305,7 +305,7 @@ export function SalesTable({ initialSales, initialTotal }: Props) {
             {filters.page < totalPages && (
               <button
                 onClick={() => changePage(filters.page + 1)}
-                className="px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-white transition-colors"
+                className="btn-page"
               >
                 Next →
               </button>

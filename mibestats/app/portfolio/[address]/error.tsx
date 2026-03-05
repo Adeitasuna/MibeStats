@@ -18,13 +18,13 @@ export default function PortfolioAddressError({
       <div className="flex gap-3">
         <button
           onClick={reset}
-          className="px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-sm transition-colors"
+          className="btn-ghost"
         >
           Try again
         </button>
         <Link
           href="/portfolio"
-          className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition-colors"
+          className="btn-page text-sm text-gray-400"
         >
           Search again
         </Link>

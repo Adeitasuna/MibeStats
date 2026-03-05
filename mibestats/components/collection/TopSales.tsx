@@ -48,7 +48,7 @@ export function TopSales({ sales }: Props) {
                 </Link>
                 {sale.token?.swagRank && <SwagRankBadge rank={sale.token.swagRank} size="sm" />}
                 {sale.token?.isGrail && (
-                  <span className="text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1 py-0.5 rounded">
+                  <span className="badge-grail">
                     GRAIL
                   </span>
                 )}

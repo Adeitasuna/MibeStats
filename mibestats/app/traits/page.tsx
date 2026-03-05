@@ -319,7 +319,7 @@ export default async function TraitsPage({
                 {currentPage > 1 && (
                   <Link
                     href={makeUrl({ page: String(currentPage - 1) })}
-                    className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white transition-colors"
+                    className="btn-page"
                   >
                     ← Prev
                   </Link>
@@ -327,7 +327,7 @@ export default async function TraitsPage({
                 {currentPage < totalPages && (
                   <Link
                     href={makeUrl({ page: String(currentPage + 1) })}
-                    className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white transition-colors"
+                    className="btn-page"
                   >
                     Next →
                   </Link>

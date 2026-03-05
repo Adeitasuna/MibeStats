@@ -58,7 +58,7 @@ export function RarityLeaderboard({ tokens }: Props) {
                     #{token.tokenId}
                   </Link>
                   {token.isGrail && (
-                    <span className="ml-2 text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded">
+                    <span className="ml-2 badge-grail">
                       GRAIL
                     </span>
                   )}

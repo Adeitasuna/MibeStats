@@ -12,7 +12,7 @@ export default function TraitsError({
       <p className="text-sm text-gray-400">Something went wrong fetching the rarity explorer.</p>
       <button
         onClick={reset}
-        className="px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-sm transition-colors"
+        className="btn-ghost"
       >
         Try again
       </button>

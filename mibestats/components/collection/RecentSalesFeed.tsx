@@ -59,7 +59,7 @@ export function RecentSalesFeed({ sales }: Props) {
                   <SwagRankBadge rank={sale.token.swagRank} size="sm" />
                 )}
                 {sale.token?.isGrail && (
-                  <span className="text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-medium">
+                  <span className="badge-grail font-medium">
                     GRAIL
                   </span>
                 )}
