@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { floorHistoryQuerySchema, parseSearchParams } from '@/lib/validation'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { withRateLimit } from '@/lib/api-handler'
 
 export const revalidate = 3600   // 1-hour cache
 
@@ -10,16 +10,7 @@ interface DailySaleRow {
   min_price: string
 }
 
-export async function GET(req: NextRequest) {
-  const ip = getClientIp(req)
-  const rl = checkRateLimit(`floor-history:${ip}`, 100, 60)
-  if (!rl.success) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetMs - Date.now()) / 1000)) } },
-    )
-  }
-
+export const GET = withRateLimit('floor-history', 100, async (req) => {
   const parsed = floorHistoryQuerySchema.safeParse(
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
   )
@@ -74,4 +65,4 @@ export async function GET(req: NextRequest) {
   }))
 
   return NextResponse.json(data)
-}
+})

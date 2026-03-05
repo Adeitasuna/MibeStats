@@ -1,22 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { tokenQuerySchema, parseSearchParams } from '@/lib/validation'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { withRateLimit } from '@/lib/api-handler'
 import { magicEdenUrl } from '@/types'
 import type { Prisma } from '@prisma/client'
 
 export const revalidate = 86400   // 24-hour cache
 
-export async function GET(req: NextRequest) {
-  const ip = getClientIp(req)
-  const rl = checkRateLimit(`tokens:${ip}`, 100, 60)
-  if (!rl.success) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetMs - Date.now()) / 1000)) } },
-    )
-  }
-
+export const GET = withRateLimit('tokens', 100, async (req) => {
   const parsed = tokenQuerySchema.safeParse(
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
   )
@@ -49,45 +40,40 @@ export async function GET(req: NextRequest) {
     sort === 'price_desc' ? { lastSalePrice: 'desc' }  :
     /* swag_desc default */ { swagScore: 'desc' }
 
-  try {
-    const [total, rows] = await Promise.all([
-      prisma.token.count({ where }),
-      prisma.token.findMany({
-        where,
-        orderBy,
-        skip:  (page - 1) * limit,
-        take:  limit,
-        select: {
-          tokenId: true, archetype: true, ancestor: true, timePeriod: true,
-          element: true, sunSign: true, moonSign: true, ascendingSign: true,
-          swagScore: true, swagRank: true, rarityRank: true,
-          background: true, body: true, eyes: true, eyebrows: true,
-          mouth: true, hair: true, shirt: true, hat: true, glasses: true,
-          mask: true, earrings: true, faceAccessory: true, tattoo: true,
-          item: true, drug: true,
-          isGrail: true, grailName: true, grailCategory: true,
-          imageUrl: true, ownerAddress: true,
-          lastSalePrice: true, maxSalePrice: true, saleCount: true,
-        },
-      }),
-    ])
+  const [total, rows] = await Promise.all([
+    prisma.token.count({ where }),
+    prisma.token.findMany({
+      where,
+      orderBy,
+      skip:  (page - 1) * limit,
+      take:  limit,
+      select: {
+        tokenId: true, archetype: true, ancestor: true, timePeriod: true,
+        element: true, sunSign: true, moonSign: true, ascendingSign: true,
+        swagScore: true, swagRank: true, rarityRank: true,
+        background: true, body: true, eyes: true, eyebrows: true,
+        mouth: true, hair: true, shirt: true, hat: true, glasses: true,
+        mask: true, earrings: true, faceAccessory: true, tattoo: true,
+        item: true, drug: true,
+        isGrail: true, grailName: true, grailCategory: true,
+        imageUrl: true, ownerAddress: true,
+        lastSalePrice: true, maxSalePrice: true, saleCount: true,
+      },
+    }),
+  ])
 
-    const data = rows.map((r) => ({
-      ...r,
-      lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
-      maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
-      magicEdenUrl:  magicEdenUrl(r.tokenId),
-    }))
+  const data = rows.map((r) => ({
+    ...r,
+    lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
+    maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
+    magicEdenUrl:  magicEdenUrl(r.tokenId),
+  }))
 
-    return NextResponse.json({
-      data,
-      total,
-      page,
-      limit,
-      hasNext: page * limit < total,
-    })
-  } catch (err) {
-    console.error('[/api/tokens]', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
+  return NextResponse.json({
+    data,
+    total,
+    page,
+    limit,
+    hasNext: page * limit < total,
+  })
+})
