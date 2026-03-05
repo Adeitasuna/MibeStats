@@ -108,6 +108,8 @@ model Sale {
   @@index([tokenId])
   @@index([soldAt(sort: Desc)])
   @@index([priceBera(sort: Desc)])
+  @@index([sellerAddress, buyerAddress])
+  @@index([soldAt(sort: Desc), tokenId])
   @@map("sales")
 }
 
