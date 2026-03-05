@@ -12,7 +12,7 @@
  */
 
 import 'dotenv/config'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { getTransferLogs, getLatestBlock } from '../lib/rpc'
 
 const prisma  = new PrismaClient()
@@ -70,16 +70,18 @@ async function main() {
     const batch = entries.slice(i, i + UPDATE_BATCH)
 
     // Build CASE WHEN ... THEN ... END update
-    const cases    = batch.map(([id, addr]) => `WHEN ${id} THEN '${addr}'`).join('\n      ')
-    const tokenIds = batch.map(([id]) => id).join(', ')
+    const cases = batch.map(([id, addr]) =>
+      Prisma.sql`WHEN ${id} THEN ${addr}`
+    )
+    const tokenIds = batch.map(([id]) => id)
 
-    await prisma.$executeRawUnsafe(`
+    await prisma.$executeRaw`
       UPDATE tokens
       SET owner_address = CASE token_id
-        ${cases}
+        ${Prisma.join(cases, ' ')}
       END
-      WHERE token_id IN (${tokenIds})
-    `)
+      WHERE token_id IN (${Prisma.join(tokenIds)})
+    `
   }
 
   // Save last processed block

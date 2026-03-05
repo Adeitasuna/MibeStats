@@ -5,7 +5,7 @@
  */
 
 import 'dotenv/config'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { getTransferLogs, getLatestBlock } from '../lib/rpc'
 
 const prisma = new PrismaClient()
@@ -76,12 +76,14 @@ async function main() {
   const BATCH = 500
   for (let i = 0; i < entries.length; i += BATCH) {
     const b = entries.slice(i, i + BATCH)
-    const cases = b.map(([id, count]) => `WHEN ${id} THEN ${count}`).join('\n      ')
-    const ids = b.map(([id]) => id).join(', ')
-    await prisma.$executeRawUnsafe(`
-      UPDATE tokens SET transfer_count = CASE token_id ${cases} END
-      WHERE token_id IN (${ids})
-    `)
+    const cases = b.map(([id, count]) =>
+      Prisma.sql`WHEN ${id} THEN ${count}`
+    )
+    const ids = b.map(([id]) => id)
+    await prisma.$executeRaw`
+      UPDATE tokens SET transfer_count = CASE token_id ${Prisma.join(cases, ' ')} END
+      WHERE token_id IN (${Prisma.join(ids)})
+    `
   }
 
   // Also save the owners checkpoint so daily sync continues from here
