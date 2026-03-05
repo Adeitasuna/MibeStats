@@ -77,4 +77,4 @@ export const GET = withRateLimit('sales', 100, async (req) => {
   }))
 
   return NextResponse.json({ data, total, page, limit, hasNext: page * limit < total })
-})
+}, { cacheSecs: 60 })

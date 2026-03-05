@@ -92,4 +92,4 @@ export const GET = withRateLimit('map', 30, async (req) => {
     total: points.length,
     ancestors,
   })
-})
+}, { cacheSecs: 600 })

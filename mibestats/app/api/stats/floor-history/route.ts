@@ -65,4 +65,4 @@ export const GET = withRateLimit('floor-history', 100, async (req) => {
   }))
 
   return NextResponse.json(data)
-})
+}, { cacheSecs: 3600 })

@@ -75,4 +75,4 @@ export const GET = withRateLimit('miladies', 100, async (req) => {
     hasNext: page * limit < total,
     totalPages: Math.ceil(total / limit),
   })
-})
+}, { cacheSecs: 300 })

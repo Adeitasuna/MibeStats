@@ -113,4 +113,4 @@ export const GET = withRateLimit('collection', 100, async (req) => {
   }
 
   return NextResponse.json(response)
-})
+}, { cacheSecs: 300 })

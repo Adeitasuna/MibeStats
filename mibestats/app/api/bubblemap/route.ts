@@ -79,4 +79,4 @@ export const GET = withRateLimit('bubblemap', 30, async (req) => {
   }))
 
   return NextResponse.json({ nodes, links })
-})
+}, { cacheSecs: 600 })

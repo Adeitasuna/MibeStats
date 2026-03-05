@@ -79,4 +79,4 @@ export const GET = withRateLimit('timeline', 100, async (req) => {
       ascendingSigns: ascendingSigns.map((r) => r.value),
     },
   })
-})
+}, { cacheSecs: 600 })

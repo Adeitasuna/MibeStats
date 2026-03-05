@@ -83,4 +83,4 @@ export const GET = withRateLimit('traits', 100, async (req) => {
   }
 
   return NextResponse.json(response)
-})
+}, { cacheSecs: 3600 })

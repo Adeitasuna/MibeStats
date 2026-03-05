@@ -54,4 +54,4 @@ export const GET = withRateLimit('token-detail', 100, async (req, { params }: { 
   void _sales
 
   return NextResponse.json(rest)
-})
+}, { cacheSecs: 300 })

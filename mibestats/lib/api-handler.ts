@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
+interface Options {
+  /** If set, adds Cache-Control + CDN-Cache-Control headers to successful responses. */
+  cacheSecs?: number
+}
+
 /**
- * Wraps an API route handler with rate limiting and error handling.
- *
- * Eliminates the repeated boilerplate across all API routes:
- * - IP-based rate limiting with configurable key + limit
- * - 429 response with Retry-After header
- * - try/catch with console.error + generic 500 response
+ * Wraps an API route handler with rate limiting, caching, and error handling.
  */
 export function withRateLimit(
   key: string,
   limit: number,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handler: (req: NextRequest, ...args: any[]) => Promise<NextResponse>,
+  options?: Options,
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (req: NextRequest, ...rest: any[]): Promise<NextResponse> => {
@@ -27,7 +28,13 @@ export function withRateLimit(
     }
 
     try {
-      return await handler(req, ...rest)
+      const res = await handler(req, ...rest)
+      if (options?.cacheSecs && res.ok) {
+        const swr = Math.floor(options.cacheSecs / 2)
+        res.headers.set('Cache-Control', `public, s-maxage=${options.cacheSecs}, stale-while-revalidate=${swr}`)
+        res.headers.set('CDN-Cache-Control', `public, s-maxage=${options.cacheSecs}, stale-while-revalidate=${swr}`)
+      }
+      return res
     } catch (err) {
       console.error(`[/api/${key}]`, err)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

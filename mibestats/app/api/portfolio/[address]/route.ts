@@ -62,4 +62,4 @@ export const GET = withRateLimit('portfolio', 30, async (req, { params }: { para
     tokens: mappedTokens,
     stats: { count, estimatedValue, avgRarityRank, highestSwagScore, grailCount },
   })
-})
+}, { cacheSecs: 60 })

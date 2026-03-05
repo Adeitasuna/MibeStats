@@ -169,4 +169,4 @@ export const GET = withRateLimit('eden', 100, async (req) => {
       burned: burnedCount,
     },
   })
-})
+}, { cacheSecs: 900 })

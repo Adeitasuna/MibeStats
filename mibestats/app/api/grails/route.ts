@@ -39,4 +39,4 @@ export const GET = withRateLimit('grails', 100, async (req) => {
   }
 
   return NextResponse.json({ total: grails.length, categories })
-})
+}, { cacheSecs: 3600 })

@@ -76,4 +76,4 @@ export const GET = withRateLimit('tokens', 100, async (req) => {
     limit,
     hasNext: page * limit < total,
   })
-})
+}, { cacheSecs: 300 })
