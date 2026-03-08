@@ -165,35 +165,45 @@ export default function MetadatasPage() {
       {token && !loading && (
         <div className="flex flex-col gap-4">
           <table className="w-full border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '12.5%' }} />
+            </colgroup>
             <tbody>
               {/* Row 1: MiParcels (col1-2), Miladies (col3), empty (col4), Last Sale (col5-6), Max Sale (col7-8) */}
               <tr>
-                <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-middle text-center w-[12.5%]">
+                <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-top text-center overflow-hidden">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">MiParcels</div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
                     alt={`MiParcels #${token.tokenId}`}
-                    className="w-full h-auto rounded"
+                    className="max-w-full max-h-[120px] object-contain rounded mx-auto"
                   />
                 </td>
-                <td rowSpan={2} className="border border-mibe-border p-1 align-middle text-center w-[12.5%]">
+                <td rowSpan={2} className="border border-mibe-border p-1 align-top text-center overflow-hidden">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">Miladies</div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
                     alt={`Miladies #${token.tokenId}`}
-                    className="w-full h-auto rounded"
+                    className="max-w-full max-h-[120px] object-contain rounded mx-auto"
                   />
                 </td>
-                <td className="border border-mibe-border p-2 w-[12.5%]" />
-                <td colSpan={2} className="border border-mibe-border p-2 align-top w-[12.5%]">
+                <td className="border border-mibe-border p-2" />
+                <td colSpan={2} className="border border-mibe-border p-2 align-top">
                   <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last sale ($BERA)</span>
                   <div className="text-base font-bold text-white tabular-nums">
                     {token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}
                   </div>
                 </td>
-                <td colSpan={2} className="border border-mibe-border p-2 align-top w-[12.5%]">
+                <td colSpan={2} className="border border-mibe-border p-2 align-top">
                   <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max sale ($BERA)</span>
                   <div className="text-base font-bold text-white tabular-nums">
                     {token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}
