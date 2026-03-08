@@ -229,81 +229,61 @@ export default function MetadatasPage() {
       {/* Token display */}
       {token && !loading && (
         <div className="flex flex-col gap-4">
-          {/* Grid layout: 8 columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-8 gap-3">
-            {/* Row 1-2: Thumbnail + grail (cols 1-3) */}
-            <div className="lg:col-span-3 flex items-start gap-3">
-              {token.imageUrl && (
-                <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-mibe-border">
-                  <Image
-                    src={token.imageUrl}
-                    alt={`Mibera #${token.tokenId}`}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
-                </div>
+          {/* Top bar: title + grail + links + sale cards */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <h2 className="section-title text-xl whitespace-nowrap">
+                Mibera #{token.tokenId}
+              </h2>
+              <SwagRankBadge rank={token.swagRank} size="md" />
+              {token.isGrail && (
+                <span className="text-mibe-gold font-bold text-sm whitespace-nowrap">
+                  GRAIL — {token.grailName}
+                </span>
               )}
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="section-title text-xl">
-                    Mibera #{token.tokenId}
-                  </h2>
-                  <SwagRankBadge rank={token.swagRank} size="md" />
-                </div>
-                {token.isGrail && (
-                  <span className="text-mibe-gold font-bold text-sm">
-                    GRAIL — {token.grailName}
-                  </span>
-                )}
-                <div className="flex items-center gap-2 mt-1">
-                  <a
-                    href={magicEdenUrl(token.tokenId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-mibe-cyan hover:text-white transition-colors flex items-center gap-1"
-                  >
-                    <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    MagicEden
-                  </a>
-                  {token.ownerAddress && (
-                    <span className="text-[10px] font-mono text-mibe-text-2" title={token.ownerAddress}>
-                      Owner: {truncateAddress(token.ownerAddress)}
-                    </span>
-                  )}
-                </div>
-              </div>
+              <a
+                href={magicEdenUrl(token.tokenId)}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-mibe-cyan hover:text-white transition-colors whitespace-nowrap"
+              >
+                MagicEden
+              </a>
+              {token.ownerAddress && (
+                <span className="text-[10px] font-mono text-mibe-text-2 whitespace-nowrap" title={token.ownerAddress}>
+                  Owner: {truncateAddress(token.ownerAddress)}
+                </span>
+              )}
             </div>
-
-            {/* Row 1-2: Last Sale + Max Sale (cols 4-8) */}
-            <div className="lg:col-span-5 grid grid-cols-2 gap-3">
-              <div className="card-gold p-3 flex flex-col gap-0.5">
+            <div className="flex gap-2 shrink-0">
+              <div className="card-gold px-3 py-2 flex flex-col gap-0.5">
                 <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last Sale ($BERA)</span>
-                <span className="text-lg font-bold text-white tabular-nums">
+                <span className="text-base font-bold text-white tabular-nums">
                   {token.lastSalePrice != null ? `${token.lastSalePrice.toFixed(2)}` : '—'}
                 </span>
               </div>
-              <div className="card-gold p-3 flex flex-col gap-0.5">
+              <div className="card-gold px-3 py-2 flex flex-col gap-0.5">
                 <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max Sale ($BERA)</span>
-                <span className="text-lg font-bold text-white tabular-nums">
+                <span className="text-base font-bold text-white tabular-nums">
                   {token.maxSalePrice != null ? `${token.maxSalePrice.toFixed(2)}` : '—'}
                 </span>
               </div>
             </div>
+          </div>
 
-            {/* Row 3-8: Large image (cols 1-3) */}
-            <div className="lg:col-span-3 lg:row-span-6">
-              <div className="card-gold p-1.5 overflow-hidden rounded-xl sticky top-4 max-w-[360px]">
+          {/* Main content: image left (3/8) + cards right (5/8) */}
+          <div className="grid grid-cols-1 lg:grid-cols-8 gap-3 items-start">
+            {/* Image (cols 1-3) */}
+            <div className="lg:col-span-3">
+              <div className="card-gold p-1.5 overflow-hidden rounded-xl sticky top-4">
                 {token.imageUrl ? (
                   <Image
                     src={token.imageUrl}
                     alt={`Mibera #${token.tokenId}`}
-                    width={360}
-                    height={360}
+                    width={400}
+                    height={400}
                     className="object-contain rounded-lg w-full h-auto"
-                    sizes="(max-width: 768px) 100vw, 360px"
+                    sizes="(max-width: 1024px) 100vw, 37.5vw"
                   />
                 ) : (
                   <div className="w-full aspect-square flex items-center justify-center text-mibe-muted">
@@ -313,8 +293,8 @@ export default function MetadatasPage() {
               </div>
             </div>
 
-            {/* Row 3-8: Metadata cards (cols 4-8) */}
-            <div className="lg:col-span-5 lg:row-span-6">
+            {/* Metadata cards (cols 4-8) */}
+            <div className="lg:col-span-5">
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                 {FIELD_GROUPS.flatMap((group) =>
                   group.fields
