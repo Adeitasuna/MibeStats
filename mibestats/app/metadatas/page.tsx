@@ -23,7 +23,7 @@ interface TokenDetail extends Token {
 
 function MetadataCell({ label, value, colSpan }: { label: string; value: string | null | undefined; colSpan?: number }) {
   return (
-    <td colSpan={colSpan} className="border border-mibe-border p-2 align-top">
+    <td colSpan={colSpan} className="border border-mibe-border px-2 py-3.5 align-top">
       <span className="card-title-upper text-[9px]">{label}</span>
       <div className="text-sm text-white truncate" title={value ?? '—'}>{value ?? '—'}</div>
     </td>
@@ -184,9 +184,9 @@ export default function MetadatasPage() {
                   <img
                     src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
                     alt={`MiParcels #${token.tokenId}`}
-                    width={160}
-                    height={120}
-                    style={{ width: '160px', height: '120px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
+                    width={256}
+                    height={192}
+                    style={{ width: '256px', height: '192px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
                     className="rounded rotate-90"
                   />
                 </td>
@@ -196,20 +196,20 @@ export default function MetadatasPage() {
                   <img
                     src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
                     alt={`Miladies #${token.tokenId}`}
-                    width={100}
-                    height={100}
-                    style={{ width: '100px', height: '100px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
+                    width={160}
+                    height={160}
+                    style={{ width: '160px', height: '160px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
                     className="rounded"
                   />
                 </td>
-                <td className="border border-mibe-border p-2" />
-                <td colSpan={2} className="border border-mibe-border p-2 align-top">
+                <td className="border border-mibe-border px-2 py-3.5" />
+                <td colSpan={2} className="border border-mibe-border px-2 py-3.5 align-top">
                   <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last sale ($BERA)</span>
                   <div className="text-base font-bold text-white tabular-nums">
                     {token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}
                   </div>
                 </td>
-                <td colSpan={2} className="border border-mibe-border p-2 align-top">
+                <td colSpan={2} className="border border-mibe-border px-2 py-3.5 align-top">
                   <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max sale ($BERA)</span>
                   <div className="text-base font-bold text-white tabular-nums">
                     {token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}
@@ -218,7 +218,7 @@ export default function MetadatasPage() {
               </tr>
               {/* Row 2: MiParcels/Miladies continue (rowSpan), col4-8 empty */}
               <tr>
-                <td colSpan={5} className="border border-mibe-border p-2" />
+                <td colSpan={5} className="border border-mibe-border px-2 py-3.5" />
               </tr>
               {/* Row 3: Image (col1-3, rowSpan 6), metadata cards start */}
               <tr>
