@@ -229,31 +229,33 @@ export default function MetadatasPage() {
       {/* Token display */}
       {token && !loading && (
         <div className="flex flex-col gap-4">
-          {/* Top bar: title + grail + links + sale cards */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <h2 className="section-title text-xl whitespace-nowrap">
-                Mibera #{token.tokenId}
-              </h2>
-              <SwagRankBadge rank={token.swagRank} size="md" />
-              {token.isGrail && (
-                <span className="text-mibe-gold font-bold text-sm whitespace-nowrap">
-                  GRAIL — {token.grailName}
-                </span>
-              )}
-              <a
-                href={magicEdenUrl(token.tokenId)}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-mibe-cyan hover:text-white transition-colors whitespace-nowrap"
-              >
-                MagicEden
-              </a>
-              {token.ownerAddress && (
-                <span className="text-[10px] font-mono text-mibe-text-2 whitespace-nowrap" title={token.ownerAddress}>
-                  Owner: {truncateAddress(token.ownerAddress)}
-                </span>
-              )}
+          {/* Top row: small thumbnail + sale cards */}
+          <div className="flex items-start gap-3">
+            {token.imageUrl && (
+              <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-mibe-border">
+                <Image
+                  src={token.imageUrl}
+                  alt={`Mibera #${token.tokenId}`}
+                  fill
+                  className="object-cover"
+                  sizes="64px"
+                />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="section-title text-lg">Mibera #{token.tokenId}</h2>
+                <SwagRankBadge rank={token.swagRank} size="md" />
+                {token.isGrail && (
+                  <span className="text-mibe-gold font-bold text-xs">GRAIL — {token.grailName}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mt-1 text-xs">
+                <a href={magicEdenUrl(token.tokenId)} target="_blank" rel="noreferrer" className="text-mibe-cyan hover:text-white transition-colors">MagicEden</a>
+                {token.ownerAddress && (
+                  <span className="font-mono text-[10px] text-mibe-text-2" title={token.ownerAddress}>Owner: {truncateAddress(token.ownerAddress)}</span>
+                )}
+              </div>
             </div>
             <div className="flex gap-2 shrink-0">
               <div className="card-gold px-3 py-2 flex flex-col gap-0.5">
@@ -272,9 +274,9 @@ export default function MetadatasPage() {
           </div>
 
           {/* Main content: image left (3/8) + cards right (5/8) */}
-          <div className="grid grid-cols-1 lg:grid-cols-8 gap-3 items-start">
-            {/* Image (cols 1-3) */}
-            <div className="lg:col-span-3">
+          <div className="flex flex-col md:flex-row gap-3 items-start">
+            {/* Image */}
+            <div className="w-full md:w-[37.5%] shrink-0">
               <div className="card-gold p-1.5 overflow-hidden rounded-xl sticky top-4">
                 {token.imageUrl ? (
                   <Image
@@ -283,7 +285,7 @@ export default function MetadatasPage() {
                     width={400}
                     height={400}
                     className="object-contain rounded-lg w-full h-auto"
-                    sizes="(max-width: 1024px) 100vw, 37.5vw"
+                    sizes="(max-width: 768px) 100vw, 37.5vw"
                   />
                 ) : (
                   <div className="w-full aspect-square flex items-center justify-center text-mibe-muted">
@@ -293,9 +295,9 @@ export default function MetadatasPage() {
               </div>
             </div>
 
-            {/* Metadata cards (cols 4-8) */}
-            <div className="lg:col-span-5">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            {/* Metadata cards */}
+            <div className="flex-1 min-w-0">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                 {FIELD_GROUPS.flatMap((group) =>
                   group.fields
                     .filter(({ key, format }) => {
