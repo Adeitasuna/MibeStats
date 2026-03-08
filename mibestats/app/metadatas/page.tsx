@@ -21,77 +21,12 @@ interface TokenDetail extends Token {
   }>
 }
 
-interface FieldDef {
-  label: string
-  key: keyof Token | 'magicEdenUrl'
-  format?: (v: unknown) => string
-}
-
-const IDENTITY_FIELDS: FieldDef[] = [
-  { label: 'Token ID', key: 'tokenId' },
-  { label: 'Archetype', key: 'archetype' },
-  { label: 'Ancestor', key: 'ancestor' },
-  { label: 'Time Period', key: 'timePeriod' },
-  { label: 'Birthday', key: 'birthday' },
-  { label: 'Birth Coordinates', key: 'birthCoordinates' },
-]
-
-const ASTROLOGY_FIELDS: FieldDef[] = [
-  { label: 'Element', key: 'element' },
-  { label: 'Sun Sign', key: 'sunSign' },
-  { label: 'Moon Sign', key: 'moonSign' },
-  { label: 'Ascending Sign', key: 'ascendingSign' },
-]
-
-const RANKING_FIELDS: FieldDef[] = [
-  { label: 'Swag Score', key: 'swagScore' },
-  { label: 'Swag Rank', key: 'swagRank' },
-  { label: 'Rarity Rank', key: 'rarityRank' },
-  { label: 'Sale Count', key: 'saleCount' },
-]
-
-const APPEARANCE_FIELDS: FieldDef[] = [
-  { label: 'Background', key: 'background' },
-  { label: 'Body', key: 'body' },
-  { label: 'Eyes', key: 'eyes' },
-  { label: 'Eyebrows', key: 'eyebrows' },
-  { label: 'Mouth', key: 'mouth' },
-  { label: 'Hair', key: 'hair' },
-  { label: 'Shirt', key: 'shirt' },
-  { label: 'Hat', key: 'hat' },
-  { label: 'Glasses', key: 'glasses' },
-  { label: 'Mask', key: 'mask' },
-  { label: 'Earrings', key: 'earrings' },
-  { label: 'Face Accessory', key: 'faceAccessory' },
-  { label: 'Tattoo', key: 'tattoo' },
-  { label: 'Item', key: 'item' },
-  { label: 'Drug', key: 'drug' },
-]
-
-const GRAIL_FIELDS: FieldDef[] = [
-  { label: 'Is Grail', key: 'isGrail', format: (v) => v ? 'Yes' : 'No' },
-  { label: 'Grail Name', key: 'grailName' },
-  { label: 'Grail Category', key: 'grailCategory' },
-]
-
-const FIELD_GROUPS = [
-  { title: 'Identity', fields: IDENTITY_FIELDS },
-  { title: 'Astrology', fields: ASTROLOGY_FIELDS },
-  { title: 'Ranking', fields: RANKING_FIELDS },
-  { title: 'Appearance', fields: APPEARANCE_FIELDS },
-  { title: 'Grail', fields: GRAIL_FIELDS },
-]
-
-function MetadataCard({ label, value, isMono }: { label: string; value: string; isMono?: boolean }) {
+function MetadataCell({ label, value, colSpan }: { label: string; value: string | null | undefined; colSpan?: number }) {
   return (
-    <div className="card p-2.5 flex flex-col gap-0.5">
-      <span className="card-title-upper">
-        {label}
-      </span>
-      <span className={`text-sm text-white ${isMono ? 'font-mono text-xs' : ''}`}>
-        {value}
-      </span>
-    </div>
+    <td colSpan={colSpan} className="border border-mibe-border p-2 align-top">
+      <span className="card-title-upper text-[9px]">{label}</span>
+      <div className="text-sm text-white truncate" title={value ?? '—'}>{value ?? '—'}</div>
+    </td>
   )
 }
 
@@ -226,96 +161,103 @@ export default function MetadatasPage() {
         </div>
       )}
 
-      {/* Token display */}
+      {/* Token display — 8-column table layout */}
       {token && !loading && (
         <div className="flex flex-col gap-4">
-          {/* Top row: small thumbnail + sale cards */}
-          <div className="flex items-start gap-3">
-            {token.imageUrl && (
-              <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-mibe-border">
-                <Image
-                  src={token.imageUrl}
-                  alt={`Mibera #${token.tokenId}`}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
-                />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="section-title text-lg">Mibera #{token.tokenId}</h2>
-                <SwagRankBadge rank={token.swagRank} size="md" />
-                {token.isGrail && (
-                  <span className="text-mibe-gold font-bold text-xs">GRAIL — {token.grailName}</span>
-                )}
-              </div>
-              <div className="flex items-center gap-3 mt-1 text-xs">
-                <a href={magicEdenUrl(token.tokenId)} target="_blank" rel="noreferrer" className="text-mibe-cyan hover:text-white transition-colors">MagicEden</a>
-                {token.ownerAddress && (
-                  <span className="font-mono text-[10px] text-mibe-text-2" title={token.ownerAddress}>Owner: {truncateAddress(token.ownerAddress)}</span>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <div className="card-gold px-3 py-2 flex flex-col gap-0.5">
-                <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last Sale ($BERA)</span>
-                <span className="text-base font-bold text-white tabular-nums">
-                  {token.lastSalePrice != null ? `${token.lastSalePrice.toFixed(2)}` : '—'}
-                </span>
-              </div>
-              <div className="card-gold px-3 py-2 flex flex-col gap-0.5">
-                <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max Sale ($BERA)</span>
-                <span className="text-base font-bold text-white tabular-nums">
-                  {token.maxSalePrice != null ? `${token.maxSalePrice.toFixed(2)}` : '—'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main content: image left (3/8) + cards right (5/8) */}
-          <div className="flex flex-col md:flex-row gap-3 items-start">
-            {/* Image */}
-            <div className="w-full md:w-[37.5%] shrink-0">
-              <div className="card-gold p-1.5 overflow-hidden rounded-xl sticky top-4">
-                {token.imageUrl ? (
-                  <Image
-                    src={token.imageUrl}
-                    alt={`Mibera #${token.tokenId}`}
-                    width={400}
-                    height={400}
-                    className="object-contain rounded-lg w-full h-auto"
-                    sizes="(max-width: 768px) 100vw, 37.5vw"
-                  />
-                ) : (
-                  <div className="w-full aspect-square flex items-center justify-center text-mibe-muted">
-                    No image
+          <table className="w-full border-collapse table-fixed">
+            <tbody>
+              {/* Row 1: MiParcels (col1-2), Miladies (col3), empty (col4), Last Sale (col5-6), Max Sale (col7-8) */}
+              <tr>
+                <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-middle text-center w-[12.5%]">
+                  <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">MiParcels</div>
+                  <div className="text-mibe-muted text-xs italic">Coming soon</div>
+                </td>
+                <td rowSpan={2} className="border border-mibe-border p-1 align-middle text-center w-[12.5%]">
+                  <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">Miladies</div>
+                  <div className="text-mibe-muted text-xs italic">Coming soon</div>
+                </td>
+                <td className="border border-mibe-border p-2 w-[12.5%]" />
+                <td colSpan={2} className="border border-mibe-border p-2 align-top w-[12.5%]">
+                  <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last sale ($BERA)</span>
+                  <div className="text-base font-bold text-white tabular-nums">
+                    {token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Metadata cards */}
-            <div className="flex-1 min-w-0">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                {FIELD_GROUPS.flatMap((group) =>
-                  group.fields
-                    .filter(({ key, format }) => {
-                      const raw = (token as unknown as Record<string, unknown>)[key]
-                      const value = format ? format(raw) : raw
-                      return value !== null && value !== undefined
-                    })
-                    .map(({ label, key, format }) => {
-                      const raw = (token as unknown as Record<string, unknown>)[key]
-                      const value = format ? format(raw) : String(raw)
-                      return (
-                        <MetadataCard key={key} label={label} value={String(value)} />
-                      )
-                    })
-                )}
-              </div>
-            </div>
-          </div>
+                </td>
+                <td colSpan={2} className="border border-mibe-border p-2 align-top w-[12.5%]">
+                  <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max sale ($BERA)</span>
+                  <div className="text-base font-bold text-white tabular-nums">
+                    {token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}
+                  </div>
+                </td>
+              </tr>
+              {/* Row 2: MiParcels/Miladies continue (rowSpan), col4-8 empty */}
+              <tr>
+                <td colSpan={5} className="border border-mibe-border p-2" />
+              </tr>
+              {/* Row 3: Image (col1-3, rowSpan 6), metadata cards start */}
+              <tr>
+                <td colSpan={3} rowSpan={6} className="border border-mibe-border p-1.5 align-top">
+                  <div className="card-gold p-1 rounded-xl overflow-hidden">
+                    {token.imageUrl ? (
+                      <Image
+                        src={token.imageUrl}
+                        alt={`Mibera #${token.tokenId}`}
+                        width={400}
+                        height={400}
+                        className="object-contain rounded-lg w-full h-auto"
+                        sizes="37.5vw"
+                      />
+                    ) : (
+                      <div className="w-full aspect-square flex items-center justify-center text-mibe-muted">No image</div>
+                    )}
+                  </div>
+                </td>
+                <MetadataCell label="ID" value={String(token.tokenId)} />
+                <MetadataCell label="Grail" value={token.isGrail ? token.grailName : '—'} />
+                <MetadataCell label="Ancestor" value={token.ancestor} />
+                <MetadataCell label="Archetype" value={token.archetype} />
+                <MetadataCell label="Ascending sign" value={token.ascendingSign} />
+              </tr>
+              {/* Row 4 */}
+              <tr>
+                <MetadataCell label="Background" value={token.background} />
+                <MetadataCell label="Birth coordinates" value={token.birthCoordinates} colSpan={2} />
+                <MetadataCell label="Birthday" value={token.birthday} colSpan={2} />
+              </tr>
+              {/* Row 5 */}
+              <tr>
+                <MetadataCell label="Body" value={token.body} />
+                <MetadataCell label="Drug" value={token.drug} />
+                <MetadataCell label="Earrings" value={token.earrings} />
+                <MetadataCell label="Element" value={token.element} />
+                <MetadataCell label="Eyebrows" value={token.eyebrows} />
+              </tr>
+              {/* Row 6 */}
+              <tr>
+                <MetadataCell label="Eyes" value={token.eyes} />
+                <MetadataCell label="Face accessory" value={token.faceAccessory} />
+                <MetadataCell label="Glasses" value={token.glasses} />
+                <MetadataCell label="Hair" value={token.hair} />
+                <MetadataCell label="Hat" value={token.hat} />
+              </tr>
+              {/* Row 7 */}
+              <tr>
+                <MetadataCell label="Item" value={token.item} />
+                <MetadataCell label="Mask" value={token.mask} />
+                <MetadataCell label="Moon sign" value={token.moonSign} />
+                <MetadataCell label="Mouth" value={token.mouth} />
+                <MetadataCell label="Shirt" value={token.shirt} />
+              </tr>
+              {/* Row 8 */}
+              <tr>
+                <MetadataCell label="Sun sign" value={token.sunSign} />
+                <MetadataCell label="Swag rank" value={token.swagRank} />
+                <MetadataCell label="Swag score" value={String(token.swagScore)} />
+                <MetadataCell label="Tattoo" value={token.tattoo} />
+                <MetadataCell label="Time period" value={token.timePeriod} />
+              </tr>
+            </tbody>
+          </table>
 
           {/* Sales history - full width below */}
           {token.salesHistory && token.salesHistory.length > 0 && (
