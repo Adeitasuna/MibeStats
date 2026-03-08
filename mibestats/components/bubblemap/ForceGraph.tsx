@@ -51,7 +51,8 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
 
   const graphData = useMemo(() => ({
-    nodes: nodes.map((n) => ({ ...n })),
+    // Sort descending by count so big bubbles paint first (behind small ones)
+    nodes: [...nodes].sort((a, b) => b.count - a.count).map((n) => ({ ...n })),
     links: links.map((l) => ({ ...l })),
   }), [nodes, links])
 
@@ -130,7 +131,14 @@ export function ForceGraph({ nodes, links, focusedAddress, onNodeFocus }: Props)
     }
     ctx.fill()
 
-    // White border for focused node
+    // Light contour on all visible bubbles
+    if (!isDimmed) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+    }
+
+    // White border for focused node (overwrites subtle stroke)
     if (isFocused) {
       ctx.strokeStyle = '#fff'
       ctx.lineWidth = 2.5

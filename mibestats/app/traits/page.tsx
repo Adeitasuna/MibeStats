@@ -63,6 +63,30 @@ const getTraits = unstable_cache(
       UNION ALL SELECT 'shirt', shirt, COUNT(*) FROM tokens WHERE shirt IS NOT NULL GROUP BY shirt
       UNION ALL SELECT 'swagRank', swag_rank, COUNT(*) FROM tokens GROUP BY swag_rank
       UNION ALL SELECT 'grail', grail_category, COUNT(*) FROM tokens WHERE is_grail = TRUE GROUP BY grail_category
+      UNION ALL
+      SELECT 'chronoArea' AS category,
+        CASE
+          WHEN ck < -100000 THEN 'Prehistory'
+          WHEN ck < -10000  THEN 'Paleolithic'
+          WHEN ck < -5000   THEN 'Neolithic'
+          WHEN ck < -500    THEN 'Early Antiquity'
+          WHEN ck < 0       THEN 'Late Antiquity'
+          WHEN ck < 500     THEN 'Early Middle Ages'
+          WHEN ck < 1500    THEN 'Middle Ages'
+          WHEN ck < 1800    THEN 'Modern Times'
+          WHEN ck < 1950    THEN 'Contemporary Era'
+          ELSE '20th Century and beyond'
+        END AS value,
+        COUNT(*) AS count
+      FROM (
+        SELECT
+          CASE WHEN UPPER(SPLIT_PART(birthday, ' ', 2)) = 'BCE'
+            THEN -CAST(SPLIT_PART(SPLIT_PART(birthday, ' ', 1), '/', 3) AS INTEGER)
+            ELSE CAST(SPLIT_PART(SPLIT_PART(birthday, ' ', 1), '/', 3) AS INTEGER)
+          END AS ck
+        FROM tokens WHERE birthday IS NOT NULL
+      ) _ck
+      GROUP BY 2
     `
 
     // Group rows by category
@@ -101,6 +125,7 @@ const getTraits = unstable_cache(
       swagRanks:       counts('swagRank'),
       grailCategories: counts('grail', 42),
       grailCount:      42,
+      chronoAreas:     counts('chronoArea', (grouped.get('chronoArea') ?? []).reduce((s, r) => s + Number(r.count), 0) || 10000),
     }
   },
   ['traits-distribution'],

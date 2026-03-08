@@ -68,7 +68,7 @@ export const GET = withRateLimit('timeline', 100, async (req) => {
       year: parseInt(r.birth_year, 10),
       era: r.era,
       count: Number(r.count),
-      label: `${r.birth_year} ${r.era}`,
+      label: r.era === 'BCE' ? `${r.birth_year} BCE` : r.birth_year,
     })),
     filters: {
       timePeriods:    timePeriods.map((r) => r.value),

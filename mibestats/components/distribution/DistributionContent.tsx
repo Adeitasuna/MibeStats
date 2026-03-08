@@ -1,8 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
+  BarChart as RechartsBarChart, Bar, XAxis, YAxis,
+} from 'recharts'
 import { PieChartGrid } from '@/components/charts/PieChartGrid'
+import { TimelineTreemap } from '@/components/charts/Treemap'
 import type { TraitDistribution, TraitCount } from '@/types'
+
+interface YearData {
+  year: number
+  era: string
+  count: number
+  label: string
+}
 
 interface ChartGroup {
   groupTitle: string
@@ -88,15 +100,152 @@ function BarChart({ data, colorMap }: { data: TraitCount[]; colorMap?: Record<st
   )
 }
 
+/* ── Chronos Area constants ── */
+
+const ERA_ORDER = [
+  'Prehistory', 'Paleolithic', 'Neolithic', 'Early Antiquity', 'Late Antiquity',
+  'Early Middle Ages', 'Middle Ages', 'Modern Times', 'Contemporary Era', '20th Century and beyond',
+]
+
+const TOOLTIP_BOX: React.CSSProperties = {
+  background: '#000',
+  border: '1px solid #ffd700',
+  borderRadius: 8,
+  padding: '6px 10px',
+  fontSize: 11,
+}
+
+const PIE_COLORS = [
+  '#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149',
+  '#bc8cff', '#f0883e', '#8b949e', '#db61a2', '#79c0ff',
+]
+
+function eraBarColor(index: number, total: number): string {
+  const t = total <= 1 ? 0 : index / (total - 1)
+  const r = Math.round(26 + t * (255 - 26))
+  const g = Math.round(58 + t * (215 - 58))
+  const b = Math.round(92 + t * (0 - 92))
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+function ChronosArea({ data }: { data: TraitCount[] }) {
+  if (data.length === 0) return null
+
+  const total = data.reduce((s, d) => s + d.count, 0)
+
+  // Pie: sorted by count desc
+  const sorted = [...data].sort((a, b) => b.count - a.count)
+  const pieData = sorted.map((d) => ({
+    name: `${d.value} (${d.count.toLocaleString()})`,
+    rawName: d.value,
+    value: d.count,
+  }))
+
+  // Bar: chronological order
+  const chronoSorted = ERA_ORDER
+    .map((era) => data.find((d) => d.value === era))
+    .filter((d): d is TraitCount => d != null)
+  const barData = chronoSorted.map((d) => ({ name: d.value, value: d.count }))
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+      {/* Pie donut */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <span className="card-title-upper">Era Distribution</span>
+        <div className="card p-3 flex flex-col">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                innerRadius={35}
+                dataKey="value"
+                nameKey="name"
+                paddingAngle={1}
+                stroke="none"
+              >
+                {pieData.map((_, i) => (
+                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+                ))}
+              </Pie>
+              <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.[0]) return null
+                  const d = payload[0].payload
+                  const pct = ((d.value / total) * 100).toFixed(1)
+                  return (
+                    <div style={TOOLTIP_BOX}>
+                      <span style={{ color: '#ffd700', fontWeight: 'bold' }}>{d.rawName}</span>
+                      <span style={{ color: '#fff' }}> : {pct}% ({d.value.toLocaleString()})</span>
+                    </div>
+                  )
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Horizontal bar — chronological order */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <span className="card-title-upper">Timeline Distribution</span>
+        <div className="card p-3 flex flex-col">
+          <ResponsiveContainer width="100%" height={300}>
+            <RechartsBarChart data={barData} layout="vertical" margin={{ left: 0, right: 12, top: 4, bottom: 4 }}>
+              <XAxis type="number" hide />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={140}
+                tick={{ fontSize: 10, fill: '#8b949e' }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.[0]) return null
+                  const d = payload[0].payload
+                  const pct = ((d.value / total) * 100).toFixed(1)
+                  return (
+                    <div style={TOOLTIP_BOX}>
+                      <span style={{ color: '#ffd700', fontWeight: 'bold' }}>{d.name}</span>
+                      <span style={{ color: '#fff' }}> : {pct}% ({d.value.toLocaleString()})</span>
+                    </div>
+                  )
+                }}
+              />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={14}>
+                {barData.map((_, i) => (
+                  <Cell key={i} fill={eraBarColor(i, barData.length)} opacity={0.85} />
+                ))}
+              </Bar>
+            </RechartsBarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function DistributionContent() {
   const [traits, setTraits] = useState<TraitDistribution | null>(null)
+  const [timelineData, setTimelineData] = useState<YearData[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/traits')
-      .then((res) => res.json())
-      .then((data) => { setTraits(data); setLoading(false) })
-      .catch(() => setLoading(false))
+    Promise.all([
+      fetch('/api/traits').then((res) => res.json()),
+      fetch('/api/tokens/timeline').then((res) => res.json()),
+    ])
+      .then(([traitsData, tlData]) => {
+        setTraits(traitsData)
+        setTimelineData(tlData.data ?? [])
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   if (loading) {
@@ -139,26 +288,22 @@ export function DistributionContent() {
         )
       })}
 
-      {/* Chronos Area — Time Period breakdown */}
+      {/* Chronos Area — Era Distribution */}
       <section>
         <h2 className="separator">Chronos Area</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+        <div className="flex flex-col gap-6">
+          {/* Birthday Year treemap — full width */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span className="card-title-upper">Time Period Split</span>
-            <div className="card p-4">
-              <BarChart data={traits.timePeriods || []} />
-            </div>
+            <span className="card-title-upper">Birthday Year</span>
+            <TimelineTreemap data={timelineData.map((d) => ({
+              name: d.label,
+              size: d.count,
+              year: d.year,
+              era: d.era,
+            }))} />
           </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <span className="card-title-upper">Element Distribution</span>
-            <div className="card p-4">
-              <BarChart
-                data={traits.elements || []}
-                colorMap={{ Earth: '#3fb950', Fire: '#f85149', Water: '#58a6ff', Air: '#bc8cff' }}
-              />
-            </div>
-          </div>
+          {/* Era Distribution + Timeline Distribution side by side */}
+          <ChronosArea data={traits.chronoAreas || []} />
         </div>
       </section>
     </div>

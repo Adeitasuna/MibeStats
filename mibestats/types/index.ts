@@ -115,6 +115,7 @@ export interface TraitDistribution {
   swagRanks: TraitCount[]
   grailCategories: TraitCount[]
   grailCount: number
+  chronoAreas: TraitCount[]
 }
 
 export interface PortfolioStats {

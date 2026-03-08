@@ -208,10 +208,13 @@ export default function MetadatasPage() {
       {/* Loading */}
       {loading && (
         <div className="card p-8 flex flex-col items-center justify-center gap-3">
-          <svg className="w-8 h-8 text-mibe-gold animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
+          <Image
+            src="/waiting.gif"
+            alt="Loading..."
+            width={120}
+            height={120}
+            unoptimized
+          />
           <span className="text-mibe-text-2 text-sm">Loading Mibera #{tokenId}...</span>
         </div>
       )}
@@ -225,151 +228,152 @@ export default function MetadatasPage() {
 
       {/* Token display */}
       {token && !loading && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Left column: Image + quick stats */}
-          <div className="flex flex-col gap-3">
-            {/* Grail badge if applicable */}
-            {token.isGrail && (
-              <div className="card-gold p-3 text-center">
-                <span className="text-mibe-gold font-bold">
-                  GRAIL — {token.grailName}
-                </span>
-              </div>
-            )}
-
-            {/* Token image */}
-            <div className="card-gold p-1.5 aspect-square relative overflow-hidden rounded-xl">
-              {token.imageUrl ? (
-                <Image
-                  src={token.imageUrl}
-                  alt={`Mibera #${token.tokenId}`}
-                  fill
-                  className="object-contain rounded-lg"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-mibe-muted">
-                  No image
+        <div className="flex flex-col gap-4">
+          {/* Grid layout: 8 columns */}
+          <div className="grid grid-cols-1 lg:grid-cols-8 gap-3">
+            {/* Row 1-2: Thumbnail + grail (cols 1-3) */}
+            <div className="lg:col-span-3 flex items-start gap-3">
+              {token.imageUrl && (
+                <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-mibe-border">
+                  <Image
+                    src={token.imageUrl}
+                    alt={`Mibera #${token.tokenId}`}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
                 </div>
               )}
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="section-title text-xl">
+                    Mibera #{token.tokenId}
+                  </h2>
+                  <SwagRankBadge rank={token.swagRank} size="md" />
+                </div>
+                {token.isGrail && (
+                  <span className="text-mibe-gold font-bold text-sm">
+                    GRAIL — {token.grailName}
+                  </span>
+                )}
+                <div className="flex items-center gap-2 mt-1">
+                  <a
+                    href={magicEdenUrl(token.tokenId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-mibe-cyan hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    MagicEden
+                  </a>
+                  {token.ownerAddress && (
+                    <span className="text-[10px] font-mono text-mibe-text-2" title={token.ownerAddress}>
+                      Owner: {truncateAddress(token.ownerAddress)}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Quick stats */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Row 1-2: Last Sale + Max Sale (cols 4-8) */}
+            <div className="lg:col-span-5 grid grid-cols-2 gap-3">
               <div className="card-gold p-3 flex flex-col gap-0.5">
-                <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last Sale</span>
-                <span className="text-base font-bold text-white tabular-nums">
-                  {token.lastSalePrice != null ? `${token.lastSalePrice.toFixed(2)} BERA` : '—'}
+                <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last Sale ($BERA)</span>
+                <span className="text-lg font-bold text-white tabular-nums">
+                  {token.lastSalePrice != null ? `${token.lastSalePrice.toFixed(2)}` : '—'}
                 </span>
               </div>
               <div className="card-gold p-3 flex flex-col gap-0.5">
-                <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max Sale</span>
-                <span className="text-base font-bold text-white tabular-nums">
-                  {token.maxSalePrice != null ? `${token.maxSalePrice.toFixed(2)} BERA` : '—'}
+                <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max Sale ($BERA)</span>
+                <span className="text-lg font-bold text-white tabular-nums">
+                  {token.maxSalePrice != null ? `${token.maxSalePrice.toFixed(2)}` : '—'}
                 </span>
               </div>
             </div>
 
-            {/* MagicEden link */}
-            <a
-              href={magicEdenUrl(token.tokenId)}
-              target="_blank"
-              rel="noreferrer"
-              className="card px-4 py-2 text-center text-sm text-mibe-cyan hover:text-white hover:border-mibe-cyan transition-colors flex items-center justify-center gap-1.5"
-            >
-              <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              View on MagicEden
-            </a>
-
-            {/* Owner */}
-            {token.ownerAddress && (
-              <div className="card p-2.5 flex flex-col gap-0.5">
-                <span className="card-title-upper">Owner</span>
-                <span className="text-xs font-mono text-mibe-cyan" title={token.ownerAddress}>
-                  {truncateAddress(token.ownerAddress)}
-                </span>
+            {/* Row 3-8: Large image (cols 1-3) */}
+            <div className="lg:col-span-3 lg:row-span-6">
+              <div className="card-gold p-1.5 aspect-square relative overflow-hidden rounded-xl sticky top-4">
+                {token.imageUrl ? (
+                  <Image
+                    src={token.imageUrl}
+                    alt={`Mibera #${token.tokenId}`}
+                    fill
+                    className="object-contain rounded-lg"
+                    sizes="(max-width: 768px) 100vw, 37.5vw"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-mibe-muted">
+                    No image
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Right column: Metadata groups */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <h2 className="section-title text-xl">
-                Mibera #{token.tokenId}
-              </h2>
-              <SwagRankBadge rank={token.swagRank} size="md" />
             </div>
 
-            {FIELD_GROUPS.map((group) => {
-              const visibleFields = group.fields.filter(({ key, format }) => {
-                const raw = (token as unknown as Record<string, unknown>)[key]
-                const value = format ? format(raw) : raw
-                return value !== null && value !== undefined
-              })
-              if (visibleFields.length === 0) return null
-
-              return (
-                <div key={group.title}>
-                  <h3 className="card-title-upper mb-2">
-                    {group.title}
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {visibleFields.map(({ label, key, format }) => {
+            {/* Row 3-8: Metadata cards (cols 4-8) */}
+            <div className="lg:col-span-5 lg:row-span-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                {FIELD_GROUPS.flatMap((group) =>
+                  group.fields
+                    .filter(({ key, format }) => {
+                      const raw = (token as unknown as Record<string, unknown>)[key]
+                      const value = format ? format(raw) : raw
+                      return value !== null && value !== undefined
+                    })
+                    .map(({ label, key, format }) => {
                       const raw = (token as unknown as Record<string, unknown>)[key]
                       const value = format ? format(raw) : String(raw)
                       return (
                         <MetadataCard key={key} label={label} value={String(value)} />
                       )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
+                    })
+                )}
+              </div>
+            </div>
+          </div>
 
-            {/* Sales history */}
-            {token.salesHistory && token.salesHistory.length > 0 && (
-              <div>
-                <h3 className="card-title-upper mb-2">
-                  Sales History ({token.salesHistory.length})
-                </h3>
-                <div className="card overflow-hidden">
-                  <div className="table-responsive">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-mibe-border text-[10px] text-mibe-text-2 uppercase tracking-wider">
-                          <th className="p-2.5 text-left">Date</th>
-                          <th className="p-2.5 text-right">Price (BERA)</th>
-                          <th className="p-2.5 text-left">Buyer</th>
-                          <th className="p-2.5 text-left">Seller</th>
+          {/* Sales history - full width below */}
+          {token.salesHistory && token.salesHistory.length > 0 && (
+            <div>
+              <h3 className="card-title-upper mb-2">
+                Sales History ({token.salesHistory.length})
+              </h3>
+              <div className="card overflow-hidden">
+                <div className="table-responsive">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-mibe-border text-[10px] text-mibe-text-2 uppercase tracking-wider">
+                        <th className="p-2.5 text-left">Date</th>
+                        <th className="p-2.5 text-right">Price (BERA)</th>
+                        <th className="p-2.5 text-left">Buyer</th>
+                        <th className="p-2.5 text-left">Seller</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {token.salesHistory.map((sale) => (
+                        <tr key={sale.id} className="border-b border-mibe-border/50 hover:bg-mibe-hover/30">
+                          <td className="p-2.5 text-mibe-text-2 text-xs">
+                            {new Date(sale.soldAt).toLocaleDateString()}
+                          </td>
+                          <td className="p-2.5 text-right font-medium text-white tabular-nums">
+                            {sale.priceBera.toFixed(2)}
+                          </td>
+                          <td className="p-2.5 font-mono text-[10px] text-mibe-text-2">
+                            {sale.buyerAddress ? truncateAddress(sale.buyerAddress) : '—'}
+                          </td>
+                          <td className="p-2.5 font-mono text-[10px] text-mibe-text-2">
+                            {sale.sellerAddress ? truncateAddress(sale.sellerAddress) : '—'}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {token.salesHistory.map((sale) => (
-                          <tr key={sale.id} className="border-b border-mibe-border/50 hover:bg-mibe-hover/30">
-                            <td className="p-2.5 text-mibe-text-2 text-xs">
-                              {new Date(sale.soldAt).toLocaleDateString()}
-                            </td>
-                            <td className="p-2.5 text-right font-medium text-white tabular-nums">
-                              {sale.priceBera.toFixed(2)}
-                            </td>
-                            <td className="p-2.5 font-mono text-[10px] text-mibe-text-2">
-                              {sale.buyerAddress ? truncateAddress(sale.buyerAddress) : '—'}
-                            </td>
-                            <td className="p-2.5 font-mono text-[10px] text-mibe-text-2">
-                              {sale.sellerAddress ? truncateAddress(sale.sellerAddress) : '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>

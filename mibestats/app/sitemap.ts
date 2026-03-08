@@ -11,7 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/traits',
     '/grails',
     '/map',
-    '/timeline',
     '/metadatas',
     '/miladies',
     '/lore',

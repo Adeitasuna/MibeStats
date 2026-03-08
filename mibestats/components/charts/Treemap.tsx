@@ -35,7 +35,7 @@ interface CustomContentProps {
 
 function CustomTreemapContent(props: CustomContentProps) {
   const { x, y, width, height, name, size, maxCount } = props
-  if (width < 4 || height < 4) return null
+  if (width < 1 || height < 1) return null
 
   const color = getColor(size, maxCount)
   const showLabel = width > 30 && height > 20
@@ -99,7 +99,7 @@ export function TimelineTreemap({ data }: TreemapProps) {
 
   return (
     <div className="card p-3">
-      <div className="h-[300px] md:h-[420px] lg:h-[520px]">
+      <div style={{ height: 520 }}>
         <ResponsiveContainer width="100%" height="100%">
           <RechartTreemap
             data={treemapData}
@@ -129,20 +129,6 @@ export function TimelineTreemap({ data }: TreemapProps) {
         </ResponsiveContainer>
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center gap-3 mt-2 px-1">
-        <span className="text-[10px] text-mibe-muted shrink-0">Fewer</span>
-        <div className="flex-1 h-2.5 rounded-full overflow-hidden flex">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex-1 h-full"
-              style={{ backgroundColor: getColor((i + 1) / 20 * maxCount, maxCount) }}
-            />
-          ))}
-        </div>
-        <span className="text-[10px] text-mibe-muted shrink-0">More miberas</span>
-      </div>
     </div>
   )
 }

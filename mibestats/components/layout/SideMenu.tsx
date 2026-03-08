@@ -29,7 +29,6 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: '/map', label: 'MibeMap' },
       { href: '/distribution', label: 'MibeDistrib.' },
-      { href: '/timeline', label: 'MibeTimeline' },
     ],
   },
   {
