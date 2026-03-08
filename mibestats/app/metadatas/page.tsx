@@ -180,25 +180,27 @@ export default function MetadatasPage() {
               <tr>
                 <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-top text-center">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">MiParcels</div>
-                  <div className="relative w-full" style={{ paddingBottom: '75%' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
-                      alt={`MiParcels #${token.tokenId}`}
-                      className="absolute inset-0 w-full h-full object-cover rounded rotate-90"
-                    />
-                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
+                    alt={`MiParcels #${token.tokenId}`}
+                    width={160}
+                    height={120}
+                    style={{ width: '160px', height: '120px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
+                    className="rounded rotate-90"
+                  />
                 </td>
                 <td rowSpan={2} className="border border-mibe-border p-1 align-top text-center">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">Miladies</div>
-                  <div className="relative w-full" style={{ paddingBottom: '100%' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
-                      alt={`Miladies #${token.tokenId}`}
-                      className="absolute inset-0 w-full h-full object-cover rounded"
-                    />
-                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
+                    alt={`Miladies #${token.tokenId}`}
+                    width={100}
+                    height={100}
+                    style={{ width: '100px', height: '100px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
+                    className="rounded"
+                  />
                 </td>
                 <td className="border border-mibe-border p-2" />
                 <td colSpan={2} className="border border-mibe-border p-2 align-top">
