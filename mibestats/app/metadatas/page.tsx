@@ -295,17 +295,18 @@ export default function MetadatasPage() {
 
             {/* Row 3-8: Large image (cols 1-3) */}
             <div className="lg:col-span-3 lg:row-span-6">
-              <div className="card-gold p-1.5 aspect-square relative overflow-hidden rounded-xl sticky top-4">
+              <div className="card-gold p-1.5 overflow-hidden rounded-xl sticky top-4 max-w-[360px]">
                 {token.imageUrl ? (
                   <Image
                     src={token.imageUrl}
                     alt={`Mibera #${token.tokenId}`}
-                    fill
-                    className="object-contain rounded-lg"
-                    sizes="(max-width: 768px) 100vw, 37.5vw"
+                    width={360}
+                    height={360}
+                    className="object-contain rounded-lg w-full h-auto"
+                    sizes="(max-width: 768px) 100vw, 360px"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-mibe-muted">
+                  <div className="w-full aspect-square flex items-center justify-center text-mibe-muted">
                     No image
                   </div>
                 )}
