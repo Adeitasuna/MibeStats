@@ -170,11 +170,21 @@ export default function MetadatasPage() {
               <tr>
                 <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-middle text-center w-[12.5%]">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">MiParcels</div>
-                  <div className="text-mibe-muted text-xs italic">Coming soon</div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
+                    alt={`MiParcels #${token.tokenId}`}
+                    className="w-full h-auto rounded"
+                  />
                 </td>
                 <td rowSpan={2} className="border border-mibe-border p-1 align-middle text-center w-[12.5%]">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">Miladies</div>
-                  <div className="text-mibe-muted text-xs italic">Coming soon</div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
+                    alt={`Miladies #${token.tokenId}`}
+                    className="w-full h-auto rounded"
+                  />
                 </td>
                 <td className="border border-mibe-border p-2 w-[12.5%]" />
                 <td colSpan={2} className="border border-mibe-border p-2 align-top w-[12.5%]">
