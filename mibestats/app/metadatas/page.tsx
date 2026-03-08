@@ -178,25 +178,25 @@ export default function MetadatasPage() {
             <tbody>
               {/* Row 1: MiParcels (col1-2), Miladies (col3), empty (col4), Last Sale (col5-6), Max Sale (col7-8) */}
               <tr>
-                <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-top text-center" style={{ height: '100px' }}>
+                <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-top text-center">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">MiParcels</div>
-                  <div className="h-[80px] overflow-hidden flex items-center justify-center">
+                  <div className="relative w-full" style={{ paddingBottom: '75%' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
                       alt={`MiParcels #${token.tokenId}`}
-                      className="h-full w-auto object-contain rounded rotate-90"
+                      className="absolute inset-0 w-full h-full object-cover rounded rotate-90"
                     />
                   </div>
                 </td>
-                <td rowSpan={2} className="border border-mibe-border p-1 align-top text-center" style={{ height: '100px' }}>
+                <td rowSpan={2} className="border border-mibe-border p-1 align-top text-center">
                   <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">Miladies</div>
-                  <div className="h-[80px] overflow-hidden flex items-center justify-center">
+                  <div className="relative w-full" style={{ paddingBottom: '100%' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
                       alt={`Miladies #${token.tokenId}`}
-                      className="h-full w-auto object-contain rounded"
+                      className="absolute inset-0 w-full h-full object-cover rounded"
                     />
                   </div>
                 </td>
