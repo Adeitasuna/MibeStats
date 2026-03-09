@@ -142,7 +142,8 @@ export function MiberaMap() {
 
   // Fetch filter options once
   useEffect(() => {
-    fetch('/api/traits')
+    const controller = new AbortController()
+    fetch('/api/traits', { signal: controller.signal })
       .then((res) => res.json())
       .then((traits) => {
         setFilterOptions({
@@ -156,10 +157,13 @@ export function MiberaMap() {
           ascendingSigns: (traits.ascendingSigns || []).map((t: { value: string }) => t.value),
         })
       })
-      .catch(() => {})
+      .catch((err) => {
+        if (err.name !== 'AbortError') { /* swallow */ }
+      })
+    return () => controller.abort()
   }, [])
 
-  const fetchPoints = useCallback(async () => {
+  const fetchPoints = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
     setError(null)
     const params = new URLSearchParams()
@@ -167,11 +171,12 @@ export function MiberaMap() {
       if (value) params.set(key, value)
     }
     try {
-      const res = await fetch(`/api/tokens/map?${params.toString()}`)
+      const res = await fetch(`/api/tokens/map?${params.toString()}`, { signal })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
       setData(json)
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return
       setError('Failed to load map data. Please try again.')
     }
     setLoading(false)
@@ -179,7 +184,9 @@ export function MiberaMap() {
   }, [activeFilters])
 
   useEffect(() => {
-    fetchPoints()
+    const controller = new AbortController()
+    fetchPoints(controller.signal)
+    return () => controller.abort()
   }, [fetchPoints])
 
   const setFilter = (key: FilterKey, value: string) => {

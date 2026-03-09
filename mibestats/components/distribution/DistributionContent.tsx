@@ -236,16 +236,20 @@ export function DistributionContent() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const controller = new AbortController()
     Promise.all([
-      fetch('/api/traits').then((res) => res.json()),
-      fetch('/api/tokens/timeline').then((res) => res.json()),
+      fetch('/api/traits', { signal: controller.signal }).then((res) => res.json()),
+      fetch('/api/tokens/timeline', { signal: controller.signal }).then((res) => res.json()),
     ])
       .then(([traitsData, tlData]) => {
         setTraits(traitsData)
         setTimelineData(tlData.data ?? [])
       })
-      .catch(() => {})
+      .catch((err) => {
+        if (err.name !== 'AbortError') { /* swallow */ }
+      })
       .finally(() => setLoading(false))
+    return () => controller.abort()
   }, [])
 
   if (loading) {

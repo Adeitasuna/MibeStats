@@ -11,7 +11,7 @@ export const GET = withRateLimit('sales', 100, async (req) => {
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
   )
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
   }
 
   const { token_id, min_price, max_price, from_date, to_date, is_grail, page, limit } =

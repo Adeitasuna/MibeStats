@@ -16,14 +16,18 @@ export function TimelineContent() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/tokens/timeline')
+    const controller = new AbortController()
+    fetch('/api/tokens/timeline', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
       })
       .then((json) => setData(json.data))
-      .catch(() => setError('Failed to load timeline data. Please try again.'))
+      .catch((err) => {
+        if (err.name !== 'AbortError') setError('Failed to load timeline data. Please try again.')
+      })
       .finally(() => setLoading(false))
+    return () => controller.abort()
   }, [])
 
   const treemapData = data.map((d) => ({

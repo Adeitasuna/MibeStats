@@ -34,25 +34,28 @@ export function MiladiesContent() {
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
     setError(null)
     const params = new URLSearchParams()
     if (search) params.set('search', search)
     params.set('page', String(page))
     try {
-      const res = await fetch(`/api/tokens/miladies?${params.toString()}`)
+      const res = await fetch(`/api/tokens/miladies?${params.toString()}`, { signal })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       setResponse(data)
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return
       setError('Failed to load data. Please try again.')
     }
     setLoading(false)
   }, [search, page])
 
   useEffect(() => {
-    fetchData()
+    const controller = new AbortController()
+    fetchData(controller.signal)
+    return () => controller.abort()
   }, [fetchData])
 
   const handleSearch = (e: React.FormEvent) => {

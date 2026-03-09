@@ -15,7 +15,7 @@ export const GET = withRateLimit('floor-history', 100, async (req) => {
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
   )
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
   }
 
   const { range } = parsed.data

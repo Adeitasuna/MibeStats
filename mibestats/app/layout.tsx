@@ -1,8 +1,29 @@
 import type { Metadata } from 'next'
+import { Inter, Share_Tech_Mono, Pirata_One } from 'next/font/google'
 import './globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { AppShell } from '@/components/layout/AppShell'
 import { Web3Providers } from '@/components/providers/Web3Providers'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const shareTechMono = Share_Tech_Mono({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-share-tech-mono',
+  display: 'swap',
+})
+
+const pirataOne = Pirata_One({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-pirata-one',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -40,7 +61,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${inter.variable} ${shareTechMono.variable} ${pirataOne.variable}`}>
       <body className="min-h-screen">
         <Web3Providers>
           <AppShell>

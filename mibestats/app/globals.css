@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Fonts loaded via next/font/google in layout.tsx (non-blocking) */
 
 @tailwind base;
 @tailwind components;
@@ -44,18 +44,18 @@
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-family: var(--font-share-tech-mono), 'Courier New', monospace;
   font-size: 1.5rem;
 }
 
 /* ── Typography ── */
 
 .font-title {
-  font-family: 'Pirata One', 'Georgia', serif;
+  font-family: var(--font-pirata-one), 'Georgia', serif;
 }
 
 .font-terminal {
-  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-family: var(--font-share-tech-mono), 'Courier New', monospace;
 }
 
 /* ── CRT Scanline Overlay ── */
@@ -80,7 +80,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 0;
-  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-family: var(--font-share-tech-mono), 'Courier New', monospace;
   font-size: 1.4375rem;
   height: 100%;
 }
@@ -196,7 +196,7 @@ body {
 /* ── Page hierarchy ── */
 
 .section-title {
-  font-family: 'Pirata One', 'Georgia', serif;
+  font-family: var(--font-pirata-one), 'Georgia', serif;
   color: var(--accent-gold);
 }
 
@@ -209,7 +209,7 @@ body {
 
 /* H2 section title with gold separator line */
 .separator {
-  font-family: 'Pirata One', 'Georgia', serif;
+  font-family: var(--font-pirata-one), 'Georgia', serif;
   color: var(--accent-gold);
   font-size: 1.4rem;
   padding-bottom: 0.4rem;
@@ -341,7 +341,7 @@ a.link-cyan:hover {
 /* ── Wallet button (cypherpunk) ── */
 
 .wallet-btn {
-  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-family: var(--font-share-tech-mono), 'Courier New', monospace;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.05em;

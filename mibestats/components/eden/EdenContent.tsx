@@ -254,17 +254,21 @@ export function EdenContent() {
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
     Promise.all([
-      fetch('/api/collection').then((r) => r.ok ? r.json() : null).catch(() => null),
-      fetch('/api/stats/floor-history?range=all').then((r) => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/eden').then((r) => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/collection', { signal: controller.signal }).then((r) => r.ok ? r.json() : null).catch((e) => { if (e.name === 'AbortError') throw e; return null }),
+      fetch('/api/stats/floor-history?range=all', { signal: controller.signal }).then((r) => r.ok ? r.json() : []).catch((e) => { if (e.name === 'AbortError') throw e; return [] }),
+      fetch('/api/eden', { signal: controller.signal }).then((r) => r.ok ? r.json() : null).catch((e) => { if (e.name === 'AbortError') throw e; return null }),
     ]).then(([col, history, edenData]) => {
       if (col) setCollection(col)
       if (history) setFloorHistory(history)
       if (edenData) setEden(edenData)
       if (!col && !edenData) setError('Failed to load data')
       setLoading(false)
+    }).catch((err) => {
+      if (err.name !== 'AbortError') setLoading(false)
     })
+    return () => controller.abort()
   }, [])
 
   if (loading) {

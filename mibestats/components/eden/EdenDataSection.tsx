@@ -56,10 +56,14 @@ export function EdenDataSection() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/eden')
+    const controller = new AbortController()
+    fetch('/api/eden', { signal: controller.signal })
       .then((res) => res.json())
       .then((d) => { setData(d); setLoading(false) })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        if (err.name !== 'AbortError') setLoading(false)
+      })
+    return () => controller.abort()
   }, [])
 
   if (loading) {

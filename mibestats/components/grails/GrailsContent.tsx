@@ -87,13 +87,17 @@ export function GrailsContent() {
   const [view, setView] = useState<ViewMode>('all')
 
   useEffect(() => {
-    fetch('/api/grails')
+    const controller = new AbortController()
+    fetch('/api/grails', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
       })
       .then((d) => { setData(d); setLoading(false) })
-      .catch(() => { setError('Failed to load grails data.'); setLoading(false) })
+      .catch((err) => {
+        if (err.name !== 'AbortError') { setError('Failed to load grails data.'); setLoading(false) }
+      })
+    return () => controller.abort()
   }, [])
 
   if (loading) {
