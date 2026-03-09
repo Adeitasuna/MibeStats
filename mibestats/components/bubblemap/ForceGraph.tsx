@@ -4,9 +4,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import type { ForceGraphMethods } from 'react-force-graph-2d'
 import type { BubbleMapNode, BubbleMapLink } from '@/types'
-import { TIER_COLORS } from '@/lib/chart-constants'
 
 /* ── Constants ── */
+
+const TIER_COLORS: Record<string, string> = {
+  whale: '#ffd700',
+  diamond: '#b9f2ff',
+  gold: '#f0a030',
+  silver: '#c0c0c0',
+  bronze: '#cd7f32',
+  holder: '#555',
+}
 
 const TIER_LEGEND = [
   { tier: 'whale', color: '#ffd700', label: 'Whale (100+)' },

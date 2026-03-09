@@ -2,12 +2,84 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+} from 'recharts'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
-import { FloorChart } from './FloorChart'
-import { EdenPie } from './EdenPie'
-import type { CollectionData, FloorSnapshot, EdenApiData } from './eden-types'
+
+/* ── Types ── */
+
+interface CollectionData {
+  floorPrice: number | null
+  volume24h: number | null
+  volume7d: number | null
+  volume30d: number | null
+  volumeAllTime: number | null
+  totalSales: number | null
+  totalHolders: number | null
+}
+
+interface FloorSnapshot {
+  date: string
+  floorPrice: number
+}
+
+interface BestSale {
+  id: string
+  tokenId: number
+  priceBera: number
+  soldAt: string
+  imageUrl: string | null
+  swagRank: string | null
+  isGrail: boolean
+  grailName: string | null
+  magicEdenUrl: string
+}
+
+interface SalesDistItem {
+  saleCount: number
+  tokenCount: number
+}
+
+interface MostSoldItem {
+  tokenId: number
+  saleCount: number
+  transferCount: number
+  imageUrl: string | null
+  swagRank: string
+  isGrail: boolean
+  grailName: string | null
+  maxSalePrice: number | null
+  lastSalePrice: number | null
+  magicEdenUrl: string
+}
+
+interface EdenApiData {
+  bestSales: BestSale[]
+  salesDistribution: SalesDistItem[]
+  mostSold: MostSoldItem[]
+  salesStats: {
+    count1d: number
+    count7d: number
+    countAll: number
+    volume1d: number
+    volume7d: number
+    volumeAll: number
+    lowestSale24h: number | null
+    highestSale24h: number | null
+  }
+  grailStats: {
+    grails: number
+    nonGrails: number
+    burned: number
+  }
+}
 
 /* ── Helpers ── */
+
+const PIE_COLORS = ['#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149', '#bc8cff', '#f0883e', '#8b949e']
 
 function fmt(value: number | null | undefined, decimals = 2): string {
   if (value == null) return '—'
@@ -19,14 +91,16 @@ function fmtShort(value: number | null | undefined): string {
   return value.toLocaleString()
 }
 
+type Range = '7d' | '30d' | 'all'
+
 /* ── Stat cards ── */
 
 function GoldCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <span className="card-title-upper">{label}</span>
       <div className="stat-card stat-card--gold">
-        <span className="text-2xl font-bold text-white">{value}</span>
+        <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff' }}>{value}</span>
       </div>
     </div>
   )
@@ -34,10 +108,136 @@ function GoldCard({ label, value }: { label: string; value: string }) {
 
 function MiniCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <span className="card-title-upper">{label}</span>
       <div className="stat-card">
-        <span className="text-lg font-bold text-white">{value}</span>
+        <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fff' }}>{value}</span>
+      </div>
+    </div>
+  )
+}
+
+/* ── Floor Price Chart ── */
+
+function FloorChart({ data }: { data: FloorSnapshot[] }) {
+  const [range, setRange] = useState<Range>('30d')
+
+  const now = Date.now()
+  const cutoffs: Record<Range, number> = {
+    '7d': now - 7 * 86400000,
+    '30d': now - 30 * 86400000,
+    'all': 0,
+  }
+
+  const filtered = data
+    .filter((d) => new Date(d.date).getTime() >= cutoffs[range])
+    .map((d) => ({ date: d.date, price: Number(d.floorPrice.toFixed(4)) }))
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span className="card-title-upper">Floor Price</span>
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
+          {(['7d', '30d', 'all'] as Range[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              style={{
+                padding: '0.15rem 0.5rem',
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                borderRadius: '0.25rem',
+                border: 'none',
+                cursor: 'pointer',
+                background: range === r ? 'rgba(255,215,0,0.15)' : 'transparent',
+                color: range === r ? '#ffd700' : '#8b949e',
+              }}
+            >
+              {r === 'all' ? 'All' : r}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="stat-card" style={{ padding: '0.75rem' }}>
+        {filtered.length === 0 ? (
+          <div style={{ height: '12rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: '0.875rem' }}>
+            No data yet
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={filtered} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+              <defs>
+                <linearGradient id="floorGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ffd700" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#ffd700" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: '#8b949e', fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v: string) => v.slice(5)}
+              />
+              <YAxis
+                tick={{ fill: '#8b949e', fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v: number) => `${v}`}
+                width={45}
+              />
+              <Tooltip
+                contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 12, color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
+                labelStyle={{ color: '#fff' }}
+                formatter={(v: number) => [`${v} BERA`, 'Floor']}
+              />
+              <Area type="monotone" dataKey="price" stroke="#ffd700" strokeWidth={2} fill="url(#floorGradient)" dot={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ── Pie chart ── */
+
+function EdenPie({ data, title }: { data: { name: string; value: number }[]; title: string }) {
+  // Sort desc, limit to 12 with "Other"
+  const sorted = [...data].sort((a, b) => b.value - a.value)
+  const top = sorted.slice(0, 11)
+  const restValue = sorted.slice(11).reduce((s, d) => s + d.value, 0)
+  const chartData = [
+    ...top,
+    ...(restValue > 0 ? [{ name: 'Other', value: restValue }] : []),
+  ]
+  const total = chartData.reduce((s, d) => s + d.value, 0)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <span className="card-title-upper">{title}</span>
+      <div className="stat-card" style={{ padding: '0.75rem' }}>
+        <ResponsiveContainer width="100%" height={240}>
+          <PieChart>
+            <Pie data={chartData} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" nameKey="name" paddingAngle={2} stroke="none">
+              {chartData.map((_, i) => (
+                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{ background: '#000', border: '1px solid #ffd700', borderRadius: 8, fontSize: 12, color: '#fff' }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#fff' }}
+              formatter={(value: number, name: string) => {
+                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
+                return [`${pct}% (${value.toLocaleString()})`, name]
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   )
@@ -73,8 +273,8 @@ export function EdenContent() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
-        <img src="/waiting.gif" alt="Loading..." className="max-w-[300px]" style={{ imageRendering: 'pixelated' }} />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
+        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
       </div>
     )
   }
@@ -106,13 +306,13 @@ export function EdenContent() {
   })() : []
 
   return (
-    <div className="flex flex-col gap-5">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {error && (
         <div className="card p-3 border-mibe-red text-red-400 text-sm">{error}</div>
       )}
 
       {/* Row 1: Floor Price | Max Sell Price | Lowest of Day | Highest of Day */}
-      <div id="eden-row1" className="grid grid-cols-2 gap-3">
+      <div id="eden-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
         <GoldCard label="Floor Price (7d)" value={fmt(collection?.floorPrice)} />
         <GoldCard label="Max Sell Price (ATH)" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
         <GoldCard label="Lowest Sale (24h)" value={eden?.salesStats.lowestSale24h != null ? fmt(eden.salesStats.lowestSale24h) : '—'} />
@@ -120,13 +320,13 @@ export function EdenContent() {
       </div>
 
       {/* Rows 2-3: Sales cards (cols 1-3) + Floor chart (cols 4-6 spanning 2 rows) */}
-      <div id="eden-stats-chart" className="grid grid-cols-3 gap-3">
+      <div id="eden-stats-chart" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
         {/* Row 2 cols 1-3: Sales Count */}
         <MiniCard label="Sales Count — 1d" value={eden ? String(eden.salesStats.count1d) : '—'} />
         <MiniCard label="Sales Count — 7d" value={eden ? String(eden.salesStats.count7d) : '—'} />
         <MiniCard label="Sales Count — All" value={eden ? fmtShort(eden.salesStats.countAll) : '—'} />
         {/* Floor chart spanning cols 4-6, rows 1-2 (positioned via CSS) */}
-        <div id="eden-floor-chart" className="col-span-full">
+        <div id="eden-floor-chart" style={{ gridColumn: '1 / -1' }}>
           <FloorChart data={floorHistory} />
         </div>
         {/* Row 3 cols 1-3: Sales Volume */}
@@ -154,7 +354,7 @@ export function EdenContent() {
 
       {/* Row 4: 3 Pie charts */}
       {eden && (
-        <div id="eden-pies" className="grid grid-cols-1 gap-4">
+        <div id="eden-pies" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
           <EdenPie data={nftStatusPie} title="NFT Status" />
           <EdenPie data={salesDistPie} title="Nb Sales per Mibera" />
           <EdenPie data={diamondMiberaPie} title="Diamond Mibera" />
@@ -163,49 +363,49 @@ export function EdenContent() {
 
       {/* Row 5: Best Sales (cols 1-3) | Most Sold (cols 4-6) */}
       {eden && (
-        <div id="eden-tables" className="grid grid-cols-1 gap-4">
+        <div id="eden-tables" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
           {/* Best Sales */}
           {eden.bestSales.length > 0 && (
-            <div className="flex flex-col gap-1">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               <span className="card-title-upper">Best Sales — Top 30</span>
-              <div className="stat-card p-0 overflow-hidden">
+              <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-white/10 text-[0.625rem] uppercase tracking-wide text-mibe-text-2">
-                        <th className="p-3 text-left">#</th>
-                        <th className="p-3 text-left">Img</th>
-                        <th className="p-3 text-left">ID</th>
-                        <th className="p-3 text-left">Rank</th>
-                        <th className="p-3 text-left">Grail</th>
-                        <th className="p-3 text-right">Price</th>
-                        <th className="p-3 text-left">Date</th>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#888' }}>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>#</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Img</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>ID</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Rank</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Grail</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'right' }}>Price</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Date</th>
                       </tr>
                     </thead>
                     <tbody>
                       {eden.bestSales.map((sale, i) => (
-                        <tr key={sale.id} className="border-b border-white/5">
-                          <td className="py-2 px-3 text-mibe-muted">{i + 1}</td>
-                          <td className="p-1.5">
+                        <tr key={sale.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '0.5rem 0.75rem', color: '#555' }}>{i + 1}</td>
+                          <td style={{ padding: '0.35rem' }}>
                             {sale.imageUrl ? (
-                              <Image src={sale.imageUrl} alt={`#${sale.tokenId}`} width={48} height={48} className="rounded object-cover shrink-0 cursor-pointer" onClick={() => setLightboxUrl(sale.imageUrl)} />
+                              <Image src={sale.imageUrl} alt={`#${sale.tokenId}`} width={48} height={48} className="rounded object-cover shrink-0" style={{ cursor: 'pointer' }} onClick={() => setLightboxUrl(sale.imageUrl)} />
                             ) : (
-                              <div className="w-12 h-12 rounded bg-[#1a1a1a]" />
+                              <div style={{ width: 48, height: 48, borderRadius: '0.25rem', background: '#1a1a1a' }} />
                             )}
                           </td>
-                          <td className="py-2 px-3">
-                            <a href={sale.magicEdenUrl} target="_blank" rel="noreferrer" className="text-[#58a6ff] no-underline">#{sale.tokenId}</a>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>
+                            <a href={sale.magicEdenUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{sale.tokenId}</a>
                           </td>
-                          <td className="py-2 px-3">{sale.swagRank && <SwagRankBadge rank={sale.swagRank} size="sm" />}</td>
-                          <td className="py-2 px-3">
+                          <td style={{ padding: '0.5rem 0.75rem' }}>{sale.swagRank && <SwagRankBadge rank={sale.swagRank} size="sm" />}</td>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>
                             {sale.isGrail ? (
-                              <span className="text-mibe-gold text-xs font-bold">{sale.grailName ?? 'Yes'}</span>
+                              <span style={{ color: '#ffd700', fontSize: '0.75rem', fontWeight: 700 }}>{sale.grailName ?? 'Yes'}</span>
                             ) : (
-                              <span className="text-mibe-muted">—</span>
+                              <span style={{ color: '#555' }}>—</span>
                             )}
                           </td>
-                          <td className="py-2 px-3 text-right font-medium text-white">{sale.priceBera.toFixed(2)}</td>
-                          <td className="py-2 px-3 text-mibe-text-2 text-xs">{new Date(sale.soldAt).toLocaleDateString()}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', fontWeight: 500, color: '#fff' }}>{sale.priceBera.toFixed(2)}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', color: '#888', fontSize: '0.75rem' }}>{new Date(sale.soldAt).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -217,46 +417,46 @@ export function EdenContent() {
 
           {/* Most Sold */}
           {eden.mostSold.length > 0 && (
-            <div className="flex flex-col gap-1">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               <span className="card-title-upper">Most Sold Miberas — Top 30</span>
-              <div className="stat-card p-0 overflow-hidden">
+              <div className="stat-card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-white/10 text-[0.625rem] uppercase tracking-wide text-mibe-text-2">
-                        <th className="p-3 text-left">#</th>
-                        <th className="p-3 text-left">Img</th>
-                        <th className="p-3 text-left">ID</th>
-                        <th className="p-3 text-left">Rank</th>
-                        <th className="p-3 text-center">Sales</th>
-                        <th className="p-3 text-center">Transfers</th>
-                        <th className="p-3 text-right">Max</th>
-                        <th className="p-3 text-right">Last</th>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', fontSize: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#888' }}>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>#</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Img</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>ID</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'left' }}>Rank</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'center' }}>Sales</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'center' }}>Transfers</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'right' }}>Max</th>
+                        <th style={{ padding: '0.75rem', textAlign: 'right' }}>Last</th>
                       </tr>
                     </thead>
                     <tbody>
                       {eden.mostSold.map((token, i) => (
-                        <tr key={token.tokenId} className="border-b border-white/5">
-                          <td className="py-2 px-3 text-mibe-muted">{i + 1}</td>
-                          <td className="p-1.5">
+                        <tr key={token.tokenId} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '0.5rem 0.75rem', color: '#555' }}>{i + 1}</td>
+                          <td style={{ padding: '0.35rem' }}>
                             {token.imageUrl ? (
-                              <Image src={token.imageUrl} alt={`#${token.tokenId}`} width={48} height={48} className="rounded object-cover shrink-0 cursor-pointer" onClick={() => setLightboxUrl(token.imageUrl)} />
+                              <Image src={token.imageUrl} alt={`#${token.tokenId}`} width={48} height={48} className="rounded object-cover shrink-0" style={{ cursor: 'pointer' }} onClick={() => setLightboxUrl(token.imageUrl)} />
                             ) : (
-                              <div className="w-12 h-12 rounded bg-[#1a1a1a]" />
+                              <div style={{ width: 48, height: 48, borderRadius: '0.25rem', background: '#1a1a1a' }} />
                             )}
                           </td>
-                          <td className="py-2 px-3">
-                            <a href={token.magicEdenUrl} target="_blank" rel="noreferrer" className="text-[#58a6ff] no-underline">#{token.tokenId}</a>
+                          <td style={{ padding: '0.5rem 0.75rem' }}>
+                            <a href={token.magicEdenUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{token.tokenId}</a>
                           </td>
-                          <td className="py-2 px-3"><SwagRankBadge rank={token.swagRank} size="sm" /></td>
-                          <td className="py-2 px-3 text-center">
-                            <span className="bg-mibe-gold/15 text-mibe-gold py-0.5 px-2 rounded text-xs font-bold">{token.saleCount}</span>
+                          <td style={{ padding: '0.5rem 0.75rem' }}><SwagRankBadge rank={token.swagRank} size="sm" /></td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>
+                            <span style={{ background: 'rgba(255,215,0,0.15)', color: '#ffd700', padding: '0.15rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.75rem', fontWeight: 700 }}>{token.saleCount}</span>
                           </td>
-                          <td className="py-2 px-3 text-center">
-                            <span className="text-[#8b949e] text-xs">{token.transferCount}</span>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>
+                            <span style={{ color: '#8b949e', fontSize: '0.75rem' }}>{token.transferCount}</span>
                           </td>
-                          <td className="py-2 px-3 text-right font-medium text-white">{token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}</td>
-                          <td className="py-2 px-3 text-right text-mibe-text-2">{token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', fontWeight: 500, color: '#fff' }}>{token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', color: '#888' }}>{token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -272,13 +472,17 @@ export function EdenContent() {
       {lightboxUrl && (
         <div
           onClick={() => setLightboxUrl(null)}
-          className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center cursor-pointer"
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
         >
           <img
             src={lightboxUrl}
             alt="Enlarged"
-            className="max-w-[90vw] max-h-[90vh] rounded-lg"
-            style={{ imageRendering: 'pixelated' }}
+            style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: '0.5rem', imageRendering: 'pixelated' }}
           />
         </div>
       )}

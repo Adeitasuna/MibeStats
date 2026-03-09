@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function LorePage() {
   return (
-    <div className="flex flex-col gap-10">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
       <div>
         <h1 className="section-title text-3xl">MibeLore</h1>
         <p className="chapo-h1">
@@ -25,7 +25,7 @@ export default function LorePage() {
       {/* ── Lore Documents — 7 compact blocks in 1 row ── */}
       <section>
         <h2 className="separator">Lore</h2>
-        <div className="grid grid-cols-7 gap-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
           {LORE_DOCUMENTS.map((doc) => (
             <a
               key={doc.title}
@@ -35,7 +35,7 @@ export default function LorePage() {
               className="card-info-blue"
             >
               <div className="card-info-blue-title">
-                <svg width="16" height="16" className="shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg width="16" height="16" style={{ flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 <span className="font-terminal">{doc.title}</span>
@@ -60,13 +60,13 @@ export default function LorePage() {
       {/* ── Official Site ── */}
       <section>
         <h2 className="separator">Official Site</h2>
-        <p className="chapo-h2 mb-4">
+        <p className="chapo-h2" style={{ marginBottom: '1rem' }}>
           Explore the Mibera darknet marketplace at{' '}
           <a href="https://mibera.0xhoneyjar.xyz" target="_blank" rel="noreferrer" className="link-cyan">
             mibera.0xhoneyjar.xyz
           </a>
         </p>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-2">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.5rem' }}>
           {OFFICIAL_SITE_PAGES.map((page) => (
             <a
               key={page.label}
@@ -76,7 +76,7 @@ export default function LorePage() {
               className="card-info-blue"
             >
               <div className="card-info-blue-title">
-                <svg width="16" height="16" className="shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg width="16" height="16" style={{ flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
                 <span className="font-terminal">{page.label}</span>

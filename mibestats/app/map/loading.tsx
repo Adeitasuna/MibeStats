@@ -8,7 +8,7 @@ export default function Loading() {
       </div>
 
       {/* Map area placeholder */}
-      <div className="card animate-pulse h-[600px]">
+      <div className="card animate-pulse" style={{ height: 600 }}>
         <div className="w-full h-full flex items-center justify-center bg-white/5 rounded">
           <div className="flex flex-col items-center gap-3">
             <div className="h-12 w-12 bg-white/5 rounded-full" />

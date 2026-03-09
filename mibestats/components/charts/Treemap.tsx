@@ -1,8 +1,6 @@
 'use client'
 
 import { Treemap as RechartTreemap, ResponsiveContainer, Tooltip } from 'recharts'
-import { TOOLTIP_STYLE } from '@/lib/chart-constants'
-import { TreemapCellContent } from '@/components/charts/TreemapContent'
 
 interface TreemapItem {
   name: string
@@ -13,6 +11,75 @@ interface TreemapItem {
 
 interface TreemapProps {
   data: TreemapItem[]
+}
+
+// Color scale based on count — more miberas = more intense gold
+function getColor(count: number, maxCount: number): string {
+  const ratio = Math.min(count / maxCount, 1)
+  // Interpolate from dark blue (#1a1a2e) to gold (#ffd700)
+  const r = Math.round(26 + ratio * (255 - 26))
+  const g = Math.round(26 + ratio * (215 - 26))
+  const b = Math.round(46 + ratio * (0 - 46))
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+interface CustomContentProps {
+  x: number
+  y: number
+  width: number
+  height: number
+  name: string
+  size: number
+  maxCount: number
+}
+
+function CustomTreemapContent(props: CustomContentProps) {
+  const { x, y, width, height, name, size, maxCount } = props
+  if (width < 1 || height < 1) return null
+
+  const color = getColor(size, maxCount)
+  const showLabel = width > 30 && height > 20
+  const showCount = width > 50 && height > 35
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={color}
+        stroke="#0d1117"
+        strokeWidth={1}
+        rx={2}
+      />
+      {showLabel && (
+        <text
+          x={x + width / 2}
+          y={y + height / 2 - (showCount ? 6 : 0)}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill={size / maxCount > 0.3 ? '#000' : '#e6edf3'}
+          fontSize={Math.min(11, width / 4)}
+          fontWeight="bold"
+        >
+          {name}
+        </text>
+      )}
+      {showCount && (
+        <text
+          x={x + width / 2}
+          y={y + height / 2 + 10}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill={size / maxCount > 0.3 ? '#333' : '#8b949e'}
+          fontSize={Math.min(9, width / 5)}
+        >
+          {size.toLocaleString()}
+        </text>
+      )}
+    </g>
+  )
 }
 
 export function TimelineTreemap({ data }: TreemapProps) {
@@ -41,10 +108,16 @@ export function TimelineTreemap({ data }: TreemapProps) {
             aspectRatio={4 / 3}
             stroke="#0d1117"
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            content={<TreemapCellContent maxCount={maxCount} showLabel={true} x={0} y={0} width={0} height={0} name="" size={0} /> as any}
+            content={<CustomTreemapContent maxCount={maxCount} x={0} y={0} width={0} height={0} name="" size={0} /> as any}
           >
             <Tooltip
-              contentStyle={{ ...TOOLTIP_STYLE, color: '#fff' }}
+              contentStyle={{
+                background: '#000',
+                border: '1px solid #ffd700',
+                borderRadius: 8,
+                fontSize: 12,
+                color: '#fff',
+              }}
               itemStyle={{ color: '#fff' }}
               labelStyle={{ color: '#fff' }}
               formatter={(value: number) => [

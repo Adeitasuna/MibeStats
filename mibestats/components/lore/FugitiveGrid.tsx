@@ -64,66 +64,84 @@ function FugitiveCardEl({
       href={fugitive.url || `https://x.com/${fugitive.handle.replace('@', '')}`}
       target="_blank"
       rel="noreferrer"
-      className="fugitive-card no-underline bg-mibe-bg-alt border border-mibe-red rounded"
+      className="fugitive-card"
+      style={{
+        textDecoration: 'none',
+        background: '#111',
+        border: '1px solid #f85149',
+        borderRadius: '4px',
+      }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       {/* Header bar */}
-      <div className="bg-mibe-red text-black px-2.5 py-1 flex justify-between items-center">
-        <span className="font-terminal text-xs font-bold tracking-widest uppercase">
+      <div style={{
+        background: '#f85149',
+        color: '#000',
+        padding: '0.3rem 0.6rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <span className="font-terminal" style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           WANTED
         </span>
-        <span className="font-terminal text-[0.7rem] font-semibold">
+        <span className="font-terminal" style={{ fontSize: '0.7rem', fontWeight: 600 }}>
           #{String(idx + 1).padStart(3, '0')}
         </span>
       </div>
 
       {/* Card body */}
-      <div className="flex p-3 gap-3">
+      <div style={{ display: 'flex', padding: '0.75rem', gap: '0.75rem' }}>
         {/* Mugshot */}
-        <div className="shrink-0 flex flex-col items-center gap-1">
-          <div className="w-[70px] h-[70px] border-2 border-[#333] overflow-hidden bg-mibe-hover">
+        <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+          <div style={{
+            width: '70px', height: '70px',
+            border: '2px solid #333',
+            overflow: 'hidden',
+            background: '#1a1a1a',
+          }}>
             {fugitive.avatarUrl ? (
               <Image
                 src={fugitive.avatarUrl}
                 alt={fugitive.displayName}
                 width={70}
                 height={70}
-                className="object-cover w-full h-full"
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                 unoptimized
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <svg width="32" height="32" className="text-mibe-muted" fill="currentColor" viewBox="0 0 24 24">
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="32" height="32" style={{ color: '#555' }} fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
               </div>
             )}
           </div>
-          <span className="font-terminal text-[0.7rem] text-mibe-cyan">
+          <span className="font-terminal" style={{ fontSize: '0.7rem', color: '#58a6ff' }}>
             {fugitive.handle}
           </span>
         </div>
 
         {/* Intel */}
-        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
           <div>
-            <span className="font-terminal text-[0.95rem] font-bold text-white">
+            <span className="font-terminal" style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
               {fugitive.displayName}
             </span>
             {fugitive.alias && (
-              <span className="font-terminal text-[0.8rem] text-mibe-gold ml-1.5">
+              <span className="font-terminal" style={{ fontSize: '0.8rem', color: '#ffd700', marginLeft: '0.4rem' }}>
                 aka &quot;{fugitive.alias}&quot;
               </span>
             )}
           </div>
           <div>
-            <span className="font-terminal text-[0.7rem] text-mibe-red uppercase tracking-wider">Profile: </span>
-            <span className="text-[0.8rem] text-[#ccc] leading-relaxed">{fugitive.profile}</span>
+            <span className="font-terminal" style={{ fontSize: '0.7rem', color: '#f85149', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Profile: </span>
+            <span style={{ fontSize: '0.8rem', color: '#ccc', lineHeight: 1.4 }}>{fugitive.profile}</span>
           </div>
           <div>
-            <span className="font-terminal text-[0.7rem] text-mibe-gold uppercase tracking-wider">Facts: </span>
-            <span className="text-[0.8rem] text-mibe-text-2 leading-relaxed">{fugitive.facts}</span>
+            <span className="font-terminal" style={{ fontSize: '0.7rem', color: '#ffd700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facts: </span>
+            <span style={{ fontSize: '0.8rem', color: '#888', lineHeight: 1.4 }}>{fugitive.facts}</span>
           </div>
         </div>
       </div>
@@ -186,10 +204,10 @@ export function FugitiveGrid({ fugitives }: FugitiveGridProps) {
       <h2 className="separator">
         Searched by the FBI: TOP 7 fugitives
       </h2>
-      <p className="chapo-h2 mb-4">
+      <p className="chapo-h2" style={{ marginBottom: '1rem' }}>
         The most wanted accounts in the Mibera ecosystem
       </p>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-3">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.75rem' }}>
         {fugitives.map((fugitive, idx) => (
           <FugitiveCardEl
             key={fugitive.handle}

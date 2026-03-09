@@ -10,7 +10,7 @@ interface Props {
 
 export function TopSales({ sales }: Props) {
   return (
-    <div className="flex flex-col gap-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <span className="card-title-upper">
         Top Sales (All-Time)
       </span>

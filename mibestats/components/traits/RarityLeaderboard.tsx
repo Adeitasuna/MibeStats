@@ -23,7 +23,7 @@ export function RarityLeaderboard({ tokens }: Props) {
   if (sorted.length === 0) return null
 
   return (
-    <div className="flex flex-col gap-1">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <span className="card-title-upper">
         Rarity Leaderboard — Top SSS &amp; SS
       </span>
