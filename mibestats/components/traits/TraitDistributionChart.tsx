@@ -9,6 +9,9 @@ import {
   Treemap as RechartTreemap,
 } from 'recharts'
 import type { TraitDistribution, TraitCount } from '@/types'
+import { CHART_COLORS } from '@/lib/chart-constants'
+import { ChartTooltip } from '@/components/charts/ChartTooltip'
+import { TreemapCellContent } from '@/components/charts/TreemapContent'
 
 const CATEGORIES: Array<{ key: keyof TraitDistribution; label: string }> = [
   { key: 'archetypes',  label: 'Archetype'  },
@@ -24,74 +27,6 @@ const BAR_MAX_ITEMS = 20
 
 const BAR_COLOR   = '#3B82F6'
 const BAR_ACTIVE  = '#EAB308'
-
-const PIE_COLORS = [
-  '#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149',
-  '#bc8cff', '#f0883e', '#8b949e', '#db61a2', '#79c0ff',
-]
-
-const TOOLTIP_BOX: React.CSSProperties = {
-  background: '#000',
-  border: '1px solid #ffd700',
-  borderRadius: 8,
-  padding: '6px 10px',
-  fontSize: 12,
-}
-
-function ChartTooltip({ name, count, total }: { name: string; count: number; total: number }) {
-  const pct = ((count / total) * 100).toFixed(1)
-  return (
-    <div style={TOOLTIP_BOX}>
-      <span style={{ color: '#ffd700', fontWeight: 'bold' }}>{name}</span>
-      <span style={{ color: '#fff' }}> : {pct}% ({count.toLocaleString()})</span>
-    </div>
-  )
-}
-
-function getTreemapColor(count: number, maxCount: number): string {
-  const ratio = Math.min(count / maxCount, 1)
-  const r = Math.round(26 + ratio * (255 - 26))
-  const g = Math.round(26 + ratio * (215 - 26))
-  const b = Math.round(46 + ratio * (0 - 46))
-  return `rgb(${r}, ${g}, ${b})`
-}
-
-interface TreemapContentProps {
-  x: number
-  y: number
-  width: number
-  height: number
-  name: string
-  size: number
-  maxCount: number
-}
-
-function TraitTreemapContent(props: TreemapContentProps) {
-  const { x, y, width, height, size, maxCount } = props
-  if (width < 4 || height < 4) return null
-
-  const color = getTreemapColor(size, maxCount)
-  const showCount = width > 24 && height > 16
-
-  return (
-    <g>
-      <rect
-        x={x} y={y} width={width} height={height}
-        fill={color} stroke="#0d1117" strokeWidth={1} rx={2}
-      />
-      {showCount && (
-        <text
-          x={x + width / 2} y={y + height / 2}
-          textAnchor="middle" dominantBaseline="central"
-          fill={size / maxCount > 0.3 ? '#000' : '#e6edf3'}
-          fontSize={Math.min(11, width / 5)} fontWeight="bold"
-        >
-          {size.toLocaleString()}
-        </text>
-      )}
-    </g>
-  )
-}
 
 interface Props {
   traits:         TraitDistribution
@@ -174,7 +109,7 @@ export function TraitDistributionChart({ traits, activeCategory, currentFilters 
                 aspectRatio={4 / 3}
                 stroke="#0d1117"
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                content={<TraitTreemapContent maxCount={maxCount} x={0} y={0} width={0} height={0} name="" size={0} /> as any}
+                content={<TreemapCellContent maxCount={maxCount} x={0} y={0} width={0} height={0} name="" size={0} /> as any}
               >
                 <Tooltip
                   content={({ active, payload }) => {
@@ -262,7 +197,7 @@ export function TraitDistributionChart({ traits, activeCategory, currentFilters 
                   stroke="none"
                 >
                   {pieData.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.85} />
                   ))}
                 </Pie>
                 <Legend wrapperStyle={{ fontSize: 11, color: '#8b949e' }} />

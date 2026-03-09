@@ -12,37 +12,24 @@ function FractureCard({
   onImageClick: () => void
 }) {
   return (
-    <div className="card" style={{ padding: '0.4rem', width: '100%', maxWidth: '120px', textAlign: 'center' }}>
+    <div className="card p-1.5 w-full max-w-[120px] text-center">
       <div
         onClick={(e) => { e.preventDefault(); onImageClick() }}
-        style={{ width: '85px', height: '85px', margin: '0 auto 0.25rem', borderRadius: '4px', overflow: 'hidden', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+        className="w-[85px] h-[85px] mx-auto mb-1 rounded-sm overflow-hidden bg-mibe-hover flex items-center justify-center cursor-pointer"
       >
-        <Image src={stage.imageUrl} alt={stage.name} width={85} height={85} style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '100%' }} unoptimized />
+        <Image src={stage.imageUrl} alt={stage.name} width={85} height={85} className="object-contain max-w-full max-h-full" unoptimized />
       </div>
-      <p className="font-terminal" style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ffd700', margin: '0 0 0.1rem 0', lineHeight: 1.2 }}>
+      <p className="font-terminal text-[0.8rem] font-semibold text-mibe-gold m-0 mb-0.5 leading-tight">
         {stage.name}
       </p>
-      <p style={{ fontSize: '0.7rem', color: '#888', lineHeight: 1.25, margin: '0 0 0.15rem 0' }}>
+      <p className="text-[0.7rem] text-mibe-text-2 leading-tight m-0 mb-0.5">
         {stage.description}
       </p>
       <a
         href={stage.mintUrl}
         target="_blank"
         rel="noreferrer"
-        className="font-terminal mint-btn"
-        style={{
-          display: 'inline-block',
-          fontSize: '0.65rem',
-          fontWeight: 700,
-          color: '#ffd700',
-          background: 'transparent',
-          border: '1px solid #ffd700',
-          borderRadius: '3px',
-          padding: '0.15rem 0.5rem',
-          textDecoration: 'none',
-          letterSpacing: '0.05em',
-          marginTop: '0.2rem',
-        }}
+        className="font-terminal mint-btn inline-block text-[0.65rem] font-bold text-mibe-gold bg-transparent border border-mibe-gold rounded-sm px-2 py-0.5 no-underline tracking-wide mt-1"
       >
         Mint
       </a>
@@ -56,20 +43,11 @@ export function FractureTimeline() {
 
   return (
     <>
-      <div style={{ position: 'relative' }}>
+      <div className="relative">
         {/* Continuous horizontal line behind all dots */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '5%',
-          right: '5%',
-          height: '2px',
-          background: '#ffd700',
-          transform: 'translateY(-50%)',
-          zIndex: 0,
-        }} />
+        <div className="absolute top-1/2 left-[5%] right-[5%] h-0.5 bg-mibe-gold -translate-y-1/2 z-0" />
 
-        <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+        <div className="flex items-center relative">
           {FRACTURE_STAGES.map((stage, i) => {
             const isTop = i % 2 === 0
             const dateLabel = stage.date || 'TBD'
@@ -82,49 +60,37 @@ export function FractureTimeline() {
             }
 
             return (
-              <div key={stage.phase} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, position: 'relative' }}>
+              <div key={stage.phase} className="flex flex-col items-center flex-1 min-w-0 relative">
                 {/* Top area — card if even, date if odd */}
-                <div style={{ height: cardH, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', width: '100%', padding: '0 0.1rem' }}>
+                <div className="flex flex-col justify-end items-center w-full px-0.5" style={{ height: cardH }}>
                   {isTop ? (
                     <FractureCard stage={stage} onImageClick={openLightbox} />
                   ) : (
-                    <span className="font-terminal" style={{ fontSize: '0.7rem', color: dateColor, whiteSpace: 'nowrap', marginBottom: '0.3rem' }}>
+                    <span className="font-terminal text-[0.7rem] whitespace-nowrap mb-1" style={{ color: dateColor }}>
                       {dateLabel}
                     </span>
                   )}
                 </div>
 
                 {/* Vertical connector (top) */}
-                <div style={{ width: '2px', height: '0.5rem', background: '#ffd700' }} />
+                <div className="w-0.5 h-2 bg-mibe-gold" />
 
                 {/* Phase dot */}
-                <div style={{
-                  width: '2.2rem',
-                  height: '2.2rem',
-                  borderRadius: '50%',
-                  background: '#0a0a0a',
-                  border: '2px solid #ffd700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  zIndex: 2,
-                  flexShrink: 0,
-                }}>
-                  <span className="font-terminal" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffd700' }}>
+                <div className="w-[2.2rem] h-[2.2rem] rounded-full bg-mibe-bg border-2 border-mibe-gold flex items-center justify-center relative z-[2] shrink-0">
+                  <span className="font-terminal text-[0.85rem] font-bold text-mibe-gold">
                     {stage.phase}
                   </span>
                 </div>
 
                 {/* Vertical connector (bottom) */}
-                <div style={{ width: '2px', height: '0.5rem', background: '#ffd700' }} />
+                <div className="w-0.5 h-2 bg-mibe-gold" />
 
                 {/* Bottom area — card if odd, date if even */}
-                <div style={{ height: cardH, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', width: '100%', padding: '0 0.1rem' }}>
+                <div className="flex flex-col justify-start items-center w-full px-0.5" style={{ height: cardH }}>
                   {!isTop ? (
                     <FractureCard stage={stage} onImageClick={openLightbox} />
                   ) : (
-                    <span className="font-terminal" style={{ fontSize: '0.7rem', color: dateColor, whiteSpace: 'nowrap', marginTop: '0.3rem' }}>
+                    <span className="font-terminal text-[0.7rem] whitespace-nowrap mt-1" style={{ color: dateColor }}>
                       {dateLabel}
                     </span>
                   )}
@@ -139,25 +105,15 @@ export function FractureTimeline() {
       {lightboxUrl && (
         <div
           onClick={() => setLightboxUrl(null)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9999,
-            background: 'rgba(0,0,0,0.85)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            gap: '0.75rem',
-          }}
+          className="fixed inset-0 z-[9999] bg-black/85 flex flex-col items-center justify-center cursor-pointer gap-3"
         >
           <img
             src={lightboxUrl}
             alt={lightboxName}
-            style={{ maxWidth: '90vw', maxHeight: '80vh', borderRadius: '0.5rem', imageRendering: 'pixelated' }}
+            className="max-w-[90vw] max-h-[80vh] rounded-lg"
+            style={{ imageRendering: 'pixelated' }}
           />
-          <span className="font-terminal" style={{ color: '#ffd700', fontSize: '1rem' }}>
+          <span className="font-terminal text-mibe-gold text-base">
             {lightboxName}
           </span>
         </div>

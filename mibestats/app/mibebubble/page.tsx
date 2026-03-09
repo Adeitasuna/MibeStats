@@ -12,8 +12,8 @@ const BubbleMapContent = nextDynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex justify-center items-center" style={{ minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
+      <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+        <img src="/waiting.gif" alt="Loading..." className="max-w-[300px]" style={{ imageRendering: 'pixelated' }} />
       </div>
     ),
   },

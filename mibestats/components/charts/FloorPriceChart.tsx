@@ -31,7 +31,7 @@ export function FloorPriceChart({ data }: Props) {
   }))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+    <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between">
         <span className="card-title-upper">
           Floor Price

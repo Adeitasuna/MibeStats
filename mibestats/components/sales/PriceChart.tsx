@@ -28,7 +28,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
   if (!active || !payload?.[0]) return null
   const d = payload[0].payload
   return (
-    <div className="text-xs p-2 rounded-lg" style={{ background: '#111', border: '1px solid #222' }}>
+    <div className="text-xs p-2 rounded-lg bg-[#111] border border-[#222]">
       <div className="text-gray-400">{new Date(d.soldAt).toLocaleDateString()}</div>
       <div className="text-white font-semibold mt-0.5">{d.price.toFixed(2)} BERA</div>
       <div className="text-gray-400">#{d.tokenId}</div>

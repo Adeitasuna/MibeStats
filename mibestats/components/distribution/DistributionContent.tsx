@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { PieChartGrid } from '@/components/charts/PieChartGrid'
 import { TimelineTreemap } from '@/components/charts/Treemap'
+import { CHART_COLORS, TOOLTIP_STYLE } from '@/lib/chart-constants'
 import type { TraitDistribution, TraitCount } from '@/types'
 
 interface YearData {
@@ -107,18 +108,6 @@ const ERA_ORDER = [
   'Early Middle Ages', 'Middle Ages', 'Modern Times', 'Contemporary Era', '20th Century and beyond',
 ]
 
-const TOOLTIP_BOX: React.CSSProperties = {
-  background: '#000',
-  border: '1px solid #ffd700',
-  borderRadius: 8,
-  padding: '6px 10px',
-  fontSize: 11,
-}
-
-const PIE_COLORS = [
-  '#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149',
-  '#bc8cff', '#f0883e', '#8b949e', '#db61a2', '#79c0ff',
-]
 
 function eraBarColor(index: number, total: number): string {
   const t = total <= 1 ? 0 : index / (total - 1)
@@ -148,9 +137,9 @@ function ChronosArea({ data }: { data: TraitCount[] }) {
   const barData = chronoSorted.map((d) => ({ name: d.value, value: d.count }))
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+    <div className="grid grid-cols-2 gap-3">
       {/* Pie donut */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div className="flex flex-col gap-1">
         <span className="card-title-upper">Era Distribution</span>
         <div className="card p-3 flex flex-col">
           <ResponsiveContainer width="100%" height={300}>
@@ -167,7 +156,7 @@ function ChronosArea({ data }: { data: TraitCount[] }) {
                 stroke="none"
               >
                 {pieData.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.85} />
                 ))}
               </Pie>
               <Legend wrapperStyle={{ fontSize: 10, color: '#8b949e' }} />
@@ -177,7 +166,7 @@ function ChronosArea({ data }: { data: TraitCount[] }) {
                   const d = payload[0].payload
                   const pct = ((d.value / total) * 100).toFixed(1)
                   return (
-                    <div style={TOOLTIP_BOX}>
+                    <div style={TOOLTIP_STYLE}>
                       <span style={{ color: '#ffd700', fontWeight: 'bold' }}>{d.rawName}</span>
                       <span style={{ color: '#fff' }}> : {pct}% ({d.value.toLocaleString()})</span>
                     </div>
@@ -190,7 +179,7 @@ function ChronosArea({ data }: { data: TraitCount[] }) {
       </div>
 
       {/* Horizontal bar — chronological order */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div className="flex flex-col gap-1">
         <span className="card-title-upper">Timeline Distribution</span>
         <div className="card p-3 flex flex-col">
           <ResponsiveContainer width="100%" height={300}>
@@ -210,7 +199,7 @@ function ChronosArea({ data }: { data: TraitCount[] }) {
                   const d = payload[0].payload
                   const pct = ((d.value / total) * 100).toFixed(1)
                   return (
-                    <div style={TOOLTIP_BOX}>
+                    <div style={TOOLTIP_STYLE}>
                       <span style={{ color: '#ffd700', fontWeight: 'bold' }}>{d.name}</span>
                       <span style={{ color: '#fff' }}> : {pct}% ({d.value.toLocaleString()})</span>
                     </div>
@@ -254,8 +243,8 @@ export function DistributionContent() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
+      <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+        <img src="/waiting.gif" alt="Loading..." className="max-w-[300px]" style={{ imageRendering: 'pixelated' }} />
       </div>
     )
   }
@@ -297,7 +286,7 @@ export function DistributionContent() {
         <h2 className="separator">Chronos Area</h2>
         <div className="flex flex-col gap-6">
           {/* Birthday Year treemap — full width */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div className="flex flex-col gap-1">
             <span className="card-title-upper">Birthday Year</span>
             <TimelineTreemap data={timelineData.map((d) => ({
               name: d.label,

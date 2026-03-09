@@ -5,6 +5,8 @@ import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 import type { BubbleMapNode, BubbleMapLink } from '@/types'
+import { CHART_COLORS, TIER_COLORS } from '@/lib/chart-constants'
+import { GoldCard } from './GoldCard'
 
 interface Props {
   nodes: BubbleMapNode[]
@@ -12,14 +14,6 @@ interface Props {
 }
 
 const TIER_ORDER = ['whale', 'diamond', 'gold', 'silver', 'bronze', 'holder'] as const
-const TIER_COLORS: Record<string, string> = {
-  whale: '#ffd700',
-  diamond: '#b9f2ff',
-  gold: '#f0a030',
-  silver: '#c0c0c0',
-  bronze: '#cd7f32',
-  holder: '#555',
-}
 const PAGE_SIZE = 20
 
 export function BubbleMapStats({ nodes, links }: Props) {
@@ -66,21 +60,21 @@ export function BubbleMapStats({ nodes, links }: Props) {
   return (
     <div className="flex flex-col gap-4">
       {/* 3 Gold cards on one line */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+      <div className="grid grid-cols-3 gap-3">
         <GoldCard label="Total Wallets" value={walletCount.toLocaleString()} />
         <GoldCard label="Transfers" value={transferCount.toLocaleString()} />
         <GoldCard label="Bidirectional" value={bidirectionalPairs.toLocaleString()} />
       </div>
 
       {/* Table (left 1/2) + Charts (right 1/2) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="grid grid-cols-2 gap-4">
         {/* Address table */}
         <div className="flex flex-col gap-1">
           <span className="card-title-upper">
             Wallets by NFT Count
           </span>
           <div className="stat-card p-0 overflow-hidden flex flex-col">
-            <div className="overflow-y-auto" style={{ maxHeight: 420 }}>
+            <div className="overflow-y-auto max-h-[420px]">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10 text-[0.5625rem] uppercase tracking-wider text-mibe-text-2">
@@ -169,7 +163,7 @@ export function BubbleMapStats({ nodes, links }: Props) {
                 <PieChart>
                   <Pie data={nftDistData} cx="50%" cy="50%" outerRadius={65} innerRadius={30} dataKey="value" nameKey="name" paddingAngle={1} stroke="none">
                     {nftDistData.map((_, i) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} opacity={0.85} />
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.85} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -191,15 +185,3 @@ export function BubbleMapStats({ nodes, links }: Props) {
   )
 }
 
-const PIE_COLORS = ['#ffd700', '#58a6ff', '#ff69b4', '#3fb950', '#f85149', '#bc8cff', '#f0883e', '#8b949e', '#a5d6ff', '#ffc658', '#82ca9d']
-
-function GoldCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="card-title-upper">{label}</span>
-      <div className="stat-card stat-card--gold">
-        <span className="text-xl font-bold text-white">{value}</span>
-      </div>
-    </div>
-  )
-}

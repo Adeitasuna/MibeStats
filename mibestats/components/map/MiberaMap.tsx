@@ -237,8 +237,8 @@ export function MiberaMap() {
   // Show loading gif until data is ready
   if (initialLoad.current && loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
+      <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+        <img src="/waiting.gif" alt="Loading..." className="max-w-[300px]" style={{ imageRendering: 'pixelated' }} />
       </div>
     )
   }
@@ -246,25 +246,19 @@ export function MiberaMap() {
   return (
     <div className="flex flex-col gap-3">
       {/* Color-by selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.85rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-sm text-mibe-gold font-semibold uppercase tracking-wide">
           Color by
         </span>
         {COLOR_BY_OPTIONS.map((opt) => (
           <button
             key={opt.key}
             onClick={() => setColorBy(opt.key)}
-            className="font-terminal"
-            style={{
-              padding: '0.25rem 0.6rem',
-              fontSize: '0.85rem',
-              borderRadius: '0.25rem',
-              border: '1px solid',
-              borderColor: colorBy === opt.key ? '#ffd700' : '#2a2a2a',
-              background: colorBy === opt.key ? 'rgba(255,215,0,0.15)' : 'transparent',
-              color: colorBy === opt.key ? '#ffd700' : '#888',
-              cursor: 'pointer',
-            }}
+            className={`font-terminal px-2.5 py-1 text-sm rounded border cursor-pointer ${
+              colorBy === opt.key
+                ? 'border-mibe-gold bg-mibe-gold/15 text-mibe-gold'
+                : 'border-mibe-border bg-transparent text-mibe-text-2'
+            }`}
           >
             {opt.label}
           </button>
@@ -272,12 +266,12 @@ export function MiberaMap() {
       </div>
 
       {/* Filters — extra top spacing */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+      <div className="flex items-end gap-3 flex-wrap mt-4">
         {FILTER_KEYS.map((def) => (
-          <div key={def.key} style={{ flex: '1 1 0', minWidth: '100px' }}>
+          <div key={def.key} className="flex-[1_1_0] min-w-[100px]">
             <label
               htmlFor={`map-filter-${def.key}`}
-              style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
+              className="block text-xs font-semibold uppercase tracking-wide text-mibe-gold mb-1"
             >
               {def.label}
             </label>
@@ -285,19 +279,11 @@ export function MiberaMap() {
               id={`map-filter-${def.key}`}
               value={activeFilters[def.key] ?? ''}
               onChange={(e) => setFilter(def.key, e.target.value)}
-              className="font-terminal"
-              style={{
-                width: '100%',
-                padding: '0.35rem 0.5rem',
-                fontSize: '0.85rem',
-                color: activeFilters[def.key] ? '#ffd700' : '#e0e0e0',
-                background: '#0a0a0a',
-                border: '1px solid',
-                borderColor: activeFilters[def.key] ? 'rgba(255,215,0,0.4)' : '#2a2a2a',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-                outline: 'none',
-              }}
+              className={`font-terminal w-full py-1.5 px-2 text-sm bg-mibe-bg border rounded cursor-pointer outline-none ${
+                activeFilters[def.key]
+                  ? 'text-mibe-gold border-mibe-gold/40'
+                  : 'text-[#e0e0e0] border-mibe-border'
+              }`}
             >
               <option value="">All</option>
               {getOptions(def.key).map((opt) => (
@@ -309,9 +295,7 @@ export function MiberaMap() {
         {filterCount > 0 && (
           <button
             onClick={clearFilters}
-            style={{ fontSize: '0.8rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none', paddingBottom: '0.3rem' }}
-            onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
-            onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+            className="text-xs text-mibe-muted cursor-pointer bg-transparent border-none pb-1 hover:text-white transition-colors"
           >
             Clear
           </button>
@@ -319,24 +303,17 @@ export function MiberaMap() {
       </div>
 
       {/* Legend (1/6) + Map (5/6) */}
-      <div style={{ display: 'flex', gap: '0.5rem', height: '500px', marginTop: '1rem' }}>
+      <div className="flex gap-2 h-[500px] mt-4">
         {/* Legend sidebar */}
         <div
-          className="stat-card"
-          style={{
-            width: 'calc(100% / 6)',
-            minWidth: '120px',
-            padding: '0.5rem',
-            overflowY: 'auto',
-            flexShrink: 0,
-          }}
+          className="stat-card w-1/6 min-w-[120px] p-2 overflow-y-auto shrink-0"
         >
           {/* Count + loading */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
-            <strong className="font-terminal" style={{ color: '#fff', fontSize: '1rem' }}>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <strong className="font-terminal text-white text-base">
               {data?.total?.toLocaleString() ?? '...'}
             </strong>
-            <span className="font-terminal" style={{ color: '#888', fontSize: '0.8rem' }}>miberas</span>
+            <span className="font-terminal text-mibe-text-2 text-xs">miberas</span>
             {loading && (
               <svg width="10" height="10" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite', color: '#ffd700' }}>
                 <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -344,50 +321,36 @@ export function MiberaMap() {
               </svg>
             )}
           </div>
-          {error && <div className="font-terminal" style={{ color: '#f85149', fontSize: '0.8rem', marginBottom: '0.3rem' }}>{error}</div>}
+          {error && <div className="font-terminal text-mibe-red text-xs mb-1">{error}</div>}
 
           {/* Separator */}
-          <div style={{ borderTop: '1px solid #2a2a2a', marginBottom: '0.4rem' }} />
+          <div className="border-t border-mibe-border mb-1.5" />
 
           {/* Category title */}
-          <div style={{ fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.35rem' }}>
+          <div className="text-xs font-semibold uppercase tracking-wide text-mibe-gold mb-1">
             {COLOR_BY_OPTIONS.find((o) => o.key === colorBy)?.label}
           </div>
 
           {/* Legend items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+          <div className="flex flex-col gap-0.5">
             {legendEntries.map((entry) => {
               const isActive = activeFilters[colorBy] === entry.value
               return (
                 <div
                   key={entry.value}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}
+                  className="flex items-center gap-1.5 cursor-pointer"
                   onClick={() => setFilter(colorBy, isActive ? '' : entry.value)}
                 >
-                  <span style={{
-                    display: 'inline-block',
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: entry.color,
-                    flexShrink: 0,
-                  }} />
+                  <span className="inline-block w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                   <span
-                    className="font-terminal"
-                    style={{
-                      fontSize: '0.75rem',
-                      color: isActive ? '#fff' : '#888',
-                      fontWeight: isActive ? 600 : 400,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      flex: 1,
-                    }}
+                    className={`font-terminal text-xs whitespace-nowrap overflow-hidden text-ellipsis flex-1 ${
+                      isActive ? 'text-white font-semibold' : 'text-mibe-text-2 font-normal'
+                    }`}
                   >
                     {entry.value}
                   </span>
                   {isActive && (
-                    <span style={{ color: '#f85149', fontSize: '0.85rem', fontWeight: 700, flexShrink: 0, lineHeight: 1 }}>×</span>
+                    <span className="text-mibe-red text-sm font-bold shrink-0 leading-none">×</span>
                   )}
                 </div>
               )
@@ -396,7 +359,7 @@ export function MiberaMap() {
         </div>
 
         {/* Map */}
-        <div className="stat-card" style={{ flex: 1, overflow: 'hidden', padding: 0 }}>
+        <div className="stat-card flex-1 overflow-hidden p-0">
           <style>{`.mibemap .leaflet-tile-pane { filter: brightness(1.6) saturate(0.7); }`}</style>
           <MapContainer
             className="mibemap"

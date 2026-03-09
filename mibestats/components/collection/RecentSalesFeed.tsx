@@ -11,7 +11,7 @@ interface Props {
 
 export function RecentSalesFeed({ sales }: Props) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+    <div className="flex flex-col gap-1">
       <span className="card-title-upper">
         Recent Sales
       </span>
