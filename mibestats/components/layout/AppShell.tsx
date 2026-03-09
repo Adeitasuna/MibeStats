@@ -22,7 +22,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Fixed desktop sidebar */}
       <aside
         id="desktop-sidebar"
-        className="border-r overflow-y-auto fixed left-0 top-14 bottom-0 w-[calc(100vw/6)] z-40 hidden bg-[var(--menu-bg)] border-[#1e1c16]"
+        className="border-r overflow-y-auto"
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: '3.5rem',
+          bottom: 0,
+          width: 'calc(100vw / 6)',
+          zIndex: 40,
+          display: 'none',
+          backgroundColor: 'var(--menu-bg)',
+          borderColor: '#1e1c16',
+        }}
       >
         <SideMenu />
       </aside>
@@ -31,11 +42,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/70 z-30"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              zIndex: 30,
+            }}
             onClick={closeMobile}
           />
           <aside
-            className="border-r overflow-y-auto fixed left-0 top-14 bottom-0 w-56 z-40 bg-[var(--menu-bg)] border-[#1e1c16]"
+            className="border-r overflow-y-auto"
+            style={{
+              position: 'fixed',
+              left: 0,
+              top: '3.5rem',
+              bottom: 0,
+              width: '14rem',
+              zIndex: 40,
+              backgroundColor: 'var(--menu-bg)',
+              borderColor: '#1e1c16',
+            }}
           >
             <SideMenu onNavigate={closeMobile} />
           </aside>
@@ -45,7 +71,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content — scrolls naturally */}
       <main
         id="main-content"
-        className="p-4 lg:p-6 mt-14 ml-0 min-h-[calc(100vh-3.5rem)]"
+        className="p-4 lg:p-6"
+        style={{
+          marginTop: '3.5rem',
+          marginLeft: 0,
+          minHeight: 'calc(100vh - 3.5rem)',
+        }}
       >
         <div className="max-w-6xl w-full">
           {children}

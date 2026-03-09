@@ -36,14 +36,28 @@ interface NavbarProps {
 export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
   return (
     <header
-      className="border-b border-mibe-border fixed top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-black"
+      className="border-b border-mibe-border"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '3.5rem',
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 1rem',
+        backgroundColor: '#000000',
+      }}
     >
       {/* Left: mobile hamburger + logo */}
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <button
           id="mobile-hamburger"
           onClick={onMenuToggle}
-          className="text-mibe-text-2 hover:text-mibe-gold transition-colors hidden"
+          className="text-mibe-text-2 hover:text-mibe-gold transition-colors"
+          style={{ display: 'none' }}
           aria-label="Toggle menu"
         >
           {mobileOpen ? (
@@ -56,16 +70,16 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
             </svg>
           )}
         </button>
-        <Link href="/eden" className="section-title whitespace-nowrap text-[1.6rem] tracking-wide no-underline [text-shadow:0_0_8px_rgba(255,215,0,0.4)]">
+        <Link href="/eden" className="section-title" style={{ whiteSpace: 'nowrap', fontSize: '1.6rem', letterSpacing: '0.05em', textDecoration: 'none', textShadow: '0 0 8px rgba(255,215,0,0.4)' }}>
           MibeStats
         </Link>
-        <span className="font-terminal whitespace-nowrap text-[0.7rem] text-mibe-muted tracking-[0.15em] uppercase" id="header-subtitle">
+        <span className="font-terminal" id="header-subtitle" style={{ whiteSpace: 'nowrap', fontSize: '0.7rem', color: '#555', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
           // dark market intelligence
         </span>
       </div>
 
       {/* Right: wallet */}
-      <div className="shrink-0">
+      <div style={{ flexShrink: 0 }}>
         <WalletButton />
       </div>
 
