@@ -161,68 +161,78 @@ export default function MetadatasPage() {
         </div>
       )}
 
-      {/* Token display — 8-column table layout */}
+      {/* Token display — 9-column table layout */}
       {token && !loading && (
         <div className="flex flex-col gap-4">
           <table className="w-full border-collapse table-fixed">
             <colgroup>
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
-              <col style={{ width: '12.5%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
+              <col style={{ width: '11.11%' }} />
             </colgroup>
             <tbody>
-              {/* Row 1: MiParcels (col1-2), Miladies (col3), empty (col4), Last Sale (col5-6), Max Sale (col7-8) */}
+              {/* Row 0: Last Sale + Max Sale */}
               <tr>
-                <td colSpan={2} rowSpan={2} className="border border-mibe-border p-1 align-top text-center">
-                  <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">MiParcels</div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`https://thj-assets.s3.us-west-2.amazonaws.com/parcels/parcelsImages/${token.tokenId}.png`}
-                    alt={`MiParcels #${token.tokenId}`}
-                    width={256}
-                    height={192}
-                    style={{ width: '256px', height: '192px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
-                    className="rounded rotate-90"
-                  />
-                </td>
-                <td rowSpan={2} className="border border-mibe-border p-1 align-top text-center">
-                  <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">Miladies</div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`https://thj-assets.s3.us-west-2.amazonaws.com/fractures/miladies/images/${token.tokenId}.png`}
-                    alt={`Miladies #${token.tokenId}`}
-                    width={160}
-                    height={160}
-                    style={{ width: '160px', height: '160px', objectFit: 'cover', display: 'block', margin: '0 auto' }}
-                    className="rounded"
-                  />
-                </td>
-                <td className="border border-mibe-border px-2 py-3.5" />
-                <td colSpan={2} className="border border-mibe-border px-2 py-3.5 align-top">
+                <td colSpan={4} className="border border-mibe-border px-2 py-3.5 align-top">
                   <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Last sale ($BERA)</span>
                   <div className="text-base font-bold text-white tabular-nums">
                     {token.lastSalePrice != null ? token.lastSalePrice.toFixed(2) : '—'}
                   </div>
                 </td>
-                <td colSpan={2} className="border border-mibe-border px-2 py-3.5 align-top">
+                <td colSpan={5} className="border border-mibe-border px-2 py-3.5 align-top">
                   <span className="text-[9px] text-mibe-gold uppercase tracking-widest font-medium">Max sale ($BERA)</span>
                   <div className="text-base font-bold text-white tabular-nums">
                     {token.maxSalePrice != null ? token.maxSalePrice.toFixed(2) : '—'}
                   </div>
                 </td>
               </tr>
-              {/* Row 2: MiParcels/Miladies continue (rowSpan), col4-8 empty */}
+              {/* Row 1: MiParcels, Miladies, MiReveal #1.1 to #7.7 — all via CloudFront */}
               <tr>
-                <td colSpan={5} className="border border-mibe-border px-2 py-3.5" />
+                {(() => {
+                  const CDN = 'https://d163aeqznbc6js.cloudfront.net/images'
+                  // Extract hash from imageUrl: .../hash.png
+                  const imgHash = token.imageUrl?.split('/').pop()?.replace('.png', '') ?? ''
+                  // MiParcels + Miladies: S3 with tokenId
+                  // MiReveal #1.1: IPFS only (not on CloudFront)
+                  // MiReveal #2.2-#7.7: CloudFront reveal_phase2-7 with image hash
+                  const S3 = 'https://thj-assets.s3.us-west-2.amazonaws.com'
+                  const IPFS = 'https://bafybeie26hxmg7vdrokv7lxdyrumykj5rkgwabklckdmiyrdsc2hu3crgq.ipfs.dweb.link'
+                  const phases = [
+                    { label: 'MiParcels', url: `${S3}/parcels/parcelsImages/${token.tokenId}.png`, rotate: true },
+                    { label: 'Miladies', url: `${S3}/fractures/miladies/images/${token.tokenId}.png`, rotate: false },
+                    { label: 'MiReveal #1.1', url: `${IPFS}/${imgHash}.png`, rotate: false },
+                    { label: 'MiReveal #2.2', url: `${CDN}/reveal_phase2/reveal_phase2_images/${imgHash}.png`, rotate: false },
+                    { label: 'MiReveal #3.3', url: `${CDN}/reveal_phase3/reveal_phase3_images/${imgHash}.png`, rotate: false },
+                    { label: 'MiReveal #4.20', url: `${CDN}/reveal_phase4/images/${imgHash}.png`, rotate: false },
+                    { label: 'MiReveal #5.5', url: `${CDN}/reveal_phase5/images/${imgHash}.png`, rotate: false },
+                    { label: 'MiReveal #6.9', url: `${CDN}/reveal_phase6/images/${imgHash}.png`, rotate: false },
+                    { label: 'MiReveal #7.7', url: `${CDN}/reveal_phase7/images/${imgHash}.png`, rotate: false },
+                  ]
+                  return phases.map((phase) => (
+                    <td key={phase.label} className="border border-mibe-border p-1 align-top text-center">
+                      <div className="text-[9px] text-mibe-text-2 uppercase tracking-wider mb-1">{phase.label}</div>
+                      <div className="flex items-center justify-center" style={{ height: '120px' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={phase.url}
+                          alt={`${phase.label} #${token.tokenId}`}
+                          className={`rounded${phase.rotate ? ' rotate-90' : ''}`}
+                          style={{ maxHeight: '120px', maxWidth: '100%', objectFit: 'contain' }}
+                        />
+                      </div>
+                    </td>
+                  ))
+                })()}
               </tr>
-              {/* Row 3: Image (col1-3, rowSpan 6), metadata cards start */}
+              {/* Row 2: Image (col1-4, rowSpan 6), metadata cards start */}
               <tr>
-                <td colSpan={3} rowSpan={6} className="border border-mibe-border p-1.5 align-top">
+                <td colSpan={4} rowSpan={6} className="border border-mibe-border p-1.5 align-top">
                   <div className="card-gold p-1 rounded-xl overflow-hidden">
                     {token.imageUrl ? (
                       <Image
@@ -231,7 +241,7 @@ export default function MetadatasPage() {
                         width={400}
                         height={400}
                         className="object-contain rounded-lg w-full h-auto"
-                        sizes="37.5vw"
+                        sizes="44vw"
                       />
                     ) : (
                       <div className="w-full aspect-square flex items-center justify-center text-mibe-muted">No image</div>
@@ -244,13 +254,13 @@ export default function MetadatasPage() {
                 <MetadataCell label="Archetype" value={token.archetype} />
                 <MetadataCell label="Ascending sign" value={token.ascendingSign} />
               </tr>
-              {/* Row 4 */}
+              {/* Row 3 */}
               <tr>
                 <MetadataCell label="Background" value={token.background} />
                 <MetadataCell label="Birth coordinates" value={token.birthCoordinates} colSpan={2} />
                 <MetadataCell label="Birthday" value={token.birthday} colSpan={2} />
               </tr>
-              {/* Row 5 */}
+              {/* Row 4 */}
               <tr>
                 <MetadataCell label="Body" value={token.body} />
                 <MetadataCell label="Drug" value={token.drug} />
@@ -258,7 +268,7 @@ export default function MetadatasPage() {
                 <MetadataCell label="Element" value={token.element} />
                 <MetadataCell label="Eyebrows" value={token.eyebrows} />
               </tr>
-              {/* Row 6 */}
+              {/* Row 5 */}
               <tr>
                 <MetadataCell label="Eyes" value={token.eyes} />
                 <MetadataCell label="Face accessory" value={token.faceAccessory} />
@@ -266,7 +276,7 @@ export default function MetadatasPage() {
                 <MetadataCell label="Hair" value={token.hair} />
                 <MetadataCell label="Hat" value={token.hat} />
               </tr>
-              {/* Row 7 */}
+              {/* Row 6 */}
               <tr>
                 <MetadataCell label="Item" value={token.item} />
                 <MetadataCell label="Mask" value={token.mask} />
@@ -274,7 +284,7 @@ export default function MetadatasPage() {
                 <MetadataCell label="Mouth" value={token.mouth} />
                 <MetadataCell label="Shirt" value={token.shirt} />
               </tr>
-              {/* Row 8 */}
+              {/* Row 7 */}
               <tr>
                 <MetadataCell label="Sun sign" value={token.sunSign} />
                 <MetadataCell label="Swag rank" value={token.swagRank} />
