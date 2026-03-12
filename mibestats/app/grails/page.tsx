@@ -33,7 +33,7 @@ export default function GrailsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="section-title text-3xl">MibeGrails</h1>
+        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Collection &gt; </span>Grails</h1>
         <p className="chapo-h1">
           42 hand-drawn 1/1 masterpieces
         </p>

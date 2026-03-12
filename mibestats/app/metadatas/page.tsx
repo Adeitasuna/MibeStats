@@ -59,6 +59,7 @@ export default function MetadatasPage() {
   const [error, setError] = useState<string | null>(null)
   const [modalPhase, setModalPhase] = useState<{ label: string; url: string; description: string } | null>(null)
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
+  const [failedImages, setFailedImages] = useState<Set<number>>(new Set())
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set())
   const phaseRefs = useRef<(HTMLDivElement | null)[]>([])
   const phaseHovered = useRef<Set<number>>(new Set())
@@ -67,12 +68,18 @@ export default function MetadatasPage() {
     setLoadedImages((prev) => { const next = new Set(prev); next.add(key); return next })
   }, [])
 
-  // Reset loaded images and flipped cards when token changes
-  useEffect(() => { setLoadedImages(new Set()); setFlippedCards(new Set()) }, [tokenId])
+  const markFailed = useCallback((idx: number) => {
+    setFailedImages((prev) => { const next = new Set(prev); next.add(idx); return next })
+  }, [])
 
-  // Random glitch scheduler for phase images (only non-flipped cards)
+  // Reset loaded images, failed images and flipped cards when token changes
+  useEffect(() => { setLoadedImages(new Set()); setFailedImages(new Set<number>()); setFlippedCards(new Set()) }, [tokenId])
+
+  // Random glitch scheduler for phase images (only non-flipped, non-failed cards)
   const flippedRef = useRef(flippedCards)
+  const failedRef = useRef(failedImages)
   useEffect(() => { flippedRef.current = flippedCards }, [flippedCards])
+  useEffect(() => { failedRef.current = failedImages }, [failedImages])
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>
@@ -86,7 +93,7 @@ export default function MetadatasPage() {
 
         const candidates: number[] = []
         for (let i = 0; i < 9; i++) {
-          if (!phaseHovered.current.has(i) && !flippedRef.current.has(i) && phaseRefs.current[i]) candidates.push(i)
+          if (!phaseHovered.current.has(i) && !flippedRef.current.has(i) && !failedRef.current.has(i) && phaseRefs.current[i]) candidates.push(i)
         }
 
         if (candidates.length > 0) {
@@ -144,7 +151,7 @@ export default function MetadatasPage() {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div>
-        <h1 className="section-title text-3xl">MibeMetadatas</h1>
+        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Collection &gt; </span>Explorer</h1>
         <p className="chapo-h1">
           Explore individual Mibera metadata
         </p>
@@ -205,7 +212,7 @@ export default function MetadatasPage() {
             <button
               type="button"
               className="btn-go"
-              onClick={() => setFlippedCards(new Set(Array.from({ length: 9 }, (_, i) => i)))}
+              onClick={() => setFlippedCards(new Set(Array.from({ length: 9 }, (_, i) => i).filter(i => !failedImages.has(i))))}
               style={{ padding: '0.4rem 0.85rem', lineHeight: 1.2, borderRadius: '0.5rem', background: 'rgb(255, 215, 0)', color: '#000', fontSize: '0.75rem', fontWeight: 600, border: '1px solid rgb(184, 156, 50)', cursor: 'pointer', flexShrink: 0 }}
             >
               Reveal all
@@ -231,11 +238,35 @@ export default function MetadatasPage() {
 
             return (
               <div className="flex flex-col gap-4">
+                {/* Hidden preload — ensures onLoad fires even with backface-visibility */}
+                <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
+                  {phases.map((phase, idx) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={phase.label} src={phase.url} alt="" onLoad={() => markLoaded(phase.label)} onError={() => markFailed(idx)} />
+                  ))}
+                </div>
                 {/* Row 1: 9 phase images — full width */}
                 <div style={{ padding: '6px', marginBottom: '0.75rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {phases.map((phase, idx) => {
                       const isFlipped = flippedCards.has(idx)
+                      const isFailed = failedImages.has(idx)
+
+                      // Failed phase — static card, no flip, no effects
+                      if (isFailed) {
+                        return (
+                          <div
+                            key={phase.label}
+                            style={{ flex: 1, textAlign: 'center', minWidth: 0, borderRadius: '3px' }}
+                          >
+                            <div style={{ width: '100%', aspectRatio: '3 / 4', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0a0a0a 100%)', borderRadius: '3px', border: '1px solid rgba(255, 255, 255, 0.08)', position: 'relative' }}>
+                              <div style={{ position: 'absolute', top: '4px', left: 0, right: 0, fontSize: '0.6rem', color: 'rgba(255, 255, 255, 0.25)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0 4px' }}>{phase.label}</div>
+                              <span style={{ fontSize: '0.6rem', color: 'rgba(255, 255, 255, 0.15)', userSelect: 'none', textTransform: 'uppercase' }}>N/A</span>
+                            </div>
+                          </div>
+                        )
+                      }
+
                       return (
                         <div
                           key={phase.label}
@@ -290,7 +321,6 @@ export default function MetadatasPage() {
                                 <img
                                   src={phase.url}
                                   alt={`${phase.label} #${token.tokenId}`}
-                                  onLoad={() => markLoaded(phase.label)}
                                   style={{
                                     width: '100%', height: '100%', objectFit: 'cover', borderRadius: '3px',
                                     opacity: loadedImages.has(phase.label) ? 1 : 0,
@@ -315,6 +345,15 @@ export default function MetadatasPage() {
                     {token.imageUrl && !loadedImages.has('main') && (
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
                         <div className="img-spinner" style={{ width: 40, height: 40 }} />
+                      </div>
+                    )}
+                    {/* Grail badge */}
+                    {token.isGrail && (
+                      <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', zIndex: 2 }}>
+                        <div style={{ background: 'rgba(255, 215, 0, 0.9)', color: '#000', fontSize: '14px', fontWeight: 700, padding: '4px 10px', borderRadius: '4px', letterSpacing: '0.05em' }}>GRAIL</div>
+                        {token.grailName && (
+                          <div style={{ background: 'rgba(0, 0, 0, 0.75)', color: 'rgb(255, 236, 179)', fontSize: '12px', fontWeight: 600, padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(255, 215, 0, 0.4)' }}>{token.grailName}</div>
+                        )}
                       </div>
                     )}
                     {token.imageUrl ? (
