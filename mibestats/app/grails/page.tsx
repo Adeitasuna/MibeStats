@@ -15,7 +15,7 @@ const GrailsContent = nextDynamic(
           <div className="h-5 bg-white/5 rounded w-24 animate-pulse" />
           <div className="h-8 bg-white/5 rounded w-32 animate-pulse" />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-3">
+        <div className="grails-grid">
           {Array.from({ length: 14 }).map((_, i) => (
             <div key={i} className="card-gold overflow-hidden animate-pulse">
               <div className="px-2 pt-2"><div className="h-2.5 bg-white/10 rounded w-16" /></div>

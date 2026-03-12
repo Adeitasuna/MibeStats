@@ -18,11 +18,12 @@ export const GET = withRateLimit('sales', 100, async (req) => {
     parsed.data
 
   const where: Prisma.SaleWhereInput = {
+    priceBera: { gte: 5 },
     ...(token_id !== undefined && { tokenId: token_id }),
     ...(is_grail !== undefined && { token: { isGrail: is_grail } }),
     ...((min_price !== undefined || max_price !== undefined) && {
       priceBera: {
-        ...(min_price !== undefined && { gte: min_price }),
+        gte: min_price !== undefined ? Math.max(min_price, 5) : 5,
         ...(max_price !== undefined && { lte: max_price }),
       },
     }),

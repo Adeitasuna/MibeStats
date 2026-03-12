@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
-import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 
 interface MiladyToken {
   tokenId: number
@@ -26,209 +25,300 @@ interface MiladiesResponse {
   totalPages: number
 }
 
+function MiladyCard({
+  token,
+  idx,
+  registerHandle,
+}: {
+  token: MiladyToken
+  idx: number
+  registerHandle: (idx: number, handle: { isHovered: boolean; triggerGlitch: (ms: number) => void }) => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const [hovered, setHovered] = useState(false)
+  const [miladyLoaded, setMiladyLoaded] = useState(false)
+  const [miberaLoaded, setMiberaLoaded] = useState(false)
+
+  const triggerGlitch = useCallback((durationMs: number) => {
+    const el = ref.current
+    if (!el) return
+    el.classList.add('glitching')
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => el.classList.remove('glitching'), durationMs)
+  }, [])
+
+  useEffect(() => {
+    registerHandle(idx, { isHovered: false, triggerGlitch })
+  }, [idx, registerHandle, triggerGlitch])
+
+  const maxPrice = token.maxSalePrice != null ? Number(token.maxSalePrice).toLocaleString(undefined, { maximumFractionDigits: 1 }) : ''
+  const lastPrice = token.lastSalePrice != null ? Number(token.lastSalePrice).toLocaleString(undefined, { maximumFractionDigits: 1 }) : ''
+
+  return (
+    <div
+      ref={ref}
+      className="fugitive-card overflow-hidden group transition-all"
+      style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgb(255, 236, 179)', borderRadius: '0.5rem', background: '#111' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Token ID */}
+      <div style={{ padding: '0.4rem 0.5rem 0.2rem', textAlign: 'center' }}>
+        <span style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgb(255, 236, 179)' }}>
+          #{token.tokenId}
+        </span>
+      </div>
+
+      {/* Image — milady by default, mibera on hover */}
+      <div style={{ position: 'relative', aspectRatio: '3 / 4', overflow: 'hidden', borderTop: '1px solid rgb(255, 236, 179)', borderBottom: '1px solid rgb(255, 236, 179)' }}>
+        {/* Spinner */}
+        {!miladyLoaded && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', zIndex: 1 }}>
+            <div className="img-spinner" />
+          </div>
+        )}
+
+        {/* Milady image (default) */}
+        <Image
+          src={token.miladyImageUrl}
+          alt={`Milady #${token.tokenId}`}
+          fill
+          className="object-cover transition-opacity duration-300"
+          style={{ borderRadius: 0, opacity: miladyLoaded && !hovered ? 1 : 0 }}
+          sizes="14vw"
+          unoptimized
+          onLoad={() => setMiladyLoaded(true)}
+        />
+
+        {/* Mibera image (on hover) */}
+        {token.miberaImageUrl && (
+          <Image
+            src={token.miberaImageUrl}
+            alt={`Mibera #${token.tokenId}`}
+            fill
+            className="object-cover transition-opacity duration-300"
+            style={{ borderRadius: 0, opacity: hovered && miberaLoaded ? 1 : 0 }}
+            sizes="14vw"
+            onLoad={() => setMiberaLoaded(true)}
+          />
+        )}
+
+        {/* Grail badge */}
+        {token.isGrail && (
+          <div style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(255,215,0,0.9)', color: '#000', fontSize: '8px', fontWeight: 700, padding: '1px 4px', borderRadius: '3px', zIndex: 2 }}>
+            GRAIL
+          </div>
+        )}
+      </div>
+
+      {/* Prices or Diamond */}
+      {maxPrice || lastPrice ? (
+        <div style={{ padding: '0.35rem 0.5rem 0.5rem', fontSize: '0.7rem', lineHeight: 1.5, color: 'rgb(255, 236, 179)' }}>
+          <div>Max : {maxPrice ? `${maxPrice} $BERA` : '—'}</div>
+          <div>Last : {lastPrice ? `${lastPrice} $BERA` : '—'}</div>
+        </div>
+      ) : (
+        <div style={{ padding: '0.35rem 0.5rem 0.5rem', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#00bfff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            ◆ Diamond ◆
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** Skeleton card */
+function MiladyCardSkeleton() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgba(255, 236, 179, 0.3)', borderRadius: '0.5rem', background: '#111' }}>
+      <div style={{ padding: '0.4rem 0.5rem 0.2rem', textAlign: 'center' }}>
+        <div style={{ height: '0.65rem', width: '40%', margin: '0 auto', background: 'rgba(255,255,255,0.05)', borderRadius: '3px' }} />
+      </div>
+      <div style={{ aspectRatio: '3 / 4', borderTop: '1px solid rgba(255, 236, 179, 0.3)', borderBottom: '1px solid rgba(255, 236, 179, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)' }}>
+        <div className="img-spinner" />
+      </div>
+      <div style={{ padding: '0.35rem 0.5rem 0.5rem' }}>
+        <div style={{ height: '0.6rem', width: '80%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', marginBottom: '4px' }} />
+        <div style={{ height: '0.6rem', width: '70%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px' }} />
+      </div>
+    </div>
+  )
+}
+
 export function MiladiesContent() {
-  const [response, setResponse] = useState<MiladiesResponse | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [tokens, setTokens] = useState<MiladyToken[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [initialLoad, setInitialLoad] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
+  const [page, setPage] = useState(1)
+  const [hasNext, setHasNext] = useState(false)
+  const handlesRef = useRef<Map<number, { isHovered: boolean; triggerGlitch: (ms: number) => void }>>(new Map())
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
-  const fetchData = useCallback(async (signal?: AbortSignal) => {
+  const registerHandle = useCallback((idx: number, handle: { isHovered: boolean; triggerGlitch: (ms: number) => void }) => {
+    handlesRef.current.set(idx, handle)
+  }, [])
+
+  // Random glitch scheduler
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>
+    let lastGlitchEnd = 0
+
+    function scheduleNext() {
+      const delay = 2000 + Math.random() * 5000
+      timer = setTimeout(() => {
+        const now = Date.now()
+        if (now - lastGlitchEnd < 2000) { scheduleNext(); return }
+
+        const candidates: number[] = []
+        handlesRef.current.forEach((handle, idx) => {
+          if (!handle.isHovered) candidates.push(idx)
+        })
+
+        if (candidates.length > 0) {
+          const pick = candidates[Math.floor(Math.random() * candidates.length)]
+          const handle = handlesRef.current.get(pick)
+          if (handle) {
+            const duration = 500 + Math.random() * 500
+            handle.triggerGlitch(duration)
+            lastGlitchEnd = now + duration
+          }
+        }
+        scheduleNext()
+      }, delay)
+    }
+
+    const initialDelay = 2000 + Math.random() * 3000
+    timer = setTimeout(scheduleNext, initialDelay)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Fetch page data
+  const fetchPage = useCallback(async (pageNum: number, isNew: boolean, signal?: AbortSignal) => {
     setLoading(true)
     setError(null)
     const params = new URLSearchParams()
     if (search) params.set('search', search)
-    params.set('page', String(page))
+    params.set('page', String(pageNum))
     try {
       const res = await fetch(`/api/tokens/miladies?${params.toString()}`, { signal })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      setResponse(data)
+      const data: MiladiesResponse = await res.json()
+      setTokens((prev) => isNew ? data.data : [...prev, ...data.data])
+      setTotal(data.total)
+      setHasNext(data.hasNext)
+      setInitialLoad(false)
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'AbortError') return
-      setError('Failed to load data. Please try again.')
+      setError('Failed to load data.')
     }
     setLoading(false)
-  }, [search, page])
+  }, [search])
 
+  // Initial load + search reset
   useEffect(() => {
     const controller = new AbortController()
-    fetchData(controller.signal)
+    setPage(1)
+    setTokens([])
+    setInitialLoad(true)
+    fetchPage(1, true, controller.signal)
     return () => controller.abort()
-  }, [fetchData])
+  }, [search, fetchPage])
+
+  // Load more pages
+  useEffect(() => {
+    if (page <= 1) return
+    const controller = new AbortController()
+    fetchPage(page, false, controller.signal)
+    return () => controller.abort()
+  }, [page, fetchPage])
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNext && !loading) {
+          setPage((p) => p + 1)
+        }
+      },
+      { rootMargin: '400px' },
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasNext, loading])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    setPage(1)
     setSearch(searchInput)
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Search + stats */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <form onSubmit={handleSearch} className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-64">
-            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-mibe-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              maxLength={100}
-              placeholder="ID, name, ancestor..."
-              aria-label="Search miladies by ID, name, ancestor, or archetype"
-              className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-mibe-bg border border-mibe-border text-white text-xs placeholder:text-mibe-muted focus:border-mibe-gold focus:outline-none"
-            />
-          </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      {/* Search — same style as MibeMetadatas */}
+      <form onSubmit={handleSearch} className="card" style={{ padding: '1rem 1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <label style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: '0.25rem', lineHeight: 1, flexShrink: 0 }}>
+            Search
+          </label>
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            maxLength={100}
+            placeholder="ID, name, ancestor..."
+            aria-label="Search miladies by ID, name, ancestor, or archetype"
+            style={{ width: '10rem', padding: '0.4rem 0.6rem', lineHeight: 1.2, borderRadius: '0.5rem', background: 'var(--bg-primary)', border: '1px solid var(--border-default)', color: '#fff', fontSize: '0.875rem', outline: 'none' }}
+          />
           <button
             type="submit"
-            className="px-3 py-1.5 rounded-lg bg-mibe-blue text-white text-xs font-semibold hover:bg-blue-600 transition-colors shrink-0"
+            className="btn-go"
+            style={{ padding: '0.4rem 0.85rem', lineHeight: 1.2, borderRadius: '0.5rem', background: 'rgb(255, 215, 0)', color: '#000', fontSize: '0.75rem', fontWeight: 600, border: '1px solid rgb(184, 156, 50)', cursor: 'pointer', flexShrink: 0 }}
           >
-            Search
+            Go
           </button>
           {search && (
             <button
               type="button"
-              onClick={() => { setSearch(''); setSearchInput(''); setPage(1) }}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-mibe-card border border-mibe-border text-mibe-text-2 text-xs hover:text-white hover:border-mibe-gold transition-colors shrink-0"
+              onClick={() => { setSearch(''); setSearchInput('') }}
+              style={{ padding: '0.4rem 0.85rem', lineHeight: 1.2, borderRadius: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-default)', color: '#888', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
             >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
               Clear
             </button>
           )}
-        </form>
-
-        <div className="flex items-center gap-3 text-sm">
-          {response && (
-            <span className="text-mibe-text-2">
-              <strong className="text-white tabular-nums">{response.total.toLocaleString()}</strong> miladies
+          {total > 0 && (
+            <span style={{ color: '#888', fontSize: '0.75rem', marginLeft: 'auto' }}>
+              <strong style={{ color: '#fff' }}>{total.toLocaleString()}</strong> miladies
             </span>
           )}
-          {loading && (
-            <span className="inline-flex items-center gap-1.5 text-mibe-gold text-xs">
-              <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Loading...
-            </span>
-          )}
-          {error && <span className="text-mibe-red text-xs">{error}</span>}
+          {error && <span style={{ color: '#f85149', fontSize: '0.75rem' }}>{error}</span>}
         </div>
+      </form>
+
+      {/* Grid */}
+      <div className="grails-grid">
+        {initialLoad
+          ? Array.from({ length: 42 }).map((_, i) => <MiladyCardSkeleton key={i} />)
+          : tokens.map((token, idx) => (
+              <MiladyCard key={token.tokenId} token={token} idx={idx} registerHandle={registerHandle} />
+            ))
+        }
       </div>
 
-      {/* Grid — 7 columns */}
-      {loading && !response ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
-          <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
-          {(response?.data ?? []).map((token) => (
-            <div
-              key={token.tokenId}
-              className="card overflow-hidden group hover:border-mibe-magenta transition-colors"
-            >
-              {/* Milady image */}
-              <div className="aspect-square relative overflow-hidden">
-                <Image
-                  src={token.miladyImageUrl}
-                  alt={`Milady #${token.tokenId}`}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 14vw"
-                  unoptimized
-                />
-                {token.isGrail && (
-                  <div className="absolute top-1 right-1 bg-mibe-gold/90 text-black text-[8px] font-bold px-1 py-0.5 rounded">
-                    GRAIL
-                  </div>
-                )}
-              </div>
+      {/* Sentinel for infinite scroll */}
+      <div ref={sentinelRef} style={{ height: '1px' }} />
 
-              {/* Info */}
-              <div className="p-1.5 flex flex-col gap-0.5">
-                <div className="flex items-center justify-between gap-1">
-                  <span className="text-[10px] font-medium text-white truncate">
-                    #{token.tokenId}
-                  </span>
-                  <SwagRankBadge rank={token.swagRank} size="sm" />
-                </div>
-
-                {/* Prices */}
-                <div className="flex justify-between text-[9px]">
-                  <div className="flex flex-col">
-                    <span className="text-mibe-muted">Max</span>
-                    <span className="text-white font-medium tabular-nums">
-                      {token.maxSalePrice != null ? `${token.maxSalePrice.toFixed(1)}` : '—'}
-                    </span>
-                  </div>
-                  <div className="flex flex-col text-right">
-                    <span className="text-mibe-muted">Last</span>
-                    <span className="text-white font-medium tabular-nums">
-                      {token.lastSalePrice != null ? `${token.lastSalePrice.toFixed(1)}` : '—'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Pagination */}
-      {response && response.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-mibe-text-2 tabular-nums">
-            Page {response.page} / {response.totalPages}
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setPage(1)}
-              disabled={response.page <= 1}
-              aria-label="First page"
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-mibe-card border border-mibe-border text-mibe-text-2 hover:text-white hover:border-mibe-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setPage((p) => p - 1)}
-              disabled={response.page <= 1}
-              aria-label="Previous page"
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-mibe-card border border-mibe-border text-mibe-text-2 hover:text-white hover:border-mibe-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setPage((p) => p + 1)}
-              disabled={!response.hasNext}
-              aria-label="Next page"
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-mibe-card border border-mibe-border text-mibe-text-2 hover:text-white hover:border-mibe-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setPage(response.totalPages)}
-              disabled={!response.hasNext}
-              aria-label="Last page"
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-mibe-card border border-mibe-border text-mibe-text-2 hover:text-white hover:border-mibe-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7m-8-14l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
+      {/* Loading more indicator */}
+      {loading && !initialLoad && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
+          <div className="img-spinner" />
         </div>
       )}
     </div>

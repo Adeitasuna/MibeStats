@@ -39,6 +39,7 @@ export interface Token {
   lastSalePrice: number | null
   maxSalePrice: number | null
   saleCount: number
+  transferCount: number
 }
 
 export interface Sale {

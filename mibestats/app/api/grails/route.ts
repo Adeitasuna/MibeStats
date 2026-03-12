@@ -19,16 +19,28 @@ export const GET = withRateLimit('grails', 100, async (req) => {
       item: true, drug: true,
       isGrail: true, grailName: true, grailCategory: true,
       imageUrl: true, ownerAddress: true,
-      lastSalePrice: true, maxSalePrice: true, saleCount: true,
+      saleCount: true,
+      sales: {
+        where: { priceBera: { gte: 5 } },
+        orderBy: { soldAt: 'desc' },
+        select: { priceBera: true },
+      },
     },
   })
 
-  const mapped = grails.map((t: typeof grails[number]) => ({
-    ...t,
-    lastSalePrice: t.lastSalePrice ? Number(t.lastSalePrice) : null,
-    maxSalePrice:  t.maxSalePrice  ? Number(t.maxSalePrice)  : null,
-    magicEdenUrl:  magicEdenUrl(t.tokenId),
-  }))
+  const mapped = grails.map((t: typeof grails[number]) => {
+    const realSales = t.sales.map((s) => Number(s.priceBera))
+    const lastSalePrice = realSales.length > 0 ? realSales[0] : null
+    const maxSalePrice = realSales.length > 0 ? Math.max(...realSales) : null
+    const { sales: _sales, ...rest } = t
+    void _sales
+    return {
+      ...rest,
+      lastSalePrice,
+      maxSalePrice,
+      magicEdenUrl: magicEdenUrl(t.tokenId),
+    }
+  })
 
   // Group by grail_category
   const categories: Record<string, typeof mapped> = {}

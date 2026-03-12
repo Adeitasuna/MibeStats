@@ -431,8 +431,6 @@ a.link-cyan:hover {
 /* Glitch active — triggered by JS adding .glitching class */
 .fugitive-card.glitching {
   animation: tv-signal-loss 0.8s ease-in-out;
-  border-color: #ff2020 !important;
-  box-shadow: 0 0 15px rgba(248, 81, 73, 0.25);
 }
 
 .fugitive-card.glitching::before {
@@ -470,4 +468,131 @@ a.link-cyan:hover {
 @keyframes tv-rolling-bar {
   0%   { top: -30%; opacity: 0.6; }
   100% { top: 130%; opacity: 0.6; }
+}
+
+/* ── Image loading spinner ── */
+.img-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: img-spin 0.8s linear infinite;
+}
+
+@keyframes img-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Grails responsive grid ── */
+.grails-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (min-width: 640px)  { .grails-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 768px)  { .grails-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1024px) { .grails-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (min-width: 1280px) { .grails-grid { grid-template-columns: repeat(7, 1fr); } }
+
+/* ── Metadatas: Go button ── */
+.btn-go {
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-go:hover {
+  background-color: rgb(255, 236, 179) !important;
+  box-shadow: 0 0 8px rgba(255, 236, 179, 0.3);
+}
+
+/* ── Metadatas: image + data responsive layout ── */
+.meta-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.meta-image-col {
+  flex-shrink: 0;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  max-width: 440px;
+  min-height: 200px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.5rem;
+}
+
+.meta-data-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Metadata grid: 3 columns by default */
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+}
+
+/* Stack image above data on small screens */
+@media (max-width: 899px) {
+  .meta-layout {
+    flex-direction: column;
+  }
+  .meta-image-col {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+  }
+}
+
+/* 2 columns for metadata on narrow screens */
+@media (max-width: 639px) {
+  .meta-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Phase card flip ── */
+.phase-card-flip {
+  perspective: 800px;
+  cursor: pointer;
+  overflow: visible;
+}
+
+/* Constrain glitch pseudo-elements within phase cards */
+.phase-card-flip.fugitive-card::before {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.phase-card-flip.fugitive-card::after {
+  overflow: hidden;
+}
+
+.phase-card-inner {
+  position: relative;
+  width: 100%;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+.phase-card-flip.flipped .phase-card-inner {
+  transform: rotateY(180deg);
+}
+
+.phase-card-front,
+.phase-card-back {
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.phase-card-back {
+  transform: rotateY(180deg);
+  position: absolute;
+  top: 0;
+  left: 0;
 }

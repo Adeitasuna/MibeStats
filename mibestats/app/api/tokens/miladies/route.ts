@@ -4,11 +4,10 @@ import { withRateLimit } from '@/lib/api-handler'
 
 export const revalidate = 86400
 
-// IPFS CID for Milady stage images (phase 2 of reveal)
-const MILADY_IPFS_CID = 'bafybeifatan2qtkwpmu7ymm3n6utapfepvcfcdanos5nmymzyohatdkfbm'
+const S3_BASE = 'https://thj-assets.s3.us-west-2.amazonaws.com'
 
 function miladyImageUrl(tokenId: number): string {
-  return `https://${MILADY_IPFS_CID}.ipfs.dweb.link/${tokenId}.png`
+  return `${S3_BASE}/fractures/miladies/images/${tokenId}.png`
 }
 
 export const GET = withRateLimit('miladies', 100, async (req) => {
@@ -48,24 +47,30 @@ export const GET = withRateLimit('miladies', 100, async (req) => {
         grailName: true,
         ancestor: true,
         archetype: true,
-        lastSalePrice: true,
-        maxSalePrice: true,
+        sales: {
+          where: { priceBera: { gte: 5 } },
+          orderBy: { soldAt: 'desc' },
+          select: { priceBera: true },
+        },
       },
     }),
   ])
 
-  const data = tokens.map((t) => ({
-    tokenId: t.tokenId,
-    miladyImageUrl: miladyImageUrl(t.tokenId),
-    miberaImageUrl: t.imageUrl,
-    swagRank: t.swagRank,
-    isGrail: t.isGrail,
-    grailName: t.grailName,
-    ancestor: t.ancestor,
-    archetype: t.archetype,
-    lastSalePrice: t.lastSalePrice ? Number(t.lastSalePrice) : null,
-    maxSalePrice: t.maxSalePrice ? Number(t.maxSalePrice) : null,
-  }))
+  const data = tokens.map((t) => {
+    const realSales = t.sales.map((s) => Number(s.priceBera))
+    return {
+      tokenId: t.tokenId,
+      miladyImageUrl: miladyImageUrl(t.tokenId),
+      miberaImageUrl: t.imageUrl,
+      swagRank: t.swagRank,
+      isGrail: t.isGrail,
+      grailName: t.grailName,
+      ancestor: t.ancestor,
+      archetype: t.archetype,
+      lastSalePrice: realSales.length > 0 ? realSales[0] : null,
+      maxSalePrice: realSales.length > 0 ? Math.max(...realSales) : null,
+    }
+  })
 
   return NextResponse.json({
     data,

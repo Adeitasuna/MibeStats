@@ -319,7 +319,7 @@ export function MiberaMap() {
       </div>
 
       {/* Legend (1/6) + Map (5/6) */}
-      <div style={{ display: 'flex', gap: '0.5rem', height: '500px', marginTop: '1rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', height: 'calc(100vh - 220px - 5rem)', minHeight: '400px', marginTop: '1rem' }}>
         {/* Legend sidebar */}
         <div
           className="stat-card"

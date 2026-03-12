@@ -18,6 +18,7 @@ export const GET = withRateLimit('token-detail', 100, async (req, { params }: { 
     where: { tokenId },
     include: {
       sales: {
+        where:   { priceBera: { gte: 5 } },
         orderBy: { soldAt: 'desc' },
         take:    50,
         select: {

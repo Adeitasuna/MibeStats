@@ -67,11 +67,13 @@ export const GET = withRateLimit('collection', 100, async (req) => {
   // Fetch recent + top sales in parallel
   const [recentRows, topRows, cached] = await Promise.all([
     prisma.sale.findMany({
+      where:   { priceBera: { gte: 5 } },
       orderBy: { soldAt: 'desc' },
       take:    20,
       include: { token: { select: { tokenId: true, imageUrl: true, swagRank: true, isGrail: true } } },
     }),
     prisma.sale.findMany({
+      where:   { priceBera: { gte: 5 } },
       orderBy: { priceBera: 'desc' },
       take:    10,
       include: { token: { select: { tokenId: true, imageUrl: true, swagRank: true, isGrail: true } } },
