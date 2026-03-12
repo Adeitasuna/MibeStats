@@ -17,26 +17,26 @@ interface NavSection {
 
 const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'Explore',
+    title: 'Overview',
     items: [
-      { href: '/lore', label: 'MibeLore' },
-      { href: '/eden', label: 'MibeEden' },
-      { href: '/mibebubble', label: 'MibeBubble' },
+      { href: '/eden', label: 'Dashboard' },
+      { href: '/lore', label: 'Lore' },
     ],
   },
   {
-    title: 'Datas',
+    title: 'Collection',
     items: [
-      { href: '/map', label: 'MibeMap' },
-      { href: '/distribution', label: 'MibeDistrib.' },
-    ],
-  },
-  {
-    title: 'Play wif mibera',
-    items: [
-      { href: '/metadatas', label: 'MibeMetadatas' },
-      { href: '/grails', label: 'MibeGrails' },
+      { href: '/grails', label: 'Grails' },
       { href: '/miladies', label: 'Miladies' },
+      { href: '/metadatas', label: 'Explorer' },
+    ],
+  },
+  {
+    title: 'Analytics',
+    items: [
+      { href: '/map', label: 'Map' },
+      { href: '/distribution', label: 'Distribution' },
+      { href: '/mibebubble', label: 'Bubble' },
     ],
   },
 ]

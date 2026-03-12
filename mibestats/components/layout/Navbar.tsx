@@ -82,10 +82,10 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
         </span>
       </div>
 
-      {/* Right: wallet */}
-      <div style={{ flexShrink: 0 }}>
+      {/* Right: wallet — hidden for now, will be used later */}
+      {/* <div style={{ flexShrink: 0 }}>
         <WalletButton />
-      </div>
+      </div> */}
 
       {/* Responsive: show hamburger + hide subtitle on mobile */}
       <style dangerouslySetInnerHTML={{ __html: `
