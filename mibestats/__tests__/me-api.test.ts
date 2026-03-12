@@ -1,52 +1,49 @@
 /**
- * Unit tests for lib/me-api.ts
+ * Unit tests for lib/me-api.ts (v4 EVM API)
  *
  * Tests:
  *   - Retry logic: 3-attempt exponential backoff on 429 / 5xx
  *   - MEApiError thrown after max retries exhausted
- *   - getCollectionStats() response parsing
+ *   - getCollectionStats() response parsing (2 sequential meGet calls)
  *   - getSalesPage() pagination cursor forwarding
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { getCollectionStats, getSalesPage, MEApiError } from '../lib/me-api'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
+// ─── Fixtures (v4 response shapes) ──────────────────────────────────────────
 
-const ME_STATS_FIXTURE = {
-  collections: [
-    {
-      floorAsk: { price: { amount: { native: 4.2 } } },
-      volume: { '1day': 180.5, '7day': 1200.0, '30day': 4800.0, allTime: 92000.0 },
-      salesCount: 3410,
-      ownerCount: 2180,
-    },
+const FLOOR_FIXTURE = {
+  asks: [
+    { price: { amount: { native: '4.2' } } },
   ],
 }
 
-const ME_SALES_FIXTURE = {
-  sales: [
+const ACTIVITIES_FIXTURE = {
+  activities: [
     {
-      token:     { tokenId: '42' },
-      price:     { amount: { native: 5.5 } },
-      timestamp: '2026-02-20T10:00:00Z',
-      buyer:     '0xabc',
-      seller:    '0xdef',
-      txHash:    '0x123',
+      activityType: 'TRADE',
+      timestamp: new Date(Date.now() - 3600_000).toISOString(), // 1h ago
+      fromAddress: '0xdef',
+      toAddress: '0xabc',
+      unitPrice: { amount: { native: '5.5' } },
+      asset: { id: '0x666:42' },
+      transactionInfo: { transactionId: '0x123' },
     },
     {
-      token:     { tokenId: '777' },
-      price:     { amount: { native: 12.0 } },
-      timestamp: '2026-02-20T09:00:00Z',
-      buyer:     '0xfoo',
-      seller:    '0xbar',
-      txHash:    '0x456',
+      activityType: 'TRADE',
+      timestamp: new Date(Date.now() - 7200_000).toISOString(), // 2h ago
+      fromAddress: '0xbar',
+      toAddress: '0xfoo',
+      unitPrice: { amount: { native: '12.0' } },
+      asset: { id: '0x666:777' },
+      transactionInfo: { transactionId: '0x456' },
     },
   ],
   continuation: 'cursor_abc123',
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function mockResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -55,77 +52,71 @@ function mockResponse(status: number, body: unknown): Response {
   })
 }
 
-// ─── Setup / teardown ─────────────────────────────────────────────────────────
+// ─── Setup / teardown ───────────────────────────────────────────────────────
 
 beforeEach(() => {
   process.env.ME_BEARER_TOKEN = 'test-token'
-  vi.useFakeTimers()
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
-  vi.useRealTimers()
   delete process.env.ME_BEARER_TOKEN
 })
 
-// ─── Retry logic ──────────────────────────────────────────────────────────────
+// ─── Retry logic ────────────────────────────────────────────────────────────
 
 describe('retry logic', () => {
   it('retries on 429 twice and succeeds on 3rd attempt', async () => {
     let callCount = 0
     vi.spyOn(global, 'fetch').mockImplementation(async () => {
       callCount++
-      if (callCount < 3) return mockResponse(429, { message: 'Rate limited' })
-      return mockResponse(200, ME_STATS_FIXTURE)
+      // First meGet (floor): fail twice, succeed third
+      if (callCount <= 2) return mockResponse(429, { message: 'Rate limited' })
+      if (callCount === 3) return mockResponse(200, FLOOR_FIXTURE)
+      // Second meGet (activities): succeed immediately
+      return mockResponse(200, ACTIVITIES_FIXTURE)
     })
 
-    const promise = getCollectionStats()
-    await vi.runAllTimersAsync()
-    const result = await promise
+    const result = await getCollectionStats()
 
-    expect(callCount).toBe(3)
+    expect(callCount).toBe(4) // 3 for floor (2 retries + success) + 1 for activities
     expect(result.floorPrice).toBe(4.2)
-  })
+  }, 15_000)
 
   it('retries on 500 and succeeds on 2nd attempt', async () => {
     let callCount = 0
     vi.spyOn(global, 'fetch').mockImplementation(async () => {
       callCount++
+      // First meGet (floor): fail once, succeed second
       if (callCount === 1) return mockResponse(500, { message: 'Server error' })
-      return mockResponse(200, ME_STATS_FIXTURE)
+      if (callCount === 2) return mockResponse(200, FLOOR_FIXTURE)
+      // Second meGet (activities): succeed
+      return mockResponse(200, ACTIVITIES_FIXTURE)
     })
 
-    const promise = getCollectionStats()
-    await vi.runAllTimersAsync()
-    const result = await promise
+    const result = await getCollectionStats()
 
-    expect(callCount).toBe(2)
-    expect(result.totalSales).toBe(3410)
-  })
+    expect(callCount).toBe(3) // 2 for floor (1 retry + success) + 1 for activities
+    expect(result.floorPrice).toBe(4.2)
+  }, 15_000)
 
   it('throws MEApiError after 3 consecutive 429 responses', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue(
-      mockResponse(429, { message: 'Rate limited' }),
-    )
+    vi.spyOn(global, 'fetch').mockImplementation(async () => {
+      return mockResponse(429, { message: 'Rate limited' })
+    })
 
-    const promise = getCollectionStats()
-    await vi.runAllTimersAsync()
-
-    await expect(promise).rejects.toBeInstanceOf(MEApiError)
-  })
+    await expect(getCollectionStats()).rejects.toBeInstanceOf(MEApiError)
+  }, 15_000)
 
   it('sets status and endpoint on MEApiError', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue(
-      mockResponse(429, { message: 'Rate limited' }),
-    )
+    vi.spyOn(global, 'fetch').mockImplementation(async () => {
+      return mockResponse(429, { message: 'Rate limited' })
+    })
 
-    const promise = getCollectionStats()
-    await vi.runAllTimersAsync()
-
-    const err: MEApiError = await promise.catch((e) => e)
+    const err: MEApiError = await getCollectionStats().catch((e) => e)
     expect(err.status).toBe(429)
-    expect(err.endpoint).toContain('/collections/v7')
-  })
+    expect(err.endpoint).toContain('/orders/asks')
+  }, 15_000)
 
   it('does NOT retry on 404 — throws immediately', async () => {
     let callCount = 0
@@ -145,69 +136,75 @@ describe('retry logic', () => {
   })
 })
 
-// ─── getCollectionStats() — response parsing ──────────────────────────────────
+// ─── getCollectionStats() — response parsing ────────────────────────────────
 
 describe('getCollectionStats()', () => {
-  it('parses nested collections[0] response shape', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse(200, ME_STATS_FIXTURE))
+  it('parses floor price from asks endpoint and volume from activities', async () => {
+    let callCount = 0
+    vi.spyOn(global, 'fetch').mockImplementation(async () => {
+      callCount++
+      if (callCount === 1) return mockResponse(200, FLOOR_FIXTURE)
+      return mockResponse(200, ACTIVITIES_FIXTURE)
+    })
 
     const stats = await getCollectionStats()
 
     expect(stats.floorPrice).toBe(4.2)
-    expect(stats.volume24h).toBe(180.5)
-    expect(stats.volume7d).toBe(1200.0)
-    expect(stats.volume30d).toBe(4800.0)
-    expect(stats.volumeAllTime).toBe(92000.0)
-    expect(stats.totalSales).toBe(3410)
-    expect(stats.totalHolders).toBe(2180)
+    // volume24h = 5.5 + 12.0 = 17.5 (both activities within 24h)
+    expect(stats.volume24h).toBe(17.5)
   })
 
-  it('returns null for missing / undefined fields', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue(
-      mockResponse(200, { collections: [{}] }),
-    )
+  it('returns null for missing floor price', async () => {
+    let callCount = 0
+    vi.spyOn(global, 'fetch').mockImplementation(async () => {
+      callCount++
+      if (callCount === 1) return mockResponse(200, { asks: [] })
+      return mockResponse(200, { activities: [] })
+    })
 
     const stats = await getCollectionStats()
 
     expect(stats.floorPrice).toBeNull()
     expect(stats.volume24h).toBeNull()
-    expect(stats.totalSales).toBeNull()
-    expect(stats.totalHolders).toBeNull()
+    expect(stats.volume7d).toBeNull()
   })
 
-  it('handles flat response shape (no collections wrapper)', async () => {
-    const flat = {
-      floorPrice: 3.1,
-      volume: { '1day': 100, '7day': 700, '30day': 3000, allTime: 50000 },
-      salesCount: 2000,
-      ownerCount: 1500,
-    }
-    vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse(200, flat))
+  it('returns null volume fields that require full pagination', async () => {
+    let callCount = 0
+    vi.spyOn(global, 'fetch').mockImplementation(async () => {
+      callCount++
+      if (callCount === 1) return mockResponse(200, FLOOR_FIXTURE)
+      return mockResponse(200, ACTIVITIES_FIXTURE)
+    })
 
     const stats = await getCollectionStats()
 
-    expect(stats.floorPrice).toBe(3.1)
+    // v4 doesn't provide these without full pagination
+    expect(stats.volume30d).toBeNull()
+    expect(stats.volumeAllTime).toBeNull()
+    expect(stats.totalSales).toBeNull()
+    expect(stats.totalHolders).toBeNull()
   })
 })
 
-// ─── getSalesPage() ───────────────────────────────────────────────────────────
+// ─── getSalesPage() ─────────────────────────────────────────────────────────
 
 describe('getSalesPage()', () => {
-  it('parses sales array with correct field mapping', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse(200, ME_SALES_FIXTURE))
+  it('parses activities array with correct field mapping', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse(200, ACTIVITIES_FIXTURE))
 
     const page = await getSalesPage(100)
 
     expect(page.sales).toHaveLength(2)
     expect(page.sales[0].tokenId).toBe(42)
     expect(page.sales[0].priceBera).toBe(5.5)
-    expect(page.sales[0].soldAt).toBe('2026-02-20T10:00:00Z')
     expect(page.sales[0].buyerAddress).toBe('0xabc')
+    expect(page.sales[0].sellerAddress).toBe('0xdef')
     expect(page.sales[0].txHash).toBe('0x123')
   })
 
   it('returns continuation cursor when present', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse(200, ME_SALES_FIXTURE))
+    vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse(200, ACTIVITIES_FIXTURE))
 
     const page = await getSalesPage(100)
 
@@ -216,7 +213,7 @@ describe('getSalesPage()', () => {
 
   it('returns null continuation when exhausted', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValue(
-      mockResponse(200, { sales: [], continuation: null }),
+      mockResponse(200, { activities: [], continuation: null }),
     )
 
     const page = await getSalesPage(100)
@@ -228,7 +225,7 @@ describe('getSalesPage()', () => {
     let capturedUrl = ''
     vi.spyOn(global, 'fetch').mockImplementation(async (url) => {
       capturedUrl = String(url)
-      return mockResponse(200, { sales: [], continuation: null })
+      return mockResponse(200, { activities: [], continuation: null })
     })
 
     await getSalesPage(50, 'my_cursor')
@@ -237,9 +234,9 @@ describe('getSalesPage()', () => {
     expect(capturedUrl).toContain('limit=50')
   })
 
-  it('handles empty sales array', async () => {
+  it('handles empty activities array', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValue(
-      mockResponse(200, { sales: [] }),
+      mockResponse(200, { activities: [] }),
     )
 
     const page = await getSalesPage(100)

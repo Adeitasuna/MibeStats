@@ -13,7 +13,7 @@ try {
 const cspHeader = `
   default-src 'self';
   img-src 'self' https://gateway.irys.xyz https://uploader.irys.xyz https://ipfs.io https://*.ipfs.dweb.link https://*.basemaps.cartocdn.com https://unavatar.io https://*.unavatar.io https://d163aeqznbc6js.cloudfront.net https://thj-assets.s3.us-west-2.amazonaws.com data: blob:;
-  script-src 'self' 'unsafe-inline';
+  script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''};
   style-src 'self' 'unsafe-inline';
   connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rpc.berachain.com https://api-mainnet.magiceden.dev https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org https://*.web3modal.org https://*.reown.com wss://*.reown.com https://*.basemaps.cartocdn.com;
   font-src 'self';

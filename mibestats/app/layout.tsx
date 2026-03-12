@@ -4,6 +4,7 @@ import './globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { AppShell } from '@/components/layout/AppShell'
 import { Web3Providers } from '@/components/providers/Web3Providers'
+import { AgentationOverlay } from '@/components/dev/AgentationOverlay'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AppShell>
             {children}
           </AppShell>
+          <AgentationOverlay />
         </Web3Providers>
       </body>
     </html>
