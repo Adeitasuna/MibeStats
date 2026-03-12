@@ -258,7 +258,7 @@ export function EdenContent() {
     Promise.all([
       fetch('/api/collection', { signal: controller.signal }).then((r) => r.ok ? r.json() : null).catch((e) => { if (e.name === 'AbortError') throw e; return null }),
       fetch('/api/stats/floor-history?range=all', { signal: controller.signal }).then((r) => r.ok ? r.json() : []).catch((e) => { if (e.name === 'AbortError') throw e; return [] }),
-      fetch('/api/eden', { signal: controller.signal }).then((r) => r.ok ? r.json() : null).catch((e) => { if (e.name === 'AbortError') throw e; return null }),
+      fetch('/api/eden', { signal: controller.signal }).then((r) => r.ok ? r.json() : null).catch((e) => { if (e.name === 'AbortError') throw e; return null }).then((res) => res ?? fetch('/api/eden', { signal: controller.signal }).then((r) => r.ok ? r.json() : null).catch(() => null)),
     ]).then(([col, history, edenData]) => {
       if (col) setCollection(col)
       if (history) setFloorHistory(history)

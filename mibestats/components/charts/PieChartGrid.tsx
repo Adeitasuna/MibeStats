@@ -55,11 +55,20 @@ interface TreemapContentProps {
 }
 
 function DistributionTreemapContent(props: TreemapContentProps) {
-  const { x, y, width, height, size, maxCount } = props
+  const { x, y, width, height, name, size, maxCount } = props
   if (width < 4 || height < 4) return null
 
   const color = getTreemapColor(size, maxCount)
+  const textColor = size / maxCount > 0.3 ? '#000' : '#e6edf3'
+  const fontSize = Math.min(11, width / 5)
+  const charWidth = fontSize * 0.6
+  const maxChars = Math.floor((width - 8) / charWidth)
+  const showName = width > 30 && height > 28 && maxChars > 2
   const showCount = width > 24 && height > 16
+
+  const displayName = name && maxChars > 0
+    ? name.length > maxChars ? name.slice(0, maxChars - 1) + '…' : name
+    : ''
 
   return (
     <g>
@@ -67,12 +76,23 @@ function DistributionTreemapContent(props: TreemapContentProps) {
         x={x} y={y} width={width} height={height}
         fill={color} stroke="#0d1117" strokeWidth={1} rx={2}
       />
+      {showName && (
+        <text
+          x={x + width / 2} y={y + height / 2 - (showCount ? fontSize * 0.6 : 0)}
+          textAnchor="middle" dominantBaseline="central"
+          fill={textColor}
+          fontSize={fontSize} fontWeight="bold"
+        >
+          {displayName}
+        </text>
+      )}
       {showCount && (
         <text
-          x={x + width / 2} y={y + height / 2}
+          x={x + width / 2} y={y + height / 2 + (showName ? fontSize * 0.6 : 0)}
           textAnchor="middle" dominantBaseline="central"
-          fill={size / maxCount > 0.3 ? '#000' : '#e6edf3'}
-          fontSize={Math.min(11, width / 5)} fontWeight="bold"
+          fill={textColor}
+          fontSize={fontSize * 0.85} fontWeight="normal"
+          opacity={0.8}
         >
           {size.toLocaleString()}
         </text>
