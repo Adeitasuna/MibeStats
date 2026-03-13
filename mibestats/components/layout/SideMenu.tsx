@@ -28,7 +28,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: '/grails', label: 'Grails' },
       { href: '/miladies', label: 'Miladies' },
-      { href: '/metadatas', label: 'Explorer' },
+      { href: '/explorer', label: 'Explorer' },
     ],
   },
   {
@@ -36,7 +36,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: '/map', label: 'Map' },
       { href: '/distribution', label: 'Distribution' },
-      { href: '/mibebubble', label: 'Bubble' },
+      { href: '/bubble', label: 'Bubble' },
     ],
   },
 ]
