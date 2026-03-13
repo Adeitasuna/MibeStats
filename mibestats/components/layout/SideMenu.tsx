@@ -19,7 +19,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: 'Overview',
     items: [
-      { href: '/eden', label: 'Dashboard' },
+      { href: '/dashboard', label: 'Dashboard' },
       { href: '/lore', label: 'Lore' },
     ],
   },

@@ -2,7 +2,7 @@ import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'MibeEden',
+  title: 'Dashboard',
 }
 
 export const dynamic = 'force-dynamic'

@@ -74,7 +74,7 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
             </svg>
           )}
         </button>
-        <Link href="/eden" className="section-title" style={{ whiteSpace: 'nowrap', fontSize: '1.6rem', letterSpacing: '0.05em', textDecoration: 'none', textShadow: '0 0 8px rgba(255,215,0,0.4)' }}>
+        <Link href="/dashboard" className="section-title" style={{ whiteSpace: 'nowrap', fontSize: '1.6rem', letterSpacing: '0.05em', textDecoration: 'none', textShadow: '0 0 8px rgba(255,215,0,0.4)' }}>
           MibeStats
         </Link>
         <span className="font-terminal" id="header-subtitle" style={{ whiteSpace: 'nowrap', fontSize: '0.7rem', color: '#555', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
