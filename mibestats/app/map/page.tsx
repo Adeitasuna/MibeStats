@@ -35,7 +35,7 @@ export default function MapPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Analytics &gt; </span>Map</h1>
+        <h1 className="section-title"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Analytics &gt; </span>Map</h1>
         <p className="chapo-h1">
           Interactive map of 10,000 Mibera birth locations — colored by ancestor
         </p>

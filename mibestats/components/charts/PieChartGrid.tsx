@@ -268,7 +268,7 @@ export function PieChartGrid({ sections, columns }: PieChartGridProps) {
   const cols = columns ?? (sections.length <= 6 ? sections.length : 4)
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '0.75rem' }}>
+    <div className="distribution-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '0.75rem' }}>
       {sections.map((section) => (
         <PieChartCard
           key={section.title}

@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Share_Tech_Mono, Pirata_One } from 'next/font/google'
 import './globals.css'
-import '@rainbow-me/rainbowkit/styles.css'
 import { AppShell } from '@/components/layout/AppShell'
-import { Web3Providers } from '@/components/providers/Web3Providers'
 import { AgentationOverlay } from '@/components/dev/AgentationOverlay'
 
 const inter = Inter({
@@ -64,12 +62,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`dark ${inter.variable} ${shareTechMono.variable} ${pirataOne.variable}`}>
       <body className="min-h-screen">
-        <Web3Providers>
-          <AppShell>
-            {children}
-          </AppShell>
-          <AgentationOverlay />
-        </Web3Providers>
+        <AppShell>
+          {children}
+        </AppShell>
+        <AgentationOverlay />
       </body>
     </html>
   )

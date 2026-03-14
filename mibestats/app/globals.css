@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  overflow-x: hidden;
+}
+
 :root {
   --bg-primary:   #0a0a0a;
   --bg-secondary: #111111;
@@ -198,6 +202,8 @@ body {
 .section-title {
   font-family: var(--font-pirata-one), 'Georgia', serif;
   color: var(--accent-gold);
+  font-size: clamp(1rem, 4vw, 1.875rem);
+  white-space: nowrap;
 }
 
 /* Subtitle under H1 */
@@ -334,8 +340,18 @@ a.link-cyan:hover {
   -webkit-overflow-scrolling: touch;
 }
 
-.table-responsive table {
-  min-width: 600px;
+@media (max-width: 639px) {
+  .table-responsive table {
+    font-size: 0.7rem;
+  }
+  .table-responsive th,
+  .table-responsive td {
+    padding: 0.35rem 0.4rem !important;
+  }
+  .table-responsive img {
+    width: 32px !important;
+    height: 32px !important;
+  }
 }
 
 /* ── Wallet button (cypherpunk) ── */
@@ -470,6 +486,63 @@ a.link-cyan:hover {
   100% { top: 130%; opacity: 0.6; }
 }
 
+/* ── Pac-Man Loader ── */
+.pacman-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 40px;
+  position: relative;
+  width: 120px;
+}
+
+.pacman {
+  width: 0;
+  height: 0;
+  border: 20px solid var(--accent-gold);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: pacman-chomp 0.35s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+@keyframes pacman-chomp {
+  0%   { border-right-color: transparent; }
+  100% { border-right-color: var(--accent-gold); }
+}
+
+.pacman-dots {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 8px;
+  position: relative;
+}
+
+.pacman-dots span {
+  width: 8px;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  animation: pacman-dot-move 1.4s linear infinite;
+  opacity: 1;
+}
+
+.pacman-dots span:nth-child(1) { animation-delay: 0s; }
+.pacman-dots span:nth-child(2) { animation-delay: 0.2s; }
+.pacman-dots span:nth-child(3) { animation-delay: 0.4s; }
+.pacman-dots span:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes pacman-dot-move {
+  0%   { transform: translateX(0); opacity: 1; }
+  70%  { transform: translateX(-20px); opacity: 1; }
+  85%  { transform: translateX(-24px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+
 /* ── Image loading spinner ── */
 .img-spinner {
   width: 28px;
@@ -551,6 +624,61 @@ a.link-cyan:hover {
 @media (max-width: 639px) {
   .meta-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Phase grid: 2 rows on mobile */
+@media (max-width: 639px) {
+  #phase-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
+
+/* Bubble: responsive grid — stack on mobile */
+@media (max-width: 639px) {
+  #bubble-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+  .bubble-stats-row {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* Distribution: responsive grid */
+@media (max-width: 639px) {
+  .distribution-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Map: keep below mobile nav overlay */
+.mibemap, .leaflet-container {
+  z-index: 0 !important;
+}
+
+/* Map: responsive layout */
+@media (max-width: 639px) {
+  #map-filters {
+    grid-template-columns: repeat(2, 1fr) !important;
+    font-size: 0.75rem;
+  }
+  #map-layout {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  #map-legend {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-height: 150px;
+  }
+  #map-layout > .stat-card:last-child {
+    min-height: 60vh;
+    flex: none !important;
+    height: 60vh;
   }
 }
 

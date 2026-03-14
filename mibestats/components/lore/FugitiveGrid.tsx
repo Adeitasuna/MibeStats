@@ -207,7 +207,7 @@ export function FugitiveGrid({ fugitives }: FugitiveGridProps) {
       <p className="chapo-h2" style={{ marginBottom: '1rem' }}>
         The most wanted accounts in the Mibera ecosystem
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '0.75rem' }}>
         {fugitives.map((fugitive, idx) => (
           <FugitiveCardEl
             key={fugitive.handle}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { TimelineTreemap } from '@/components/charts/Treemap'
+import { PacManLoader } from '@/components/ui/PacManLoader'
 
 interface YearData {
   year: number
@@ -40,9 +41,7 @@ export function TimelineContent() {
   // Initial load — show waiting gif like other pages
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
-      </div>
+      <PacManLoader />
     )
   }
 

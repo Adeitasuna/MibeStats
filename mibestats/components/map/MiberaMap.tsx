@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
+import { PacManLoader } from '@/components/ui/PacManLoader'
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -237,17 +238,15 @@ export function MiberaMap() {
   // Show loading gif until data is ready
   if (initialLoad.current && loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
-      </div>
+      <PacManLoader />
     )
   }
 
   return (
     <div className="flex flex-col gap-3">
       {/* Color-by selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.85rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '0.75rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Color by
         </span>
         {COLOR_BY_OPTIONS.map((opt) => (
@@ -256,8 +255,8 @@ export function MiberaMap() {
             onClick={() => setColorBy(opt.key)}
             className="font-terminal"
             style={{
-              padding: '0.25rem 0.6rem',
-              fontSize: '0.85rem',
+              padding: '0.2rem 0.4rem',
+              fontSize: '0.7rem',
               borderRadius: '0.25rem',
               border: '1px solid',
               borderColor: colorBy === opt.key ? '#ffd700' : '#2a2a2a',
@@ -271,10 +270,10 @@ export function MiberaMap() {
         ))}
       </div>
 
-      {/* Filters — extra top spacing */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+      {/* Filters — responsive grid */}
+      <div id="map-filters" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', alignItems: 'end', marginTop: '1rem' }}>
         {FILTER_KEYS.map((def) => (
-          <div key={def.key} style={{ flex: '1 1 0', minWidth: '100px' }}>
+          <div key={def.key}>
             <label
               htmlFor={`map-filter-${def.key}`}
               style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
@@ -318,11 +317,12 @@ export function MiberaMap() {
         )}
       </div>
 
-      {/* Legend (1/6) + Map (5/6) */}
-      <div style={{ display: 'flex', gap: '0.5rem', height: 'calc(100vh - 220px - 5rem)', minHeight: '400px', marginTop: '1rem' }}>
+      {/* Legend + Map */}
+      <div id="map-layout" style={{ display: 'flex', gap: '0.5rem', height: 'calc(100vh - 220px - 5rem)', minHeight: '400px', marginTop: '1rem' }}>
         {/* Legend sidebar */}
         <div
           className="stat-card"
+          id="map-legend"
           style={{
             width: 'calc(100% / 6)',
             minWidth: '120px',

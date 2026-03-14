@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 
 export default function LorePage() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+    <div className="flex flex-col gap-6">
       <div>
-        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Overview &gt; </span>Lore</h1>
+        <h1 className="section-title"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Overview &gt; </span>Lore</h1>
         <p className="chapo-h1">
           Everything you need to know about the Mibera333 universe
         </p>
@@ -25,7 +25,7 @@ export default function LorePage() {
       {/* ── Lore Documents — 7 compact blocks in 1 row ── */}
       <section>
         <h2 className="separator">Lore</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.5rem' }}>
           {LORE_DOCUMENTS.map((doc) => (
             <a
               key={doc.title}

@@ -56,7 +56,7 @@ export function FractureTimeline() {
 
   return (
     <>
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {/* Continuous horizontal line behind all dots */}
         <div style={{
           position: 'absolute',
@@ -69,7 +69,7 @@ export function FractureTimeline() {
           zIndex: 0,
         }} />
 
-        <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', position: 'relative', minWidth: '900px' }}>
           {FRACTURE_STAGES.map((stage, i) => {
             const isTop = i % 2 === 0
             const dateLabel = stage.date || 'TBD'

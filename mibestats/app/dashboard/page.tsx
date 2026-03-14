@@ -32,7 +32,7 @@ export default function EdenPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Overview &gt; </span>Dashboard</h1>
+        <h1 className="section-title"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Overview &gt; </span>Dashboard</h1>
         <p className="chapo-h1">
           From marketplace to mibestats : mibewa
         </p>

@@ -37,8 +37,11 @@ function MiladyCard({
   const ref = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
   const [hovered, setHovered] = useState(false)
+  const [tapped, setTapped] = useState(false)
   const [miladyLoaded, setMiladyLoaded] = useState(false)
   const [miberaLoaded, setMiberaLoaded] = useState(false)
+
+  const flipped = hovered || tapped
 
   const triggerGlitch = useCallback((durationMs: number) => {
     const el = ref.current
@@ -55,13 +58,24 @@ function MiladyCard({
   const maxPrice = token.maxSalePrice != null ? Number(token.maxSalePrice).toLocaleString(undefined, { maximumFractionDigits: 1 }) : ''
   const lastPrice = token.lastSalePrice != null ? Number(token.lastSalePrice).toLocaleString(undefined, { maximumFractionDigits: 1 }) : ''
 
+  // Tap outside to close on mobile
+  useEffect(() => {
+    if (!tapped) return
+    const handler = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setTapped(false)
+    }
+    document.addEventListener('pointerdown', handler)
+    return () => document.removeEventListener('pointerdown', handler)
+  }, [tapped])
+
   return (
     <div
       ref={ref}
       className="fugitive-card overflow-hidden group transition-all"
-      style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgb(255, 236, 179)', borderRadius: '0.5rem', background: '#111' }}
+      style={{ display: 'flex', flexDirection: 'column', border: '1px solid rgb(255, 236, 179)', borderRadius: '0.5rem', background: '#111', cursor: 'pointer' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => setTapped((t) => !t)}
     >
       {/* Token ID */}
       <div style={{ padding: '0.4rem 0.5rem 0.2rem', textAlign: 'center' }}>
@@ -85,7 +99,7 @@ function MiladyCard({
           alt={`Milady #${token.tokenId}`}
           fill
           className="object-cover transition-opacity duration-300"
-          style={{ borderRadius: 0, opacity: miladyLoaded && !hovered ? 1 : 0 }}
+          style={{ borderRadius: 0, opacity: miladyLoaded && !flipped ? 1 : 0 }}
           sizes="14vw"
           unoptimized
           onLoad={() => setMiladyLoaded(true)}
@@ -98,7 +112,7 @@ function MiladyCard({
             alt={`Mibera #${token.tokenId}`}
             fill
             className="object-cover transition-opacity duration-300"
-            style={{ borderRadius: 0, opacity: hovered && miberaLoaded ? 1 : 0 }}
+            style={{ borderRadius: 0, opacity: flipped && miberaLoaded ? 1 : 0 }}
             sizes="14vw"
             onLoad={() => setMiberaLoaded(true)}
           />

@@ -23,7 +23,7 @@ export default function TimelinePage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="section-title text-3xl">MibeTimeline</h1>
+        <h1 className="section-title">MibeTimeline</h1>
         <p className="chapo-h1">
           Birthday year treemap — bigger blocks = more Miberas born that year.
           <br />

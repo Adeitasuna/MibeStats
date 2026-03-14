@@ -151,7 +151,7 @@ export default function MetadatasPage() {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div>
-        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Collection &gt; </span>Explorer</h1>
+        <h1 className="section-title"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Collection &gt; </span>Explorer</h1>
         <p className="chapo-h1">
           Explore individual Mibera metadata
         </p>
@@ -186,13 +186,7 @@ export default function MetadatasPage() {
       {/* Loading */}
       {loading && (
         <div className="card p-8 flex flex-col items-center justify-center gap-3">
-          <Image
-            src="/waiting.gif"
-            alt="Loading..."
-            width={120}
-            height={120}
-            unoptimized
-          />
+          <div className="pacman-loader"><div className="pacman" /><div className="pacman-dots"><span /><span /><span /><span /></div></div>
           <span className="text-mibe-text-2 text-sm">Loading Mibera #{tokenId}...</span>
         </div>
       )}
@@ -245,9 +239,9 @@ export default function MetadatasPage() {
                     <img key={phase.label} src={phase.url} alt="" onLoad={() => markLoaded(phase.label)} onError={() => markFailed(idx)} />
                   ))}
                 </div>
-                {/* Row 1: 9 phase images — full width */}
+                {/* Phase images — responsive grid: 2 rows on mobile, 1 row on desktop */}
                 <div style={{ padding: '6px', marginBottom: '0.75rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div id="phase-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '6px' }}>
                     {phases.map((phase, idx) => {
                       const isFlipped = flippedCards.has(idx)
                       const isFailed = failedImages.has(idx)
@@ -257,7 +251,7 @@ export default function MetadatasPage() {
                         return (
                           <div
                             key={phase.label}
-                            style={{ flex: 1, textAlign: 'center', minWidth: 0, borderRadius: '3px' }}
+                            style={{ textAlign: 'center', minWidth: 0, borderRadius: '3px' }}
                           >
                             <div style={{ width: '100%', aspectRatio: '3 / 4', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0a0a0a 100%)', borderRadius: '3px', border: '1px solid rgba(255, 255, 255, 0.08)', position: 'relative' }}>
                               <div style={{ position: 'absolute', top: '4px', left: 0, right: 0, fontSize: '0.6rem', color: 'rgba(255, 255, 255, 0.25)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0 4px' }}>{phase.label}</div>
@@ -298,7 +292,7 @@ export default function MetadatasPage() {
                               if (el) el.classList.remove('glitching')
                             }
                           }}
-                          style={{ flex: 1, textAlign: 'center', cursor: 'pointer', minWidth: 0, borderRadius: '3px' }}
+                          style={{ textAlign: 'center', cursor: 'pointer', minWidth: 0, borderRadius: '3px' }}
                         >
                           <div className="phase-card-inner">
                             {/* FRONT — hidden card back */}

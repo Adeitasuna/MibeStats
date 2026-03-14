@@ -23,6 +23,14 @@ const cspHeader = `
 `
 
 const nextConfig = {
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      'pino-pretty': false,
+      '@react-native-async-storage/async-storage': false,
+    }
+    return config
+  },
   env: {
     NEXT_PUBLIC_GIT_HASH: gitHash,
     NEXT_PUBLIC_GIT_DATE: gitDate,

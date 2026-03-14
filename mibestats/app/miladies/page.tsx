@@ -36,7 +36,7 @@ export default function MiladiesPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="section-title text-3xl"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Collection &gt; </span>Miladies</h1>
+        <h1 className="section-title"><span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Collection &gt; </span>Miladies</h1>
         <p className="chapo-h1">
           The Milady Maker stage — Phase 2 of the reveal timeline
         </p>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { PacManLoader } from '@/components/ui/PacManLoader'
 import Image from 'next/image'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -273,9 +274,7 @@ export function EdenContent() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
-      </div>
+      <PacManLoader />
     )
   }
 

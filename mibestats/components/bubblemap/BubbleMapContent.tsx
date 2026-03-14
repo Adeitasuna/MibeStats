@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { PacManLoader } from '@/components/ui/PacManLoader'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
@@ -208,9 +209,7 @@ export function BubbleMapContent() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center" style={{ minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
-      </div>
+      <PacManLoader />
     )
   }
 
@@ -226,16 +225,18 @@ export function BubbleMapContent() {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem' }}>
-      {/* Row 1: 3 gold cards, each spanning 2 cols */}
-      <div style={{ gridColumn: 'span 2' }}>
-        <GoldCard label="Total Wallets" value={walletCount.toLocaleString()} />
-      </div>
-      <div style={{ gridColumn: 'span 2' }}>
-        <GoldCard label="Transfers" value={transferCount.toLocaleString()} />
-      </div>
-      <div style={{ gridColumn: 'span 2' }}>
-        <GoldCard label="Bidirectional" value={bidirectionalPairs.toLocaleString()} />
+    <div id="bubble-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem' }}>
+      {/* Row 1: 3 gold cards */}
+      <div style={{ gridColumn: 'span 6', display: 'contents' }} className="bubble-stats-row">
+        <div style={{ gridColumn: 'span 2' }}>
+          <GoldCard label="Total Wallets" value={walletCount.toLocaleString()} />
+        </div>
+        <div style={{ gridColumn: 'span 2' }}>
+          <GoldCard label="Transfers" value={transferCount.toLocaleString()} />
+        </div>
+        <div style={{ gridColumn: 'span 2' }}>
+          <GoldCard label="Bidirectional" value={bidirectionalPairs.toLocaleString()} />
+        </div>
       </div>
 
       {/* Wallets table (cols 1-3, spanning rows 2-3) */}

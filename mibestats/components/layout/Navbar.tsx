@@ -1,36 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
-
-const WalletButton = dynamic(
-  () =>
-    import('@rainbow-me/rainbowkit').then((mod) => {
-      const { ConnectButton } = mod
-      return function WalletBtn() {
-        // Skip rendering if WalletConnect projectId is not configured
-        if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
-          return null
-        }
-        return (
-          <ConnectButton.Custom>
-            {({ account, chain, openAccountModal, openConnectModal, mounted }) => {
-              const connected = mounted && account && chain
-              return (
-                <button
-                  onClick={connected ? openAccountModal : openConnectModal}
-                  className="wallet-btn"
-                >
-                  {connected ? account.displayName : '[ Connect ]'}
-                </button>
-              )
-            }}
-          </ConnectButton.Custom>
-        )
-      }
-    }),
-  { ssr: false },
-)
 
 interface NavbarProps {
   onMenuToggle: () => void

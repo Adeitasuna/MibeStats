@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { PacManLoader } from '@/components/ui/PacManLoader'
 import {
   Cell, Tooltip, ResponsiveContainer,
   BarChart as RechartsBarChart, Bar, XAxis, YAxis,
@@ -198,9 +199,7 @@ export function DistributionContent() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 10rem)' }}>
-        <img src="/waiting.gif" alt="Loading..." style={{ maxWidth: '300px', imageRendering: 'pixelated' }} />
-      </div>
+      <PacManLoader />
     )
   }
 
