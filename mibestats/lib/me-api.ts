@@ -105,50 +105,32 @@ async function mePost(endpoint: string, body: unknown, attempt = 0): Promise<Res
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Fetch current collection-level stats (floor, volume, holders).
- * Uses v4 asks + activities endpoints since v4 collections doesn't return stats.
+ * Fetch current floor price from lowest active listing on Magic Eden.
+ * This is the only stat that requires ME API — volumes are computed from DB.
  */
-export async function getCollectionStats(): Promise<MECollectionStats> {
-  // Floor price: lowest active listing
+export async function getFloorPrice(): Promise<number | null> {
   const floorRes = await meGet(
     `/orders/asks?chain=${CHAIN}&collectionId=${CONTRACT}&status[]=active&sortBy=price&sortDir=asc&limit=1`,
   )
   const floorJson = await floorRes.json()
   const floorAsk = (floorJson as { asks?: { price?: { amount?: { native?: string } } }[] })?.asks?.[0]
-  const floorPrice = toNumber(floorAsk?.price?.amount?.native)
+  return toNumber(floorAsk?.price?.amount?.native)
+}
 
-  // Volume: compute from recent activity (24h, 7d, 30d)
-  // We fetch recent trades and sum — ME v4 doesn't have a dedicated volume endpoint
-  const now = Date.now()
-  const oneDayAgo  = new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString()
-  const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString()
-
-  // Fetch up to 100 recent trades for volume calculation
-  const actRes = await meGet(
-    `/activities?chain=${CHAIN}&activityTypes[]=TRADE&collectionId=${CONTRACT}&limit=100`,
-  )
-  const actJson = await actRes.json()
-  const activities = (actJson as { activities?: Activity[] })?.activities ?? []
-
-  let volume24h = 0
-  let volume7d = 0
-  let volumeAll = 0
-  for (const a of activities) {
-    const price = toNumber(a.unitPrice?.amount?.native) ?? 0
-    const ts = new Date(a.timestamp).getTime()
-    volumeAll += price
-    if (a.timestamp >= sevenDaysAgo) volume7d += price
-    if (a.timestamp >= oneDayAgo) volume24h += price
-  }
-
+/**
+ * @deprecated Use getFloorPrice() + DB queries instead.
+ * Kept for backward compatibility with snapshot scripts.
+ */
+export async function getCollectionStats(): Promise<MECollectionStats> {
+  const floorPrice = await getFloorPrice()
   return {
     floorPrice,
-    volume24h:     volume24h > 0 ? volume24h : null,
-    volume7d:      volume7d > 0 ? volume7d : null,
-    volume30d:     null,    // would require paginating all 30d trades
-    volumeAllTime: null,    // not available from v4 without full pagination
-    totalSales:    null,    // not available from v4 collections
-    totalHolders:  null,    // not available from v4 collections
+    volume24h:     null,
+    volume7d:      null,
+    volume30d:     null,
+    volumeAllTime: null,
+    totalSales:    null,
+    totalHolders:  null,
   }
 }
 

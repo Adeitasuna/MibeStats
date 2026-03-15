@@ -312,7 +312,7 @@ export function EdenContent() {
 
       {/* Row 1: Floor Price | Max Sell Price | Lowest of Day | Highest of Day */}
       <div id="eden-row1" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-        <GoldCard label="Floor Price (7d)" value={fmt(collection?.floorPrice)} />
+        <GoldCard label="Floor Price" value={fmt(collection?.floorPrice)} />
         <GoldCard label="Max Sell Price (ATH)" value={eden && eden.bestSales.length > 0 ? fmt(eden.bestSales[0].priceBera) : '—'} />
         <GoldCard label="Lowest Sale (24h)" value={eden?.salesStats.lowestSale24h != null ? fmt(eden.salesStats.lowestSale24h) : '—'} />
         <GoldCard label="Highest Sale (24h)" value={eden?.salesStats.highestSale24h != null ? fmt(eden.salesStats.highestSale24h) : '—'} />
