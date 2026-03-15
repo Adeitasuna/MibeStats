@@ -53,16 +53,26 @@ async function meGet(endpoint: string, attempt = 0): Promise<Response> {
   const token = process.env.ME_BEARER_TOKEN
   if (!token) throw new Error('ME_BEARER_TOKEN is not set')
 
-  const res = await fetch(`${ME_BASE}${endpoint}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 3000)
+
+  let res: Response
+  try {
+    res = await fetch(`${ME_BASE}${endpoint}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+    })
+  } catch (err) {
+    clearTimeout(timeout)
+    throw new MEApiError(0, endpoint, err instanceof Error ? err.message : 'Request failed')
+  }
+  clearTimeout(timeout)
 
   if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
-    if (attempt >= 2) {
+    if (attempt >= 1) {
       throw new MEApiError(res.status, endpoint, 'Max retries exceeded')
     }
-    const delay = Math.pow(2, attempt) * 1000
-    await new Promise((r) => setTimeout(r, delay))
+    await new Promise((r) => setTimeout(r, 1000))
     return meGet(endpoint, attempt + 1)
   }
 
@@ -77,21 +87,31 @@ async function mePost(endpoint: string, body: unknown, attempt = 0): Promise<Res
   const token = process.env.ME_BEARER_TOKEN
   if (!token) throw new Error('ME_BEARER_TOKEN is not set')
 
-  const res = await fetch(`${ME_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 3000)
+
+  let res: Response
+  try {
+    res = await fetch(`${ME_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    })
+  } catch (err) {
+    clearTimeout(timeout)
+    throw new MEApiError(0, endpoint, err instanceof Error ? err.message : 'Request failed')
+  }
+  clearTimeout(timeout)
 
   if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
-    if (attempt >= 2) {
+    if (attempt >= 1) {
       throw new MEApiError(res.status, endpoint, 'Max retries exceeded')
     }
-    const delay = Math.pow(2, attempt) * 1000
-    await new Promise((r) => setTimeout(r, delay))
+    await new Promise((r) => setTimeout(r, 1000))
     return mePost(endpoint, body, attempt + 1)
   }
 

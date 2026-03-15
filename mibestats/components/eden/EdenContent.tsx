@@ -130,6 +130,10 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
     'all': 0,
   }
 
+  // Check if data is stale (last snapshot > 2 days old)
+  const lastDate = data.length > 0 ? new Date(data[data.length - 1].date).getTime() : 0
+  const isStale = now - lastDate > 2 * 86400000
+
   const filtered = data
     .filter((d) => new Date(d.date).getTime() >= cutoffs[range])
     .map((d) => ({ date: d.date, price: Number(d.floorPrice.toFixed(4)) }))
@@ -137,7 +141,10 @@ function FloorChart({ data }: { data: FloorSnapshot[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span className="card-title-upper">Floor Price</span>
+        <span className="card-title-upper">
+          Floor Price
+          {isStale && <span style={{ color: '#f0883e', fontSize: '0.6rem', marginLeft: '0.5rem', fontWeight: 400 }}>data paused — API down</span>}
+        </span>
         <div style={{ display: 'flex', gap: '0.25rem' }}>
           {(['7d', '30d', 'all'] as Range[]).map((r) => (
             <button
@@ -308,6 +315,13 @@ export function EdenContent() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {error && (
         <div className="card p-3 border-mibe-red text-red-400 text-sm">{error}</div>
+      )}
+
+      {/* ME API down notice */}
+      {collection && collection.floorPrice == null && (
+        <div className="card p-3 text-sm" style={{ border: '1px solid rgba(255,215,0,0.3)', background: 'rgba(255,215,0,0.05)', color: '#ffd700' }}>
+          Floor price temporarily unavailable — Magic Eden API is down. Sales data and volumes from the database are still up to date.
+        </div>
       )}
 
       {/* Row 1: Floor Price | Max Sell Price | Lowest of Day | Highest of Day */}
