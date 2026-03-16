@@ -1,0 +1,55 @@
+[
+  {
+    "version": "0.3.1",
+    "date": "2026-03-16",
+    "summary": "Changelog modal accessible from sidebar version number",
+    "changes": [
+      "Clickable version in sidebar opens changelog modal",
+      "Versions grouped by major.minor (patch entries merged)",
+      "Version data sourced from changelog.json"
+    ]
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-03-16",
+    "summary": "Mobile responsive + data pipeline fixes",
+    "changes": [
+      "Responsive design for all pages (dashboard, map, explorer, distribution, bubble, lore, miladies)",
+      "Tap-to-flip on mobile for Miladies cards",
+      "Volumes now computed from DB instead of Magic Eden API (accurate, no 100-trade limit)",
+      "ME sales sync and floor price snapshot added to daily cron",
+      "Faster ME API timeout (3s) with API-down notice on dashboard",
+      "Web3 providers lazy-loaded only on portfolio page (faster compilation)",
+      "Git version displayed correctly on Vercel builds"
+    ]
+  },
+  {
+    "version": "0.2.0",
+    "date": "2026-03-04",
+    "summary": "UI redesign + navigation overhaul",
+    "changes": [
+      "Routes renamed: /metadatas → /explorer, /mibebubble → /bubble, /eden → /dashboard",
+      "Side menu reorganized: Overview / Collection / Analytics sections",
+      "Grails and Miladies pages redesigned with card flip mechanic",
+      "Explorer: 9-column fracture reveal with progressive flip animation",
+      "Treemap labels with truncation, breadcrumb titles, responsive layouts",
+      "Timeline made full width, Era Distribution pie chart removed"
+    ]
+  },
+  {
+    "version": "0.1.0",
+    "date": "2026-02-27",
+    "summary": "Initial release — MibeStats live on Vercel",
+    "changes": [
+      "Dashboard with floor price, volumes, sales stats, and charts",
+      "Explorer with metadata grid and sales history per token",
+      "Distribution page with pie charts, bar charts, and treemaps",
+      "Map with 10,000 Mibera birth locations colored by trait",
+      "Bubble map with wallet relationship graph",
+      "Lore page with fracture timeline and FBI fugitives",
+      "Sales history with filterable table and price chart",
+      "On-chain sales sync via GitHub Actions cron",
+      "Security hardening: CSP, rate limiting, parameterized queries"
+    ]
+  }
+]

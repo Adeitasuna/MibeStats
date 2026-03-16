@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { ChangelogModal } from './ChangelogModal'
 
 /* ── Data ── */
 
@@ -48,22 +50,6 @@ function isActive(pathname: string, href: string) {
   return pathname === href
 }
 
-function formatDate(iso: string) {
-  try {
-    const d = new Date(iso)
-    return d.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }) + ' ' + d.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  } catch {
-    return iso
-  }
-}
-
 /* ── Component ── */
 
 interface SideMenuProps {
@@ -72,39 +58,70 @@ interface SideMenuProps {
 
 export function SideMenu({ onNavigate }: SideMenuProps) {
   const pathname = usePathname()
-  const version = process.env.NEXT_PUBLIC_GIT_HASH ?? 'dev'
-  const buildDate = process.env.NEXT_PUBLIC_GIT_DATE ?? ''
+  const [showChangelog, setShowChangelog] = useState(false)
+  const [currentVersion, setCurrentVersion] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/changelog.json')
+      .then((r) => r.json())
+      .then((entries) => {
+        if (entries.length > 0) setCurrentVersion(entries[0].version)
+      })
+      .catch(() => {})
+  }, [])
 
   return (
-    <nav className="side-menu">
-      {NAV_SECTIONS.map((section) => (
-        <div key={section.title} className="side-menu-section">
-          {/* Section title — non-clickable separator */}
-          <div className="side-menu-title">
-            {section.title}
+    <>
+      <nav className="side-menu">
+        {NAV_SECTIONS.map((section) => (
+          <div key={section.title} className="side-menu-section">
+            <div className="side-menu-title">
+              {section.title}
+            </div>
+            {section.items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onNavigate}
+                className={
+                  'side-menu-link' + (isActive(pathname, item.href) ? ' active' : '')
+                }
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
+        ))}
 
-          {/* Menu items */}
-          {section.items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={
-                'side-menu-link' + (isActive(pathname, item.href) ? ' active' : '')
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* Version footer */}
+        <div className="side-menu-footer">
+          <button
+            onClick={() => setShowChangelog(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              padding: 0,
+              color: 'inherit',
+              fontSize: 'inherit',
+              fontFamily: 'inherit',
+            }}
+            title="View changelog"
+          >
+            <span>v{currentVersion ?? '...'}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </button>
         </div>
-      ))}
+      </nav>
 
-      {/* Version footer */}
-      <div className="side-menu-footer">
-        <span>v.{version}</span>
-        {buildDate && <span>{formatDate(buildDate)}</span>}
-      </div>
-    </nav>
+      {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
+    </>
   )
 }
