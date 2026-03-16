@@ -2,13 +2,15 @@ import { execSync } from 'child_process'
 
 /** @type {import('next').NextConfig} */
 
-/* Build-time git info */
-let gitHash = 'dev'
+/* Build-time git info — use Vercel env vars if available, fallback to local git */
+let gitHash = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'dev'
 let gitDate = new Date().toISOString()
-try {
-  gitHash = execSync('git rev-parse --short HEAD').toString().trim()
-  gitDate = execSync('git log -1 --format=%cI').toString().trim()
-} catch { /* fallback to defaults */ }
+if (gitHash === 'dev') {
+  try {
+    gitHash = execSync('git rev-parse --short HEAD').toString().trim()
+    gitDate = execSync('git log -1 --format=%cI').toString().trim()
+  } catch { /* fallback to defaults */ }
+}
 
 const cspHeader = `
   default-src 'self';
