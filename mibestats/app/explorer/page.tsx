@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import { truncateAddress } from '@/lib/format'
@@ -52,8 +53,10 @@ function MetadataCell({ label, value, fullWidth }: { label: string; value: strin
 }
 
 export default function MetadatasPage() {
-  const [tokenId, setTokenId] = useState(1)
-  const [inputValue, setInputValue] = useState('1')
+  const searchParams = useSearchParams()
+  const initialId = Number(searchParams.get('id')) || 1
+  const [tokenId, setTokenId] = useState(initialId)
+  const [inputValue, setInputValue] = useState(String(initialId))
   const [token, setToken] = useState<TokenDetail | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

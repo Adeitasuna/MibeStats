@@ -3,6 +3,8 @@ import { Inter, Share_Tech_Mono, Pirata_One } from 'next/font/google'
 import './globals.css'
 import { AppShell } from '@/components/layout/AppShell'
 import { AgentationOverlay } from '@/components/dev/AgentationOverlay'
+import { ConsoleGreeting } from '@/components/dev/ConsoleGreeting'
+import { KonamiRain } from '@/components/dev/KonamiRain'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -66,6 +68,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </AppShell>
         <AgentationOverlay />
+        <ConsoleGreeting />
+        <KonamiRain />
       </body>
     </html>
   )

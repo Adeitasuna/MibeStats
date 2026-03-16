@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.3.2",
+    "date": "2026-03-16",
+    "summary": "Minor UI tweaks and internal improvements",
+    "changes": [
+      "Various visual refinements",
+      "Internal component updates",
+      "Explorer now supports URL parameters"
+    ]
+  },
+  {
     "version": "0.3.1",
     "date": "2026-03-16",
     "summary": "Changelog modal accessible from sidebar version number",

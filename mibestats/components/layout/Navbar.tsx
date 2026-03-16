@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useRef, useCallback, useEffect } from 'react'
 
 interface NavbarProps {
   onMenuToggle: () => void
@@ -8,6 +10,42 @@ interface NavbarProps {
 }
 
 export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
+  const router = useRouter()
+  const clickCount = useRef(0)
+  const clickTimer = useRef<ReturnType<typeof setTimeout>>()
+  const logoRef = useRef<HTMLAnchorElement>(null)
+
+  // Random glitch on logo every 40-90s
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>
+    function scheduleGlitch() {
+      const delay = 40000 + Math.random() * 50000
+      timer = setTimeout(() => {
+        const el = logoRef.current
+        if (el) {
+          el.classList.add('glitching')
+          setTimeout(() => el.classList.remove('glitching'), 300 + Math.random() * 200)
+        }
+        scheduleGlitch()
+      }, delay)
+    }
+    scheduleGlitch()
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleLogoClick = useCallback((e: React.MouseEvent) => {
+    clickCount.current++
+    if (clickCount.current === 3) {
+      e.preventDefault()
+      clickCount.current = 0
+      clearTimeout(clickTimer.current)
+      router.push('/explorer?id=333')
+      return
+    }
+    clearTimeout(clickTimer.current)
+    clickTimer.current = setTimeout(() => { clickCount.current = 0 }, 500)
+  }, [router])
+
   return (
     <header
       className="border-b border-mibe-border"
@@ -44,18 +82,19 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
             </svg>
           )}
         </button>
-        <Link href="/dashboard" className="section-title" style={{ whiteSpace: 'nowrap', fontSize: '1.6rem', letterSpacing: '0.05em', textDecoration: 'none', textShadow: '0 0 8px rgba(255,215,0,0.4)' }}>
+        <Link
+          ref={logoRef}
+          href="/dashboard"
+          onClick={handleLogoClick}
+          className="section-title fugitive-card"
+          style={{ whiteSpace: 'nowrap', fontSize: '1.6rem', letterSpacing: '0.05em', textDecoration: 'none', textShadow: '0 0 8px rgba(255,215,0,0.4)', position: 'relative' }}
+        >
           MibeStats
         </Link>
         <span className="font-terminal" id="header-subtitle" style={{ whiteSpace: 'nowrap', fontSize: '0.7rem', color: '#555', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
           // dark market intelligence
         </span>
       </div>
-
-      {/* Right: wallet — hidden for now, will be used later */}
-      {/* <div style={{ flexShrink: 0 }}>
-        <WalletButton />
-      </div> */}
 
       {/* Responsive: show hamburger + hide subtitle on mobile */}
       <style dangerouslySetInnerHTML={{ __html: `
