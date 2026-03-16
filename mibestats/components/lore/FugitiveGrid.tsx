@@ -96,11 +96,12 @@ function FugitiveCardEl({
         {/* Mugshot */}
         <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
           <div style={{
-            width: '70px', height: '70px',
-            border: '2px solid #333',
-            overflow: 'hidden',
-            background: '#1a1a1a',
-          }}>
+              width: '70px', height: '70px',
+              border: '2px solid #333',
+              overflow: 'hidden',
+              background: '#1a1a1a',
+            }}
+          >
             {fugitive.avatarUrl ? (
               <Image
                 src={fugitive.avatarUrl}

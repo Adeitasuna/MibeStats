@@ -5,6 +5,7 @@ import { AppShell } from '@/components/layout/AppShell'
 import { AgentationOverlay } from '@/components/dev/AgentationOverlay'
 import { ConsoleGreeting } from '@/components/dev/ConsoleGreeting'
 import { KonamiRain } from '@/components/dev/KonamiRain'
+import { MiberaWord } from '@/components/dev/MiberaWord'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AgentationOverlay />
         <ConsoleGreeting />
         <KonamiRain />
+        <MiberaWord />
       </body>
     </html>
   )

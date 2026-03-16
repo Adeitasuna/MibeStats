@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import { truncateAddress } from '@/lib/format'
@@ -54,6 +54,7 @@ function MetadataCell({ label, value, fullWidth }: { label: string; value: strin
 
 export default function MetadatasPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const initialId = Number(searchParams.get('id')) || 1
   const [tokenId, setTokenId] = useState(initialId)
   const [inputValue, setInputValue] = useState(String(initialId))
@@ -64,6 +65,18 @@ export default function MetadatasPage() {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set())
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set())
+
+  const [extraInfo, setNote42] = useState<string | null>(null)
+  const [extraOpen, setNote42Open] = useState(false)
+  useEffect(() => {
+    setNote42(null)
+    setNote42Open(false)
+    if (tokenId !== 42) return
+    fetch('/api/stats/snapshot?range=7d').then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.label) setNote42(d.label)
+    }).catch(() => {})
+  }, [tokenId])
+
   const phaseRefs = useRef<(HTMLDivElement | null)[]>([])
   const phaseHovered = useRef<Set<number>>(new Set())
 
@@ -147,6 +160,7 @@ export default function MetadatasPage() {
     const num = parseInt(inputValue, 10)
     if (num >= 1 && num <= 10000) {
       setTokenId(num)
+      router.replace(`/explorer?id=${num}`, { scroll: false })
     }
   }
 
@@ -370,6 +384,21 @@ export default function MetadatasPage() {
                       />
                     ) : (
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>No image</div>
+                    )}
+                    {extraInfo && tokenId === 42 && (
+                      <div style={{ position: 'absolute', bottom: '0.5rem', left: 0, right: 0, textAlign: 'center', zIndex: 3 }}>
+                        <button
+                          onClick={() => setNote42Open(o => !o)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ffd700', fontSize: '0.7rem', fontFamily: 'var(--font-share-tech-mono), monospace', textShadow: '0 0 8px rgba(255,215,0,0.5)' }}
+                        >
+                          42. The Answer.
+                        </button>
+                        {extraOpen && (
+                          <div style={{ marginTop: '0.3rem', background: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: '0.25rem', padding: '0.5rem 0.75rem', fontSize: '0.65rem', color: '#ffd700' }}>
+                            {extraInfo}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
 

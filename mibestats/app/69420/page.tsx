@@ -126,7 +126,7 @@ export default function TerminalPage() {
       { text: '║                                              ║', type: 'gold' },
       { text: '║   "Traits are signals, not scripts."        ║', type: 'gold' },
       { text: '║                                              ║', type: 'gold' },
-      { text: '║   Layer 3/?                                  ║', type: 'gold' },
+      { text: '║   // UNAUTHORIZED ACCESS                     ║', type: 'gold' },
       { text: '║                                              ║', type: 'gold' },
       { text: '╚══════════════════════════════════════════════╝', type: 'gold' },
       { text: '', type: 'output' },
@@ -224,6 +224,10 @@ export default function TerminalPage() {
           { text: '', type: 'output' },
         ])
         break
+      case 'echo $origin':
+      case 'echo $ORIGIN':
+        addOutput(['/home/anon'])
+        break
       case 'sudo':
       case 'su':
       case 'root':
@@ -235,7 +239,8 @@ export default function TerminalPage() {
           'drwxr-xr-x  ?  council    grails/',
           'drwxr-xr-x  ?  council    ancestors/',
           '-r--------  1  root       .shadow-traits',
-          '-rw-r-----  1  council    .k-hole.enc',
+          '-rw-r--r--  1  council    .k-hole.enc',
+          '-rw-r--r--  1  root       .htaccess',
           '----------  ?  ???        .layer4',
         ])
         break
@@ -314,36 +319,47 @@ export default function TerminalPage() {
         setPrompt({
           label: 'passphrase: ',
           callback: (val) => {
-            if (val.toLowerCase() === 'ketamine') {
-              addLines([
-                { text: '', type: 'output' },
-                { text: '  > DECRYPTING .k-hole.enc ...', type: 'system' },
-                { text: '  > Key accepted: Death // C13H16ClNO', type: 'system' },
-                { text: '', type: 'output' },
-                { text: '  K - H O L E    D E C R Y P T E D', type: 'gold' },
-                { text: '', type: 'output' },
-                { text: '  "Kronos — the god of time, chronic time.', type: 'output' },
-                { text: '  Like the Grim Reaper with his sickle and scythe,', type: 'output' },
-                { text: '  he\'s the harbinger of death. The instrument of', type: 'output' },
-                { text: '  murder and castration. The old hunched man with', type: 'output' },
-                { text: '  the long beard. The one who shows up when your', type: 'output' },
-                { text: '  time has come."', type: 'output' },
-                { text: '', type: 'output' },
-                { text: '  But Death in the tarot is not an ending.', type: 'gold' },
-                { text: '  It is transformation. Shedding the past.', type: 'gold' },
-                { text: '  The K-hole is where ego dissolves', type: 'gold' },
-                { text: '  and Mibera awakens.', type: 'gold' },
-                { text: '', type: 'output' },
-                { text: '  Layer 3.5/? unlocked', type: 'system' },
-                { text: '', type: 'output' },
-              ])
-            } else {
-              addLines([
-                { text: `  > DECRYPTION FAILED — invalid passphrase`, type: 'system' },
-                { text: '  You need the key. The tarot knows.', type: 'output' },
-                { text: '', type: 'output' },
-              ])
-            }
+            addLines([{ text: '  > Verifying ...', type: 'system' }])
+            fetch('/api/tokens/validate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ v: val }),
+            })
+              .then(r => r.json())
+              .then(d => {
+                if (d?.ok) {
+                  addLines([
+                    { text: '  > Key accepted: Death // C13H16ClNO', type: 'system' },
+                    { text: '', type: 'output' },
+                    { text: '  K - H O L E    D E C R Y P T E D', type: 'gold' },
+                    { text: '', type: 'output' },
+                    { text: '  "Kronos — the god of time, chronic time.', type: 'output' },
+                    { text: '  Like the Grim Reaper with his sickle and scythe,', type: 'output' },
+                    { text: '  he\'s the harbinger of death. The instrument of', type: 'output' },
+                    { text: '  murder and castration. The old hunched man with', type: 'output' },
+                    { text: '  the long beard. The one who shows up when your', type: 'output' },
+                    { text: '  time has come."', type: 'output' },
+                    { text: '', type: 'output' },
+                    { text: '  But Death in the tarot is not an ending.', type: 'gold' },
+                    { text: '  It is transformation. Shedding the past.', type: 'gold' },
+                    { text: '  The K-hole is where ego dissolves', type: 'gold' },
+                    { text: '  and Mibera awakens.', type: 'gold' },
+                    { text: '', type: 'output' },
+                  ])
+                  fetch('/api/collection/health?depth=full').then(r => r.ok ? r.json() : null).then(d2 => {
+                    if (d2?.detail) addLines([{ text: `  ${d2.detail}`, type: 'gold' }, { text: '', type: 'output' }])
+                  }).catch(() => {})
+                } else {
+                  addLines([
+                    { text: '  > DECRYPTION FAILED — invalid passphrase', type: 'system' },
+                    { text: '  You need the key. The tarot knows.', type: 'output' },
+                    { text: '', type: 'output' },
+                  ])
+                }
+              })
+              .catch(() => {
+                addLines([{ text: '  > Connection error', type: 'system' }])
+              })
           },
         })
         break
@@ -360,6 +376,32 @@ export default function TerminalPage() {
         break
       case 'cat .shadow-traits':
         addOutput(['[PERMISSION DENIED] Shadow traits are earned, not read.'])
+        break
+      case 'cat .htaccess':
+        addLines([
+          { text: '', type: 'output' },
+          { text: '  RewriteEngine On', type: 'output' },
+          { text: '  RewriteCond %{HTTPS} off', type: 'output' },
+          { text: '  RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]', type: 'output' },
+          { text: '', type: 'output' },
+          { text: '  # Public routes', type: 'system' },
+          { text: '  RewriteRule ^/$ /dashboard [L,R=302]', type: 'output' },
+          { text: '  RewriteRule ^dashboard$ /dashboard [L]', type: 'output' },
+          { text: '  RewriteRule ^lore$ /lore [L]', type: 'output' },
+          { text: '  RewriteRule ^grails$ /grails [L]', type: 'output' },
+          { text: '  RewriteRule ^miladies$ /miladies [L]', type: 'output' },
+          { text: '  RewriteRule ^explorer$ /explorer [L]', type: 'output' },
+          { text: '  RewriteRule ^map$ /map [L]', type: 'output' },
+          { text: '  RewriteRule ^distribution$ /distribution [L]', type: 'output' },
+          { text: '  RewriteRule ^bubble$ /bubble [L]', type: 'output' },
+          { text: '  RewriteRule ^sales$ /sales [L]', type: 'output' },
+          { text: '  RewriteRule ^portfolio$ /portfolio [L]', type: 'output' },
+          { text: '  RewriteRule ^mibera/vault$ /mibera/vault [L]', type: 'gold' },
+          { text: '', type: 'output' },
+          { text: '  # Deny all other', type: 'system' },
+          { text: '  RewriteRule ^(.*)$ - [F,L]', type: 'output' },
+          { text: '', type: 'output' },
+        ])
         break
       case 'cat .layer4':
         addOutput(['[???] Not yet. Keep looking.'])

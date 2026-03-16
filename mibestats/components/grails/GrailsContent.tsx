@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import type { Token } from '@/types'
 import { magicEdenUrl } from '@/types'
+import { StatusNote } from '@/components/dev/StatusNote'
 
 interface GrailToken extends Token {
   magicEdenUrl: string
@@ -261,6 +262,11 @@ export function GrailsContent() {
           >
             View on Magic Eden
           </a>
+          {modalGrail.grailName?.toLowerCase() === 'black hole' && (
+            <div onClick={(e) => e.stopPropagation()} style={{ marginTop: '0.25rem' }}>
+              <StatusNote t="c" style={{ fontSize: '0.8rem', color: '#ffd700', fontFamily: 'var(--font-share-tech-mono), monospace' }} />
+            </div>
+          )}
         </div>
       )}
     </div>

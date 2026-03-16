@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.3.3",
+    "date": "2026-03-16",
+    "summary": "UI polish and internal refactoring",
+    "changes": [
+      "Component naming improvements",
+      "Minor visual adjustments",
+      "Internal tooling updates"
+    ]
+  },
+  {
     "version": "0.3.2",
     "date": "2026-03-16",
     "summary": "Minor UI tweaks and internal improvements",

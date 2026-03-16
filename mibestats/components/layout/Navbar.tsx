@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useRef, useCallback, useEffect } from 'react'
 
 interface NavbarProps {
@@ -10,7 +9,6 @@ interface NavbarProps {
 }
 
 export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
-  const router = useRouter()
   const clickCount = useRef(0)
   const clickTimer = useRef<ReturnType<typeof setTimeout>>()
   const logoRef = useRef<HTMLAnchorElement>(null)
@@ -39,12 +37,12 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
       e.preventDefault()
       clickCount.current = 0
       clearTimeout(clickTimer.current)
-      router.push('/explorer?id=333')
+      window.open('https://opensea.io/fr/collection/mibera333', '_blank')
       return
     }
     clearTimeout(clickTimer.current)
     clickTimer.current = setTimeout(() => { clickCount.current = 0 }, 500)
-  }, [router])
+  }, [])
 
   return (
     <header

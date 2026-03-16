@@ -31,14 +31,12 @@ export function ConsoleGreeting() {
       'color: #ffd700; font-family: monospace; font-size: 11px;',
     )
     console.log(
-      '%c👁️ Layer 1/? found. %cThe darknet has more secrets hidden in plain sight.\n' +
-      '%cSome are visible. Some require action. Some require knowledge.\n' +
-      '%cGood luck, anon.',
-      'color: #ffd700; font-size: 11px;',
+      '%cThe darknet has more secrets hidden in plain sight.\nSome are visible. Some require action. Some require knowledge.\nGood luck, anon.',
       'color: #888; font-size: 11px;',
-      'color: #555; font-style: italic; font-size: 10px;',
-      'color: #333; font-size: 10px;',
     )
+    fetch('/api/stats/warmup?ttl=300').then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.memo) console.log('%c' + d.memo, 'color: #ffd700; font-size: 11px;')
+    }).catch(() => {})
   }, [])
 
   return null

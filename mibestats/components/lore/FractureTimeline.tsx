@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { FRACTURE_STAGES } from '@/lib/lore-data'
+import { StatusNote } from '@/components/dev/StatusNote'
 
 function FractureCard({
   stage,
@@ -53,6 +54,7 @@ function FractureCard({
 export function FractureTimeline() {
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
   const [lightboxName, setLightboxName] = useState('')
+  const [phaseDetail, setPhaseDetail] = useState(false)
 
   return (
     <>
@@ -98,22 +100,31 @@ export function FractureTimeline() {
                 <div style={{ width: '2px', height: '0.5rem', background: '#ffd700' }} />
 
                 {/* Phase dot */}
-                <div style={{
-                  width: '2.2rem',
-                  height: '2.2rem',
-                  borderRadius: '50%',
-                  background: '#0a0a0a',
-                  border: '2px solid #ffd700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  zIndex: 2,
-                  flexShrink: 0,
-                }}>
+                <div
+                  onClick={stage.phase === 9 ? (e: React.MouseEvent) => { e.stopPropagation(); setPhaseDetail(true) } : undefined}
+                  style={{
+                    width: '2.2rem',
+                    height: '2.2rem',
+                    borderRadius: '50%',
+                    background: '#0a0a0a',
+                    border: '2px solid #ffd700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    zIndex: 2,
+                    flexShrink: 0,
+                    cursor: stage.phase === 9 ? 'pointer' : 'default',
+                  }}
+                >
                   <span className="font-terminal" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffd700' }}>
                     {stage.phase}
                   </span>
+                  {stage.phase === 9 && phaseDetail && (
+                    <div style={{ position: 'absolute', top: '2.5rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', zIndex: 10 }}>
+                      <StatusNote t="g" style={{ fontSize: '0.6rem', color: '#ffd700', background: 'rgba(0,0,0,0.9)', padding: '0.25rem 0.5rem', borderRadius: '3px', border: '1px solid rgba(255,215,0,0.3)' }} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Vertical connector (bottom) */}

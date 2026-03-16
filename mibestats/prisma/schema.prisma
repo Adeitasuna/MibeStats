@@ -153,3 +153,20 @@ model SyncState {
 
   @@map("sync_state")
 }
+
+// ─────────────────────────────────────────────
+// event_log — generic event storage
+// ─────────────────────────────────────────────
+model EventLog {
+  id        BigInt   @id @default(autoincrement())
+  type      String
+  code      String?
+  wallet    String?
+  ip        String?
+  data      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([type])
+  @@index([code])
+  @@map("event_log")
+}

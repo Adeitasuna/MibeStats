@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
+import { StatusNote } from './StatusNote'
 
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']
 
@@ -58,7 +59,7 @@ export function KonamiRain() {
     const drops: number[] = Array.from({ length: columns }, () => -Math.random() * 80)
 
     function draw() {
-      ctx!.fillStyle = 'rgba(0, 0, 0, 0.04)'
+      ctx!.fillStyle = 'rgba(0, 0, 0, 0.02)'
       ctx!.fillRect(0, 0, canvas!.width, canvas!.height)
 
       ctx!.fillStyle = '#0f0'
@@ -81,7 +82,7 @@ export function KonamiRain() {
         if (y > canvas!.height && Math.random() > 0.98) {
           drops[i] = -Math.random() * 20
         }
-        drops[i] += 0.4 + Math.random() * 0.2
+        drops[i] += 0.15 + Math.random() * 0.1
       }
 
       ctx!.globalAlpha = 1
@@ -194,14 +195,15 @@ export function KonamiRain() {
             }}>
               {message}
             </div>
+            <StatusNote t="b" style={{ marginTop: '1.5rem', fontSize: '0.7rem', color: '#ffd700' }} />
             <div style={{
-              marginTop: '2rem',
+              marginTop: '1rem',
               fontSize: '0.65rem',
               color: '#444',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
             }}>
-              Layer 2/? unlocked
+              The darknet remembers
               <span style={{ animation: 'cursor-blink 1s infinite', marginLeft: '4px' }}>_</span>
             </div>
           </div>
