@@ -1,6 +1,7 @@
 import nextDynamic from 'next/dynamic'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'  // leaflet requires window — cannot prerender
 
 export const metadata: Metadata = {
   title: 'MibeMap',
