@@ -380,6 +380,7 @@ export default function MetadatasPage() {
                           transition: 'opacity 0.3s ease',
                         }}
                         sizes="35vw"
+                        priority
                         onLoad={() => markLoaded('main')}
                       />
                     ) : (
