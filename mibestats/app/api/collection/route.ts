@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getFloorPrice } from '@/lib/me-api'
+import { getFloorPriceFromBestSource } from '@/lib/floor-price'
 import { withRateLimit } from '@/lib/api-handler'
 import type { CollectionResponse, Sale } from '@/types'
 import { magicEdenUrl } from '@/types'
@@ -14,15 +14,9 @@ const MIN_SALE_PRICE = 5  // filter dust/test trades
 export const GET = withRateLimit('collection', 100, async (req) => {
   const now = Date.now()
 
-  // Fetch floor price from ME API (only thing we still need ME for)
-  let floorPrice: number | null = null
-  try {
-    floorPrice = await getFloorPrice()
-  } catch {
-    // ME API unavailable — fall back to cached value
-    const cached = await prisma.collectionStats.findUnique({ where: { id: 1 } })
-    floorPrice = cached?.floorPrice ? Number(cached.floorPrice) : null
-  }
+  // Fetch floor price from best available source (OpenSea → ME → DB fallback)
+  const floorResult = await getFloorPriceFromBestSource()
+  const floorPrice = floorResult.floorPrice
 
   // Compute all stats from DB in parallel
   // Single query for all volume stats (4 aggregates → 1)
@@ -126,8 +120,10 @@ export const GET = withRateLimit('collection', 100, async (req) => {
       : undefined,
   })
 
-  const response: CollectionResponse = {
+  const response = {
     floorPrice,
+    floorPriceSource: floorResult.source,
+    floorPriceAsOf: floorResult.asOf,
     volume24h,
     volume7d,
     volume30d,
@@ -137,7 +133,7 @@ export const GET = withRateLimit('collection', 100, async (req) => {
     updatedAt: new Date().toISOString(),
     recentSales: recentRows.map(toSale),
     topSales:    topRows.map(toSale),
-  }
+  } satisfies CollectionResponse & { floorPriceSource: string; floorPriceAsOf: string }
 
   return NextResponse.json(response)
 }, { cacheSecs: 300 })

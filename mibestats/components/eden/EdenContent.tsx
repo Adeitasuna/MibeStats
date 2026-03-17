@@ -76,10 +76,10 @@ export function EdenContent() {
         <div className="card p-3 border-mibe-red text-red-400 text-sm">{error}</div>
       )}
 
-      {/* ME API down notice */}
+      {/* Floor price unavailable notice */}
       {collection && collection.floorPrice == null && (
         <div className="card p-3 text-sm" style={{ border: '1px solid rgba(255,215,0,0.3)', background: 'rgba(255,215,0,0.05)', color: '#ffd700' }}>
-          Floor price temporarily unavailable — Magic Eden API is down. Sales data and volumes from the database are still up to date.
+          Floor price unavailable. Sales data and volumes from the database are still up to date.
         </div>
       )}
 

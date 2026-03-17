@@ -2,6 +2,8 @@
 
 export interface CollectionData {
   floorPrice: number | null
+  floorPriceSource?: 'opensea' | 'magiceden' | 'database'
+  floorPriceAsOf?: string
   volume24h: number | null
   volume7d: number | null
   volume30d: number | null

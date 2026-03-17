@@ -6,11 +6,6 @@ import { apiError } from '@/lib/api-error'
 
 export const revalidate = 3600   // 1-hour cache
 
-interface DailySaleRow {
-  day: Date
-  min_price: string
-}
-
 export const GET = withRateLimit('floor-history', 100, async (req) => {
   const parsed = floorHistoryQuerySchema.safeParse(
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
@@ -20,49 +15,24 @@ export const GET = withRateLimit('floor-history', 100, async (req) => {
   }
 
   const { range } = parsed.data
-  const now = new Date()
   let fromDate: Date | undefined
 
   if (range === '7d') {
-    fromDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    fromDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   } else if (range === '30d') {
-    fromDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    fromDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   }
 
-  // Use daily minimum sale price (floor) from sales table, filtering out spam/false prices below 5 BERA
-  const rows = fromDate
-    ? await prisma.$queryRaw<DailySaleRow[]>`
-        SELECT DATE(sold_at) AS day, MIN(price_bera)::text AS min_price
-        FROM sales
-        WHERE sold_at >= ${fromDate} AND price_bera >= 5
-        GROUP BY DATE(sold_at)
-        ORDER BY day ASC
-      `.catch(() => [] as DailySaleRow[])
-    : await prisma.$queryRaw<DailySaleRow[]>`
-        SELECT DATE(sold_at) AS day, MIN(price_bera)::text AS min_price
-        FROM sales
-        WHERE price_bera >= 5
-        GROUP BY DATE(sold_at)
-        ORDER BY day ASC
-      `.catch(() => [] as DailySaleRow[])
-
-  if (rows.length === 0) {
-    // Fallback to floor_price_history table
-    const historyRows = await prisma.floorPriceHistory.findMany({
-      where:   fromDate ? { recordedAt: { gte: fromDate } } : undefined,
-      orderBy: { recordedAt: 'asc' },
-      select:  { recordedAt: true, floorPrice: true },
-    })
-    const data = historyRows.map((r) => ({
-      date:       r.recordedAt.toISOString().split('T')[0],
-      floorPrice: Number(r.floorPrice),
-    }))
-    return NextResponse.json(data)
-  }
+  // Use real floor price snapshots (from API captures), not sales minimum
+  const rows = await prisma.floorPriceHistory.findMany({
+    where:   fromDate ? { recordedAt: { gte: fromDate } } : undefined,
+    orderBy: { recordedAt: 'asc' },
+    select:  { recordedAt: true, floorPrice: true },
+  })
 
   const data = rows.map((r) => ({
-    date:       new Date(r.day).toISOString().split('T')[0],
-    floorPrice: Number(r.min_price),
+    date:       r.recordedAt.toISOString().split('T')[0],
+    floorPrice: Number(r.floorPrice),
   }))
 
   return NextResponse.json(data)
