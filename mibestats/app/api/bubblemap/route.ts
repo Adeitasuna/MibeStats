@@ -18,7 +18,7 @@ function tierFromCount(count: number): string {
 
 export const GET = withRateLimit('bubblemap', 30, async (req) => {
   const [wallets, edges] = await Promise.all([
-    // All wallet nodes: address + NFT count (official collection only)
+    // Current holders only (count >= 1)
     prisma.$queryRaw<WalletRow[]>`
       SELECT owner_address AS address, COUNT(*)::bigint AS count
       FROM tokens
@@ -28,7 +28,8 @@ export const GET = withRateLimit('bubblemap', 30, async (req) => {
       GROUP BY owner_address
     `,
 
-    // All wallet-to-wallet edges from sales
+    // Edges between wallets — only include trades where BOTH parties
+    // are current holders (filtered in JS below)
     prisma.$queryRaw<EdgeRow[]>`
       SELECT seller_address AS source,
              buyer_address AS target,
@@ -42,18 +43,10 @@ export const GET = withRateLimit('bubblemap', 30, async (req) => {
     `,
   ])
 
-  // Wallet lookup (normalize addresses to lowercase)
-  const walletMap = new Map<string, number>()
+  // Build holder set (lowercase)
+  const holderMap = new Map<string, number>()
   for (const w of wallets) {
-    walletMap.set(w.address.toLowerCase(), Number(w.count))
-  }
-
-  // Add edge participants that aren't current holders (count = 0)
-  for (const e of edges) {
-    const src = e.source.toLowerCase()
-    const tgt = e.target.toLowerCase()
-    if (!walletMap.has(src)) walletMap.set(src, 0)
-    if (!walletMap.has(tgt)) walletMap.set(tgt, 0)
+    holderMap.set(w.address.toLowerCase(), Number(w.count))
   }
 
   // Detect bidirectional edges (lowercase keys)
@@ -62,20 +55,26 @@ export const GET = withRateLimit('bubblemap', 30, async (req) => {
     edgeKeys.add(`${e.source.toLowerCase()}→${e.target.toLowerCase()}`)
   }
 
-  // Build all nodes — current holders + historical trade participants
-  const nodes = Array.from(walletMap.entries()).map(([address, count]) => ({
+  // Only keep edges where both endpoints are current holders
+  const links = []
+  for (const e of edges) {
+    const src = e.source.toLowerCase()
+    const tgt = e.target.toLowerCase()
+    if (!holderMap.has(src) || !holderMap.has(tgt)) continue
+    links.push({
+      source: src,
+      target: tgt,
+      weight: Number(e.weight),
+      volume: Math.round(Number(e.volume) * 100) / 100,
+      bidirectional: edgeKeys.has(`${tgt}→${src}`),
+    })
+  }
+
+  // Build nodes — current holders only (no historical count=0 wallets)
+  const nodes = Array.from(holderMap.entries()).map(([address, count]) => ({
     id: address,
     count,
     tier: tierFromCount(count),
-  }))
-
-  // Build all links (all endpoints now guaranteed in walletMap)
-  const links = edges.map((e) => ({
-    source: e.source.toLowerCase(),
-    target: e.target.toLowerCase(),
-    weight: Number(e.weight),
-    volume: Number(e.volume),
-    bidirectional: edgeKeys.has(`${e.target.toLowerCase()}→${e.source.toLowerCase()}`),
   }))
 
   return NextResponse.json({ nodes, links })

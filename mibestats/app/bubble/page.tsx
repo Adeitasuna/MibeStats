@@ -5,7 +5,6 @@ export const metadata: Metadata = {
   title: 'Bubble',
 }
 
-export const dynamic = 'force-dynamic'
 
 const BubbleMapContent = nextDynamic(
   () => import('@/components/bubblemap/BubbleMapContent').then((m) => m.BubbleMapContent),

@@ -5,130 +5,10 @@ import { PacManLoader } from '@/components/ui/PacManLoader'
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// ── Color palettes ──────────────────────────────────────────────────────
-
-const ANCESTOR_COLORS: Record<string, string> = {
-  Greek: '#ffd700', Indian: '#ff6b35', Chinese: '#ff69b4', Japanese: '#e63946',
-  Egyptian: '#f4a261', Roman: '#8338ec', Persian: '#06d6a0', Celtic: '#118ab2',
-  Viking: '#264653', Aztec: '#e76f51', Mayan: '#2a9d8f', Inca: '#e9c46a',
-  Sumerian: '#f4845f', Babylonian: '#7209b7', Mongol: '#3a0ca3', Ottoman: '#4361ee',
-  Polynesian: '#4cc9f0', African: '#fb5607', Aboriginal: '#ff006e', Norse: '#8ac926',
-  Tibetan: '#ffbe0b', Korean: '#3f37c9', Thai: '#480ca8', Slavic: '#b5179e',
-  Arabic: '#560bad', Native: '#7400b8', Mesopotamian: '#6930c3', Hebrew: '#5390d9',
-  Phoenician: '#4ea8de', Etruscan: '#48bfe3', Minoan: '#56cfe1', Mycenaean: '#64dfdf',
-  Hittite: '#72efdd',
-}
-
-const ELEMENT_COLORS: Record<string, string> = {
-  Earth: '#3fb950', Fire: '#f85149', Water: '#58a6ff', Air: '#bc8cff',
-}
-
-const SWAG_RANK_COLORS: Record<string, string> = {
-  Common: '#8b949e', Uncommon: '#3fb950', Rare: '#58a6ff',
-  Epic: '#bc8cff', Legendary: '#ffd700', Mythical: '#ff006e',
-}
-
-const ZODIAC_COLORS: Record<string, string> = {
-  Aries: '#f85149', Taurus: '#3fb950', Gemini: '#ffd700', Cancer: '#58a6ff',
-  Leo: '#ff6b35', Virgo: '#8ac926', Libra: '#bc8cff', Scorpio: '#e63946',
-  Sagittarius: '#f4a261', Capricorn: '#264653', Aquarius: '#4cc9f0', Pisces: '#7209b7',
-}
-
-// Known color maps per category
-const KNOWN_COLORS: Partial<Record<ColorByKey, Record<string, string>>> = {
-  ancestor: ANCESTOR_COLORS,
-  element: ELEMENT_COLORS,
-  swagRank: SWAG_RANK_COLORS,
-  sunSign: ZODIAC_COLORS,
-  moonSign: ZODIAC_COLORS,
-  ascendingSign: ZODIAC_COLORS,
-}
-
-// Generate distinct hue-based colors for unknown categories
-const GENERATED_PALETTE = [
-  '#ffd700', '#ff6b35', '#ff69b4', '#e63946', '#f4a261', '#8338ec', '#06d6a0',
-  '#118ab2', '#e76f51', '#2a9d8f', '#e9c46a', '#f4845f', '#7209b7', '#4361ee',
-  '#4cc9f0', '#fb5607', '#ff006e', '#8ac926', '#ffbe0b', '#3f37c9', '#480ca8',
-  '#b5179e', '#560bad', '#7400b8', '#6930c3', '#5390d9', '#4ea8de', '#48bfe3',
-  '#56cfe1', '#64dfdf', '#72efdd', '#3a0ca3', '#bc8cff', '#58a6ff', '#3fb950',
-]
-
-function buildColorMap(values: string[], known?: Record<string, string>): Record<string, string> {
-  const map: Record<string, string> = {}
-  let paletteIdx = 0
-  for (const v of values) {
-    if (known?.[v]) {
-      map[v] = known[v]
-    } else {
-      map[v] = GENERATED_PALETTE[paletteIdx % GENERATED_PALETTE.length]
-      paletteIdx++
-    }
-  }
-  return map
-}
-
-// ── Types ───────────────────────────────────────────────────────────────
-
-interface MapPoint {
-  id: number
-  lat: number
-  lng: number
-  ancestor: string
-  archetype: string
-  element: string | null
-  timePeriod: string
-  swagRank: string
-  sunSign: string | null
-  moonSign: string | null
-  ascendingSign: string | null
-  isGrail: boolean
-}
-
-interface MapFilters {
-  timePeriods: string[]
-  archetypes: string[]
-  elements: string[]
-  ancestors: string[]
-  swagRanks: string[]
-  sunSigns: string[]
-  moonSigns: string[]
-  ascendingSigns: string[]
-}
-
-interface MapResponse {
-  points: MapPoint[]
-  total: number
-  ancestors: string[]
-}
-
-const COLOR_BY_OPTIONS = [
-  { key: 'ancestor',      label: 'Ancestor' },
-  { key: 'archetype',     label: 'Archetype' },
-  { key: 'element',       label: 'Element' },
-  { key: 'timePeriod',    label: 'Time Period' },
-  { key: 'swagRank',      label: 'Swag Rank' },
-  { key: 'sunSign',       label: 'Sun Sign' },
-  { key: 'moonSign',      label: 'Moon Sign' },
-  { key: 'ascendingSign', label: 'Ascending' },
-] as const
-
-type ColorByKey = typeof COLOR_BY_OPTIONS[number]['key']
-
-const FILTER_KEYS = COLOR_BY_OPTIONS
-type FilterKey = ColorByKey
-
-function getPointValue(point: MapPoint, key: ColorByKey): string | null {
-  switch (key) {
-    case 'ancestor':      return point.ancestor
-    case 'archetype':     return point.archetype
-    case 'element':       return point.element
-    case 'timePeriod':    return point.timePeriod
-    case 'swagRank':      return point.swagRank
-    case 'sunSign':       return point.sunSign
-    case 'moonSign':      return point.moonSign
-    case 'ascendingSign': return point.ascendingSign
-  }
-}
+import { KNOWN_COLORS, buildColorMap, getPointValue, type ColorByKey } from './map-colors'
+import type { MapPoint, MapFilters, MapResponse, FilterKey } from './map-types'
+import { MapFiltersBar } from './MapFiltersBar'
+import { MapLegend } from './MapLegend'
 
 // ── Component ───────────────────────────────────────────────────────────
 
@@ -244,156 +124,27 @@ export function MiberaMap() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Color-by selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.75rem', color: '#ffd700', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Color by
-        </span>
-        {COLOR_BY_OPTIONS.map((opt) => (
-          <button
-            key={opt.key}
-            onClick={() => setColorBy(opt.key)}
-            className="font-terminal"
-            style={{
-              padding: '0.2rem 0.4rem',
-              fontSize: '0.7rem',
-              borderRadius: '0.25rem',
-              border: '1px solid',
-              borderColor: colorBy === opt.key ? '#ffd700' : '#2a2a2a',
-              background: colorBy === opt.key ? 'rgba(255,215,0,0.15)' : 'transparent',
-              color: colorBy === opt.key ? '#ffd700' : '#888',
-              cursor: 'pointer',
-            }}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Filters — responsive grid */}
-      <div id="map-filters" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', alignItems: 'end', marginTop: '1rem' }}>
-        {FILTER_KEYS.map((def) => (
-          <div key={def.key}>
-            <label
-              htmlFor={`map-filter-${def.key}`}
-              style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.25rem' }}
-            >
-              {def.label}
-            </label>
-            <select
-              id={`map-filter-${def.key}`}
-              value={activeFilters[def.key] ?? ''}
-              onChange={(e) => setFilter(def.key, e.target.value)}
-              className="font-terminal"
-              style={{
-                width: '100%',
-                padding: '0.35rem 0.5rem',
-                fontSize: '0.85rem',
-                color: activeFilters[def.key] ? '#ffd700' : '#e0e0e0',
-                background: '#0a0a0a',
-                border: '1px solid',
-                borderColor: activeFilters[def.key] ? 'rgba(255,215,0,0.4)' : '#2a2a2a',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-                outline: 'none',
-              }}
-            >
-              <option value="">All</option>
-              {getOptions(def.key).map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-        ))}
-        {filterCount > 0 && (
-          <button
-            onClick={clearFilters}
-            style={{ fontSize: '0.8rem', color: '#555', cursor: 'pointer', background: 'none', border: 'none', paddingBottom: '0.3rem' }}
-            onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
-            onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
-          >
-            Clear
-          </button>
-        )}
-      </div>
+      <MapFiltersBar
+        colorBy={colorBy}
+        onColorByChange={setColorBy}
+        activeFilters={activeFilters}
+        onFilterChange={setFilter}
+        filterOptions={getOptions}
+        filterCount={filterCount}
+        onClearFilters={clearFilters}
+      />
 
       {/* Legend + Map */}
       <div id="map-layout" style={{ display: 'flex', gap: '0.5rem', height: 'calc(100vh - 220px - 5rem)', minHeight: '400px', marginTop: '1rem' }}>
-        {/* Legend sidebar */}
-        <div
-          className="stat-card"
-          id="map-legend"
-          style={{
-            width: 'calc(100% / 6)',
-            minWidth: '120px',
-            padding: '0.5rem',
-            overflowY: 'auto',
-            flexShrink: 0,
-          }}
-        >
-          {/* Count + loading */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
-            <strong className="font-terminal" style={{ color: '#fff', fontSize: '1rem' }}>
-              {data?.total?.toLocaleString() ?? '...'}
-            </strong>
-            <span className="font-terminal" style={{ color: '#888', fontSize: '0.8rem' }}>miberas</span>
-            {loading && (
-              <svg width="10" height="10" fill="none" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite', color: '#ffd700' }}>
-                <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            )}
-          </div>
-          {error && <div className="font-terminal" style={{ color: '#f85149', fontSize: '0.8rem', marginBottom: '0.3rem' }}>{error}</div>}
-
-          {/* Separator */}
-          <div style={{ borderTop: '1px solid #2a2a2a', marginBottom: '0.4rem' }} />
-
-          {/* Category title */}
-          <div style={{ fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#ffd700', marginBottom: '0.35rem' }}>
-            {COLOR_BY_OPTIONS.find((o) => o.key === colorBy)?.label}
-          </div>
-
-          {/* Legend items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            {legendEntries.map((entry) => {
-              const isActive = activeFilters[colorBy] === entry.value
-              return (
-                <div
-                  key={entry.value}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}
-                  onClick={() => setFilter(colorBy, isActive ? '' : entry.value)}
-                >
-                  <span style={{
-                    display: 'inline-block',
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: entry.color,
-                    flexShrink: 0,
-                  }} />
-                  <span
-                    className="font-terminal"
-                    style={{
-                      fontSize: '0.75rem',
-                      color: isActive ? '#fff' : '#888',
-                      fontWeight: isActive ? 600 : 400,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      flex: 1,
-                    }}
-                  >
-                    {entry.value}
-                  </span>
-                  {isActive && (
-                    <span style={{ color: '#f85149', fontSize: '0.85rem', fontWeight: 700, flexShrink: 0, lineHeight: 1 }}>×</span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        <MapLegend
+          data={data}
+          loading={loading}
+          error={error}
+          colorBy={colorBy}
+          legendEntries={legendEntries}
+          activeFilters={activeFilters}
+          onFilterChange={setFilter}
+        />
 
         {/* Map */}
         <div className="stat-card" style={{ flex: 1, overflow: 'hidden', padding: 0 }}>

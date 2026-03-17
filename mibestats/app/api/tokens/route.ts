@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { tokenQuerySchema, parseSearchParams } from '@/lib/validation'
 import { withRateLimit } from '@/lib/api-handler'
+import { apiError } from '@/lib/api-error'
 import { magicEdenUrl } from '@/types'
 import type { Prisma } from '@prisma/client'
 
@@ -12,7 +13,7 @@ export const GET = withRateLimit('tokens', 100, async (req) => {
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
   )
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
+    return apiError('Invalid parameters', 400)
   }
 
   const {
@@ -57,7 +58,7 @@ export const GET = withRateLimit('tokens', 100, async (req) => {
         item: true, drug: true,
         isGrail: true, grailName: true, grailCategory: true,
         imageUrl: true, ownerAddress: true,
-        lastSalePrice: true, maxSalePrice: true, saleCount: true,
+        lastSalePrice: true, maxSalePrice: true, saleCount: true, transferCount: true,
       },
     }),
   ])

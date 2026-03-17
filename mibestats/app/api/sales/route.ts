@@ -2,16 +2,17 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { salesQuerySchema, parseSearchParams } from '@/lib/validation'
 import { withRateLimit } from '@/lib/api-handler'
+import { apiError } from '@/lib/api-error'
 import type { Prisma } from '@prisma/client'
 
-export const revalidate = 3600
+export const revalidate = 300  // 5 min — matches sales page ISR
 
 export const GET = withRateLimit('sales', 100, async (req) => {
   const parsed = salesQuerySchema.safeParse(
     parseSearchParams(Object.fromEntries(req.nextUrl.searchParams)),
   )
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
+    return apiError('Invalid parameters', 400)
   }
 
   const { token_id, min_price, max_price, from_date, to_date, is_grail, page, limit } =

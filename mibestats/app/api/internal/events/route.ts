@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { apiError } from '@/lib/api-error'
 
 export async function GET(req: NextRequest) {
   const token = req.headers.get('authorization')?.replace('Bearer ', '')
   if (!token || token !== process.env.ADMIN_TOKEN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return apiError('Unauthorized', 401)
+  }
+
+  const ip = getClientIp(req)
+  const rl = checkRateLimit(`admin-events:${ip}`, 30, 60)
+  if (!rl.success) {
+    return apiError('Too many requests', 429)
   }
 
   const type = req.nextUrl.searchParams.get('type')

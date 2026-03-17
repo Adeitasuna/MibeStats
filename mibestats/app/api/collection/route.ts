@@ -25,35 +25,23 @@ export const GET = withRateLimit('collection', 100, async (req) => {
   }
 
   // Compute all stats from DB in parallel
+  // Single query for all volume stats (4 aggregates → 1)
+  const volStats = await prisma.$queryRaw<[{
+    vol_1d: string | null; vol_7d: string | null; vol_30d: string | null; vol_all: string | null; sale_count: bigint
+  }]>`
+    SELECT
+      SUM(CASE WHEN sold_at >= ${new Date(now - 24 * 60 * 60 * 1000)} AND price_bera >= ${MIN_SALE_PRICE} THEN price_bera END)::text AS vol_1d,
+      SUM(CASE WHEN sold_at >= ${new Date(now - 7 * 24 * 60 * 60 * 1000)} AND price_bera >= ${MIN_SALE_PRICE} THEN price_bera END)::text AS vol_7d,
+      SUM(CASE WHEN sold_at >= ${new Date(now - 30 * 24 * 60 * 60 * 1000)} AND price_bera >= ${MIN_SALE_PRICE} THEN price_bera END)::text AS vol_30d,
+      SUM(CASE WHEN price_bera >= ${MIN_SALE_PRICE} THEN price_bera END)::text AS vol_all,
+      COUNT(CASE WHEN price_bera >= ${MIN_SALE_PRICE} THEN 1 END) AS sale_count
+    FROM sales
+  `
+
   const [
-    vol24, vol7d, vol30d, volAll,
-    totalSales, totalHolders,
+    totalHolders,
     recentRows, topRows,
   ] = await Promise.all([
-    // Volume 24h
-    prisma.sale.aggregate({
-      _sum: { priceBera: true },
-      where: { soldAt: { gte: new Date(now - 24 * 60 * 60 * 1000) }, priceBera: { gte: MIN_SALE_PRICE } },
-    }),
-    // Volume 7d
-    prisma.sale.aggregate({
-      _sum: { priceBera: true },
-      where: { soldAt: { gte: new Date(now - 7 * 24 * 60 * 60 * 1000) }, priceBera: { gte: MIN_SALE_PRICE } },
-    }),
-    // Volume 30d
-    prisma.sale.aggregate({
-      _sum: { priceBera: true },
-      where: { soldAt: { gte: new Date(now - 30 * 24 * 60 * 60 * 1000) }, priceBera: { gte: MIN_SALE_PRICE } },
-    }),
-    // Volume all-time
-    prisma.sale.aggregate({
-      _sum: { priceBera: true },
-      where: { priceBera: { gte: MIN_SALE_PRICE } },
-    }),
-    // Total real sales
-    prisma.sale.count({
-      where: { priceBera: { gte: MIN_SALE_PRICE } },
-    }),
     // Total holders (distinct non-burned owner addresses)
     prisma.token.count({
       where: {
@@ -76,10 +64,12 @@ export const GET = withRateLimit('collection', 100, async (req) => {
     }),
   ])
 
-  const volume24h = vol24._sum.priceBera ? Number(vol24._sum.priceBera) : null
-  const volume7d = vol7d._sum.priceBera ? Number(vol7d._sum.priceBera) : null
-  const volume30d = vol30d._sum.priceBera ? Number(vol30d._sum.priceBera) : null
-  const volumeAllTime = volAll._sum.priceBera ? Number(volAll._sum.priceBera) : null
+  const vs = volStats[0]
+  const volume24h = vs.vol_1d ? Number(vs.vol_1d) : null
+  const volume7d = vs.vol_7d ? Number(vs.vol_7d) : null
+  const volume30d = vs.vol_30d ? Number(vs.vol_30d) : null
+  const volumeAllTime = vs.vol_all ? Number(vs.vol_all) : null
+  const totalSales = Number(vs.sale_count)
 
   // Update collection_stats cache + floor price snapshot
   await prisma.collectionStats.upsert({

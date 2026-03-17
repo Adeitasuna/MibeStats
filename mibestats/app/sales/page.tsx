@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Mibera333 sales history — price chart, daily volume, and filterable sales table.',
 }
 
-export const dynamic = 'force-dynamic'   // Render at request time (requires DB)
+export const revalidate = 300  // ISR: regenerate every 5 min
 
 async function getRecentSales(): Promise<{ sales: Sale[]; chartPoints: SalePoint[] }> {
   const rows = await prisma.sale.findMany({

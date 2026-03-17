@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { apiError } from '@/lib/api-error'
 
 interface Options {
   /** If set, adds Cache-Control + CDN-Cache-Control headers to successful responses. */
@@ -21,10 +22,9 @@ export function withRateLimit(
     const ip = getClientIp(req)
     const rl = checkRateLimit(`${key}:${ip}`, limit, 60)
     if (!rl.success) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetMs - Date.now()) / 1000)) } },
-      )
+      const res = apiError('Too many requests', 429)
+      res.headers.set('Retry-After', String(Math.ceil((rl.resetMs - Date.now()) / 1000)))
+      return res
     }
 
     try {
@@ -37,7 +37,7 @@ export function withRateLimit(
       return res
     } catch (err) {
       console.error(`[/api/${key}]`, err)
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+      return apiError('Internal server error', 500)
     }
   }
 }

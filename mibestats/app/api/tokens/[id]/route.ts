@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { tokenIdSchema } from '@/lib/validation'
 import { withRateLimit } from '@/lib/api-handler'
+import { apiError } from '@/lib/api-error'
 import { magicEdenUrl } from '@/types'
 
 export const revalidate = 3600
@@ -9,7 +10,7 @@ export const revalidate = 3600
 export const GET = withRateLimit('token-detail', 100, async (req, { params }: { params: { id: string } }) => {
   const idParsed = tokenIdSchema.safeParse(params.id)
   if (!idParsed.success) {
-    return NextResponse.json({ error: 'Invalid token ID (1–10000)' }, { status: 404 })
+    return apiError('Invalid token ID (1–10000)', 400)
   }
 
   const tokenId = idParsed.data
@@ -30,7 +31,7 @@ export const GET = withRateLimit('token-detail', 100, async (req, { params }: { 
   })
 
   if (!token) {
-    return NextResponse.json({ error: 'Token not found' }, { status: 404 })
+    return apiError('Token not found', 404)
   }
 
   const response = {

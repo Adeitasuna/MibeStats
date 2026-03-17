@@ -82,7 +82,7 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
         </button>
         <Link
           ref={logoRef}
-          href="/dashboard"
+          href="/lore"
           onClick={handleLogoClick}
           className="section-title fugitive-card"
           style={{ whiteSpace: 'nowrap', fontSize: '1.6rem', letterSpacing: '0.05em', textDecoration: 'none', textShadow: '0 0 8px rgba(255,215,0,0.4)', position: 'relative' }}

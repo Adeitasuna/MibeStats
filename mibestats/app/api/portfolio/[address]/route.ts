@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { addressSchema } from '@/lib/validation'
 import { withRateLimit } from '@/lib/api-handler'
+import { apiError } from '@/lib/api-error'
 import { magicEdenUrl } from '@/types'
 
 export const revalidate = 60   // 1-minute ISR
@@ -10,10 +11,7 @@ export const GET = withRateLimit('portfolio', 30, async (req, { params }: { para
   // ─── Address validation ─────────────────────────────────────────────────────
   const parsed = addressSchema.safeParse(params.address)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid EIP-55 checksummed address' },
-      { status: 400 },
-    )
+    return apiError('Invalid EIP-55 checksummed address', 400)
   }
 
   const address = parsed.data
@@ -32,7 +30,7 @@ export const GET = withRateLimit('portfolio', 30, async (req, { params }: { para
         item: true, drug: true,
         isGrail: true, grailName: true, grailCategory: true,
         imageUrl: true, ownerAddress: true,
-        lastSalePrice: true, maxSalePrice: true, saleCount: true,
+        lastSalePrice: true, maxSalePrice: true, saleCount: true, transferCount: true,
       },
     }),
     prisma.collectionStats.findUnique({ where: { id: 1 } }),

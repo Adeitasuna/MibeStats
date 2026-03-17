@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Share_Tech_Mono, Pirata_One } from 'next/font/google'
 import './globals.css'
 import { AppShell } from '@/components/layout/AppShell'
+import { ScrollToTop } from '@/components/layout/ScrollToTop'
 import { AgentationOverlay } from '@/components/dev/AgentationOverlay'
 import { ConsoleGreeting } from '@/components/dev/ConsoleGreeting'
 import { KonamiRain } from '@/components/dev/KonamiRain'
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`dark ${inter.variable} ${shareTechMono.variable} ${pirataOne.variable}`}>
       <body className="min-h-screen">
+        <ScrollToTop />
         <AppShell>
           {children}
         </AppShell>

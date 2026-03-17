@@ -83,6 +83,13 @@ model Token {
   @@index([drug])
   @@index([ancestor])
   @@index([element])
+  @@index([timePeriod])
+  @@index([sunSign])
+  @@index([moonSign])
+  @@index([ascendingSign])
+  @@index([ancestor, archetype, element])
+  @@index([swagRank, swagScore(sort: Desc)])
+  @@index([ownerAddress, rarityRank])
   @@map("tokens")
 }
 
@@ -110,6 +117,7 @@ model Sale {
   @@index([priceBera(sort: Desc)])
   @@index([sellerAddress, buyerAddress])
   @@index([soldAt(sort: Desc), tokenId])
+  @@index([soldAt(sort: Desc), priceBera(sort: Desc)])
   @@map("sales")
 }
 

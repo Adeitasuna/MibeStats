@@ -5,7 +5,6 @@ export const metadata: Metadata = {
   title: 'Dashboard',
 }
 
-export const dynamic = 'force-dynamic'
 
 const EdenContent = nextDynamic(
   () => import('@/components/eden/EdenContent').then((m) => m.EdenContent),

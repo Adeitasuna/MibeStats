@@ -57,7 +57,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
         item: true, drug: true,
         isGrail: true, grailName: true, grailCategory: true,
         imageUrl: true, ownerAddress: true,
-        lastSalePrice: true, maxSalePrice: true, saleCount: true,
+        lastSalePrice: true, maxSalePrice: true, saleCount: true, transferCount: true,
       },
     }),
     prisma.collectionStats.findUnique({ where: { id: 1 } }),
