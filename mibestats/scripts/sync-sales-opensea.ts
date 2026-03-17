@@ -31,13 +31,23 @@ async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
 }
 
+async function fetchWithTimeout(url: string, opts: RequestInit, timeoutMs = 10000): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...opts, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 async function fetchEventsPage(cursor?: string): Promise<OpenSeaResponse> {
   const url = new URL(OPENSEA_API_URL)
   url.searchParams.set('event_type', 'sale')
   url.searchParams.set('limit', '50')
   if (cursor) url.searchParams.set('next', cursor)
 
-  const res = await fetch(url.toString(), {
+  const res = await fetchWithTimeout(url.toString(), {
     headers: {
       'x-api-key': process.env.OPENSEA_API_KEY!,
       Accept: 'application/json',
@@ -48,7 +58,12 @@ async function fetchEventsPage(cursor?: string): Promise<OpenSeaResponse> {
     throw new Error(`OpenSea API error: ${res.status} ${res.statusText}`)
   }
 
-  return res.json() as Promise<OpenSeaResponse>
+  const data = await res.json()
+  if (!Array.isArray(data?.asset_events)) {
+    throw new Error('Unexpected OpenSea response format')
+  }
+
+  return data as OpenSeaResponse
 }
 
 async function main() {
@@ -77,17 +92,45 @@ async function main() {
     const events = result.asset_events
     cursor = result.next ?? undefined
 
-    // Parse events into sale records
-    const sales = events.map((e) => ({
-      tokenId: parseInt(e.nft.identifier, 10),
-      priceBera: new Prisma.Decimal(
-        (BigInt(e.payment.quantity) * 1_000_000n / BigInt(10 ** e.payment.decimals)).toString()
-      ).div(1_000_000),
-      soldAt: new Date(e.event_timestamp * 1000),
-      buyerAddress: e.buyer,
-      sellerAddress: e.seller,
-      txHash: e.transaction,
-    }))
+    // Parse and validate events into sale records
+    const sales = []
+    for (const e of events) {
+      const tokenId = parseInt(e.nft?.identifier, 10)
+      if (isNaN(tokenId) || tokenId < 1 || tokenId > 10000) {
+        console.warn(`Skipping invalid tokenId: ${e.nft?.identifier}`)
+        continue
+      }
+
+      const decimals = e.payment?.decimals ?? 18
+      if (decimals < 0 || decimals > 30) {
+        console.warn(`Skipping invalid decimals: ${decimals}`)
+        continue
+      }
+
+      const quantity = BigInt(e.payment?.quantity ?? '0')
+      if (quantity <= 0n) {
+        console.warn(`Skipping zero/negative quantity for token ${tokenId}`)
+        continue
+      }
+
+      const priceBera = new Prisma.Decimal(
+        (quantity * 1_000_000n / BigInt(10 ** decimals)).toString()
+      ).div(1_000_000)
+
+      if (priceBera.lte(0) || priceBera.gt(1_000_000)) {
+        console.warn(`Skipping unrealistic price ${priceBera} for token ${tokenId}`)
+        continue
+      }
+
+      sales.push({
+        tokenId,
+        priceBera,
+        soldAt: new Date(e.event_timestamp * 1000),
+        buyerAddress: e.buyer ?? null,
+        sellerAddress: e.seller ?? null,
+        txHash: e.transaction ?? null,
+      })
+    }
 
     // Stop pagination when we reach already-synced sales
     const newSales = sales.filter((s) => s.soldAt > lastSynced)

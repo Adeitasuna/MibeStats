@@ -36,7 +36,8 @@ async function tryOpenSea(): Promise<number | null> {
 
   const data = await res.json()
   const floor = data?.total?.floor_price ?? data?.floor_price ?? null
-  return typeof floor === 'number' ? floor : null
+  if (typeof floor !== 'number' || floor <= 0 || floor > 1_000_000) return null
+  return floor
 }
 
 /** Fallback: last known floor price from DB */

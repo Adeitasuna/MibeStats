@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.4.0",
+    "date": "2026-03-17",
+    "summary": "Full migration from Magic Eden to OpenSea",
+    "changes": [
+      "Floor price and sales sync now powered by OpenSea API",
+      "All NFT links point to OpenSea instead of Magic Eden",
+      "Floor price chart restored with real snapshot data",
+      "Lore cards responsive layout",
+      "Triple-click logo opens midi.0xhoneyjar.xyz",
+      "GitHub Actions workflow migrated to OpenSea",
+      "Magic Eden API fully removed"
+    ]
+  },
+  {
     "version": "0.3.5",
     "date": "2026-03-17",
     "summary": "Floor price provider migration — OpenSea ready, chart paused",
