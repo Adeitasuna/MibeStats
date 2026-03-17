@@ -1,23 +1,27 @@
 /**
- * snapshot-floor.ts — Record daily floor price from Magic Eden.
+ * snapshot-floor.ts — Record daily floor price.
+ * Fetches floor price from OpenSea, skips if unavailable.
  * Run by GitHub Actions cron after sales sync.
  */
 
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
-import { getFloorPrice } from '../lib/me-api'
+import { getFloorPriceFromBestSource } from '../lib/floor-price'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('=== Floor price snapshot ===')
 
-  const floorPrice = await getFloorPrice()
+  const result = await getFloorPriceFromBestSource()
+  const floorPrice = result.floorPrice
 
-  if (floorPrice == null) {
-    console.log('No floor price available from ME API')
+  if (floorPrice == null || result.source === 'database') {
+    console.log(`No live floor price available (source: ${result.source})`)
     return
   }
+
+  console.log(`Source: ${result.source}`)
 
   const today = new Date()
   today.setUTCHours(0, 0, 0, 0)

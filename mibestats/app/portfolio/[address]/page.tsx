@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { addressSchema } from '@/lib/validation'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 import type { SwagRank } from '@/types'
 import { PortfolioStats } from '@/components/portfolio/PortfolioStats'
 import { HoldingsGrid } from '@/components/portfolio/HoldingsGrid'
@@ -80,7 +80,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
     swagRank:      t.swagRank as SwagRank,
     lastSalePrice: t.lastSalePrice ? Number(t.lastSalePrice) : null,
     maxSalePrice:  t.maxSalePrice  ? Number(t.maxSalePrice)  : null,
-    magicEdenUrl:  magicEdenUrl(t.tokenId),
+    openSeaUrl:    openSeaUrl(t.tokenId),
   }))
 
   const short = `${address.slice(0, 6)}...${address.slice(-4)}`

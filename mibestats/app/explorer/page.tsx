@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import { truncateAddress } from '@/lib/format'
 import type { Token } from '@/types'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 /** Spinner placeholder that occupies the exact image space */
 function ImageSpinner({ size = '100%' }: { size?: string | number }) {
@@ -28,7 +28,7 @@ function ImageSpinner({ size = '100%' }: { size?: string | number }) {
 }
 
 interface TokenDetail extends Token {
-  magicEdenUrl: string
+  openSeaUrl: string
   salesHistory: Array<{
     id: string
     priceBera: number

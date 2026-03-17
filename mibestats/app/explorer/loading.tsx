@@ -36,7 +36,7 @@ export default function Loading() {
             ))}
           </div>
 
-          {/* MagicEden link */}
+          {/* OpenSea link */}
           <div className="card px-4 py-2 h-9 bg-white/5 animate-pulse rounded" />
         </div>
 

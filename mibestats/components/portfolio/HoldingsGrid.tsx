@@ -1,6 +1,6 @@
 import { TokenCard } from '@/components/traits/TokenCard'
 import type { Token } from '@/types'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 interface Props {
   tokens: Token[]
@@ -24,7 +24,7 @@ export function HoldingsGrid({ tokens }: Props) {
       {tokens.map((token) => (
         <TokenCard
           key={token.tokenId}
-          token={{ ...token, magicEdenUrl: magicEdenUrl(token.tokenId) }}
+          token={{ ...token, openSeaUrl: openSeaUrl(token.tokenId) }}
         />
       ))}
     </div>

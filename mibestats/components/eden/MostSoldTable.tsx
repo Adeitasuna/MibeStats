@@ -37,7 +37,7 @@ export function MostSoldTable({ mostSold, onImageClick }: { mostSold: MostSoldIt
                     )}
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem' }}>
-                    <a href={token.magicEdenUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{token.tokenId}</a>
+                    <a href={token.openSeaUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{token.tokenId}</a>
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem' }}><SwagRankBadge rank={token.swagRank} size="sm" /></td>
                   <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>

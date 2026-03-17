@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { withRateLimit } from '@/lib/api-handler'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 export const revalidate = 900
 
@@ -135,7 +135,7 @@ export const GET = withRateLimit('eden', 100, async (req) => {
       swagRank: s.token?.swagRank ?? null,
       isGrail: s.token?.isGrail ?? false,
       grailName: s.token?.grailName ?? null,
-      magicEdenUrl: magicEdenUrl(s.tokenId),
+      openSeaUrl: openSeaUrl(s.tokenId),
     })),
     salesDistribution: salesDistribution.map((r) => ({
       saleCount: r.sale_count,
@@ -151,7 +151,7 @@ export const GET = withRateLimit('eden', 100, async (req) => {
       grailName: r.grail_name,
       maxSalePrice: r.max_sale_price ? Number(r.max_sale_price) : null,
       lastSalePrice: r.last_sale_price ? Number(r.last_sale_price) : null,
-      magicEdenUrl: magicEdenUrl(r.token_id),
+      openSeaUrl: openSeaUrl(r.token_id),
     })),
     salesStats: {
       count1d: salesCount1d,

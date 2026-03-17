@@ -36,7 +36,7 @@ export function BestSalesTable({ bestSales, onImageClick }: { bestSales: BestSal
                     )}
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem' }}>
-                    <a href={sale.magicEdenUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{sale.tokenId}</a>
+                    <a href={sale.openSeaUrl} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>#{sale.tokenId}</a>
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem' }}>{sale.swagRank && <SwagRankBadge rank={sale.swagRank} size="sm" />}</td>
                   <td style={{ padding: '0.5rem 0.75rem' }}>

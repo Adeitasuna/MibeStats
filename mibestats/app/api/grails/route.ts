@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { withRateLimit } from '@/lib/api-handler'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 export const revalidate = 86400
 
@@ -38,7 +38,7 @@ export const GET = withRateLimit('grails', 100, async (req) => {
       ...rest,
       lastSalePrice,
       maxSalePrice,
-      magicEdenUrl: magicEdenUrl(t.tokenId),
+      openSeaUrl: openSeaUrl(t.tokenId),
     }
   })
 

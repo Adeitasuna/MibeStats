@@ -84,7 +84,7 @@ export const OFFICIAL_SITE_PAGES: SitePageLink[] = [
   { label: 'Backing', url: 'https://mibera.0xhoneyjar.xyz/backing', description: 'Support and backing information for the project' },
   { label: 'Quiz', url: 'https://mibera.0xhoneyjar.xyz/quiz', description: 'Test your knowledge of the Mibera333 universe' },
   { label: 'Maker', url: 'https://mibera.0xhoneyjar.xyz/maker', description: 'Create and customize your own Mibera content' },
-  { label: 'MagicEden', url: 'https://magiceden.io/collections/berachain/mibera333', description: 'Browse and trade Mibera333 NFTs on MagicEden marketplace' },
+  { label: 'OpenSea', url: 'https://opensea.io/collection/mibera333', description: 'Browse and trade Mibera333 NFTs on OpenSea marketplace' },
 ]
 
 export const FBI_FUGITIVES: FugitiveCard[] = [

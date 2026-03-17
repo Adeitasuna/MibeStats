@@ -37,7 +37,7 @@ export function Navbar({ onMenuToggle, mobileOpen }: NavbarProps) {
       e.preventDefault()
       clickCount.current = 0
       clearTimeout(clickTimer.current)
-      window.open('https://opensea.io/fr/collection/mibera333', '_blank')
+      window.open('https://midi.0xhoneyjar.xyz/', '_blank')
       return
     }
     clearTimeout(clickTimer.current)

@@ -8,7 +8,7 @@ import { TokenCard } from '@/components/traits/TokenCard'
 import { TraitDistributionChart } from '@/components/traits/TraitDistributionChart'
 import { RarityLeaderboard } from '@/components/traits/RarityLeaderboard'
 import { fetchTraitDistribution } from '@/lib/trait-distribution'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 import type { SwagRank } from '@/types'
 
 export const metadata: Metadata = {
@@ -64,7 +64,7 @@ const getLeaderboard = unstable_cache(
       swagRank:      r.swagRank as SwagRank,
       lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
       maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
-      magicEdenUrl:  magicEdenUrl(r.tokenId),
+      openSeaUrl:    openSeaUrl(r.tokenId),
     }))
   },
   ['traits-leaderboard'],
@@ -129,7 +129,7 @@ async function getTokens(params: Record<string, string>) {
       swagRank:      r.swagRank as SwagRank,
       lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
       maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
-      magicEdenUrl:  magicEdenUrl(r.tokenId),
+      openSeaUrl:    openSeaUrl(r.tokenId),
     })),
     total,
     page,

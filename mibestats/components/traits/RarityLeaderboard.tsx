@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import type { Token } from '@/types'
-import { magicEdenUrl as buildMEUrl } from '@/types'
+import { openSeaUrl as buildOSUrl } from '@/types'
 
 interface LeaderboardToken extends Pick<
   Token,
   'tokenId' | 'archetype' | 'ancestor' | 'swagRank' | 'rarityRank' | 'isGrail' | 'grailName'
 > {
-  magicEdenUrl?: string
+  openSeaUrl?: string
 }
 
 interface Props {
@@ -50,7 +50,7 @@ export function RarityLeaderboard({ tokens }: Props) {
                 </td>
                 <td className="py-2 pr-4">
                   <Link
-                    href={token.magicEdenUrl ?? buildMEUrl(token.tokenId)}
+                    href={token.openSeaUrl ?? buildOSUrl(token.tokenId)}
                     target="_blank"
                     rel="noreferrer"
                     className="text-white hover:text-yellow-400 transition-colors font-medium"

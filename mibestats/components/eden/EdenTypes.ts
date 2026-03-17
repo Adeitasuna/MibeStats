@@ -2,7 +2,7 @@
 
 export interface CollectionData {
   floorPrice: number | null
-  floorPriceSource?: 'opensea' | 'magiceden' | 'database'
+  floorPriceSource?: 'opensea' | 'database'
   floorPriceAsOf?: string
   volume24h: number | null
   volume7d: number | null
@@ -26,7 +26,7 @@ export interface BestSale {
   swagRank: string | null
   isGrail: boolean
   grailName: string | null
-  magicEdenUrl: string
+  openSeaUrl: string
 }
 
 export interface SalesDistItem {
@@ -44,7 +44,7 @@ export interface MostSoldItem {
   grailName: string | null
   maxSalePrice: number | null
   lastSalePrice: number | null
-  magicEdenUrl: string
+  openSeaUrl: string
 }
 
 export interface EdenApiData {

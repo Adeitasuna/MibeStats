@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { tokenQuerySchema, parseSearchParams } from '@/lib/validation'
 import { withRateLimit } from '@/lib/api-handler'
 import { apiError } from '@/lib/api-error'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 import type { Prisma } from '@prisma/client'
 
 export const revalidate = 86400   // 24-hour cache
@@ -67,7 +67,7 @@ export const GET = withRateLimit('tokens', 100, async (req) => {
     ...r,
     lastSalePrice: r.lastSalePrice ? Number(r.lastSalePrice) : null,
     maxSalePrice:  r.maxSalePrice  ? Number(r.maxSalePrice)  : null,
-    magicEdenUrl:  magicEdenUrl(r.tokenId),
+    openSeaUrl:    openSeaUrl(r.tokenId),
   }))
 
   return NextResponse.json({

@@ -25,7 +25,7 @@ export default function LorePage() {
       {/* ── Lore Documents — 7 compact blocks in 1 row ── */}
       <section>
         <h2 className="separator">Lore</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.5rem' }}>
           {LORE_DOCUMENTS.map((doc) => (
             <a
               key={doc.title}

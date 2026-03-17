@@ -35,12 +35,12 @@ jobs:
           BERACHAIN_RPC_URL:  ${{ secrets.BERACHAIN_RPC_URL }}
           NEXT_PUBLIC_CONTRACT_ADDRESS: '0x6666397DFe9a8c469BF65dc744CB1C733416c420'
 
-      - name: Sync sales (Magic Eden)
-        run: npx tsx scripts/sync-sales-me.ts
+      - name: Sync sales (OpenSea)
+        run: npx tsx scripts/sync-sales-opensea.ts
         env:
-          DATABASE_URL:    ${{ secrets.DATABASE_URL }}
-          DIRECT_URL:      ${{ secrets.DIRECT_URL }}
-          ME_BEARER_TOKEN: ${{ secrets.ME_BEARER_TOKEN }}
+          DATABASE_URL:     ${{ secrets.DATABASE_URL }}
+          DIRECT_URL:       ${{ secrets.DIRECT_URL }}
+          OPENSEA_API_KEY:  ${{ secrets.OPENSEA_API_KEY }}
 
       - name: Sync owner addresses
         run: npx tsx scripts/sync-owners.ts
@@ -53,6 +53,6 @@ jobs:
       - name: Snapshot floor price
         run: npx tsx scripts/snapshot-floor.ts
         env:
-          DATABASE_URL:    ${{ secrets.DATABASE_URL }}
-          DIRECT_URL:      ${{ secrets.DIRECT_URL }}
-          ME_BEARER_TOKEN: ${{ secrets.ME_BEARER_TOKEN }}
+          DATABASE_URL:     ${{ secrets.DATABASE_URL }}
+          DIRECT_URL:       ${{ secrets.DIRECT_URL }}
+          OPENSEA_API_KEY:  ${{ secrets.OPENSEA_API_KEY }}

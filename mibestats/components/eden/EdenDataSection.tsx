@@ -14,7 +14,7 @@ interface BestSale {
   swagRank: string | null
   isGrail: boolean
   grailName: string | null
-  magicEdenUrl: string
+  openSeaUrl: string
 }
 
 interface SalesDistItem {
@@ -31,7 +31,7 @@ interface MostSoldItem {
   grailName: string | null
   maxSalePrice: number | null
   lastSalePrice: number | null
-  magicEdenUrl: string
+  openSeaUrl: string
 }
 
 interface EdenData {
@@ -167,7 +167,7 @@ export function EdenDataSection() {
                   </td>
                   <td className="p-3">
                     <a
-                      href={sale.magicEdenUrl}
+                      href={sale.openSeaUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="text-mibe-cyan hover:underline"
@@ -239,7 +239,7 @@ export function EdenDataSection() {
                   </td>
                   <td className="p-3">
                     <a
-                      href={token.magicEdenUrl}
+                      href={token.openSeaUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="text-mibe-cyan hover:underline"

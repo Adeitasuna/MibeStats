@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 import { truncateAddress, fmtDate } from '@/lib/format'
 import type { Sale, PaginatedResponse } from '@/types'
 
@@ -217,7 +217,7 @@ export function SalesTable({ initialSales, initialTotal }: Props) {
                       )}
                       <div>
                         <Link
-                          href={magicEdenUrl(sale.tokenId)}
+                          href={openSeaUrl(sale.tokenId)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-white hover:text-yellow-400 transition-colors font-medium"

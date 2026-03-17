@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import { timeAgo } from '@/lib/format'
 import type { Sale } from '@/types'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 interface Props {
   sales: Sale[]
@@ -20,7 +20,7 @@ export function RecentSalesFeed({ sales }: Props) {
         {sales.map((sale) => (
           <li key={sale.id} className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
             {/* Token image */}
-            <Link href={magicEdenUrl(sale.tokenId)} target="_blank" rel="noreferrer" className="shrink-0">
+            <Link href={openSeaUrl(sale.tokenId)} target="_blank" rel="noreferrer" className="shrink-0">
               {sale.token?.imageUrl ? (
                 <Image
                   src={sale.token.imageUrl}
@@ -40,7 +40,7 @@ export function RecentSalesFeed({ sales }: Props) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <Link
-                  href={magicEdenUrl(sale.tokenId)}
+                  href={openSeaUrl(sale.tokenId)}
                   target="_blank"
                   rel="noreferrer"
                   className="text-sm font-medium text-white hover:text-yellow-400 transition-colors"

@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { addressSchema } from '@/lib/validation'
 import { withRateLimit } from '@/lib/api-handler'
 import { apiError } from '@/lib/api-error'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 export const revalidate = 60   // 1-minute ISR
 
@@ -43,7 +43,7 @@ export const GET = withRateLimit('portfolio', 30, async (req, { params }: { para
     ...t,
     lastSalePrice: t.lastSalePrice ? Number(t.lastSalePrice) : null,
     maxSalePrice:  t.maxSalePrice  ? Number(t.maxSalePrice)  : null,
-    magicEdenUrl:  magicEdenUrl(t.tokenId),
+    openSeaUrl:    openSeaUrl(t.tokenId),
   }))
 
   const grailCount       = tokens.filter((t) => t.isGrail).length

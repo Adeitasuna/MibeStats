@@ -4,13 +4,13 @@ import { SwagRankBadge } from '@/components/ui/SwagRankBadge'
 import type { Token } from '@/types'
 
 interface Props {
-  token: Token & { magicEdenUrl: string }
+  token: Token & { openSeaUrl: string }
 }
 
 export function TokenCard({ token }: Props) {
   return (
     <Link
-      href={token.magicEdenUrl}
+      href={token.openSeaUrl}
       target="_blank"
       rel="noreferrer"
       className="card block overflow-hidden hover:border-mibe-gold transition-colors group"

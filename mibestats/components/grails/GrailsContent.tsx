@@ -3,11 +3,11 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import type { Token } from '@/types'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 import { StatusNote } from '@/components/dev/StatusNote'
 
 interface GrailToken extends Token {
-  magicEdenUrl: string
+  openSeaUrl: string
 }
 
 interface GrailsResponse {
@@ -254,13 +254,13 @@ export function GrailsContent() {
             {modalGrail.grailCategory}
           </span>
           <a
-            href={magicEdenUrl(modalGrail.tokenId)}
+            href={openSeaUrl(modalGrail.tokenId)}
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
             style={{ color: '#1f6feb', fontSize: '0.8rem', textDecoration: 'underline' }}
           >
-            View on Magic Eden
+            View on OpenSea
           </a>
           {modalGrail.grailName?.toLowerCase() === 'black hole' && (
             <div onClick={(e) => e.stopPropagation()} style={{ marginTop: '0.25rem' }}>

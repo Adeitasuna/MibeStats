@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { getFloorPriceFromBestSource } from '@/lib/floor-price'
 import { withRateLimit } from '@/lib/api-handler'
 import type { CollectionResponse, Sale } from '@/types'
-import { magicEdenUrl } from '@/types'
+import { openSeaUrl } from '@/types'
 
 export const revalidate = 300   // 5-minute ISR cache
 

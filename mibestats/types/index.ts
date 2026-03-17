@@ -137,8 +137,8 @@ export const CONTRACT_ADDRESS = '0x6666397DFe9a8c469BF65dc744CB1C733416c420'
 export const CHAIN_ID = 80094
 export const TOKEN_COUNT = 10000
 
-export function magicEdenUrl(tokenId: number): string {
-  return `https://magiceden.io/item-details/berachain/${CONTRACT_ADDRESS}/${tokenId}`
+export function openSeaUrl(tokenId: number): string {
+  return `https://opensea.io/assets/bera_chain/${CONTRACT_ADDRESS}/${tokenId}`
 }
 
 /* ── BubbleMap types ── */
