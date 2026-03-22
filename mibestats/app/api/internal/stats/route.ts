@@ -39,28 +39,37 @@ export async function GET(req: NextRequest) {
       },
     }),
     prisma.feedback.findMany({
-      select: { score: true },
+      select: { score: true, visitorId: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
     }),
   ])
 
-  // NPS calculation: promoters (9-10) - detractors (0-6) as % of total
-  const total = feedbackAll.length
+  // Deduplicate: keep only the latest score per visitorId
+  const latestByVisitor = new Map<string, number>()
+  for (const f of feedbackAll) {
+    const key = f.visitorId ?? `anon_${f.createdAt.getTime()}`
+    if (!latestByVisitor.has(key)) latestByVisitor.set(key, f.score)
+  }
+  const dedupedScores = Array.from(latestByVisitor.values())
+
+  // NPS calculation on deduplicated scores (scale: 1=BAD, 3=FINE, 5=GOOD)
+  const total = dedupedScores.length
   let npsScore = 0
   let promoters = 0
   let passives = 0
   let detractors = 0
 
   if (total > 0) {
-    for (const f of feedbackAll) {
-      if (f.score >= 9) promoters++
-      else if (f.score >= 7) passives++
+    for (const score of dedupedScores) {
+      if (score >= 5) promoters++
+      else if (score >= 3) passives++
       else detractors++
     }
     npsScore = Math.round(((promoters - detractors) / total) * 100)
   }
 
   const avgScore = total > 0
-    ? Math.round((feedbackAll.reduce((sum, f) => sum + f.score, 0) / total) * 10) / 10
+    ? Math.round((dedupedScores.reduce((sum, s) => sum + s, 0) / total) * 10) / 10
     : 0
 
   // Daily submissions (last 7 days)
