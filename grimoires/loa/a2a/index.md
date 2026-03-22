@@ -1,40 +1,24 @@
-# Sprint Status Index
+# Sprint A2A Index — cycle-030 (MibeStats)
 
-## Cycle 041: Vision-Aware Planning — Creative Agency for AI Peers
+| Sprint | Global ID | Label | Status | Reviewer | Auditor |
+|--------|-----------|-------|--------|----------|---------|
+| sprint-1 | sprint-25 | Foundation + Collection Overview | COMPLETED | APPROVED | APPROVED |
+| sprint-2 | sprint-26 | Traits + Sales History | COMPLETED | APPROVED | APPROVED |
+| sprint-3 | sprint-27 | Portfolio + Security + Polish | COMPLETED | APPROVED | APPROVED |
 
-| Sprint | Global ID | Status | Phase |
-|--------|-----------|--------|-------|
-| Sprint 1 | 74 | COMPLETED | — |
-| Sprint 2 | 75 | COMPLETED | audit: APPROVED |
-| Sprint 3 | 76 | COMPLETED | audit: APPROVED |
+## Artifacts
 
-## Cycle 039: Two-Pass Bridge Review
-
-| Sprint | Global ID | Status | Phase |
-|--------|-----------|--------|-------|
-| Sprint 1 | 63 | COMPLETED | — |
-| Sprint 2 | 64 | COMPLETED | — |
-| Sprint 3 | 65 | COMPLETED | — |
-| Sprint 4 | 66 | COMPLETED | — |
-| Sprint 5 | 67 | COMPLETED | — |
-| Sprint 6 | 68 | COMPLETED | — |
-| Sprint 7 | 69 | COMPLETED | — |
-| Sprint 8 | 70 | COMPLETED | audit: APPROVED |
-| Sprint 9 | 71 | COMPLETED | review: PENDING |
-
-## Cycle 038: Organizational Memory Sovereignty — Three-Zone State Architecture
-
-| Sprint | Global ID | Status | Phase |
-|--------|-----------|--------|-------|
-| Sprint 1 | 57 | COMPLETED | — |
-| Sprint 2 | 58 | COMPLETED | — |
-| Sprint 3 | 59 | COMPLETED | — |
-| Sprint 4 | 60 | COMPLETED | — |
-| Sprint 5 | 61 | COMPLETED | — |
-| Sprint 6 | 62 | COMPLETED | — |
-
-## Cycle 037: Bridgebuilder Deep Review — Architectural Fixes
-
-| Sprint | Global ID | Status | Phase |
-|--------|-----------|--------|-------|
-| Sprint 1 | 56 | COMPLETED | — |
+| Sprint | File |
+|--------|------|
+| sprint-25 | `a2a/sprint-25/reviewer.md` |
+| sprint-25 | `a2a/sprint-25/engineer-feedback.md` |
+| sprint-25 | `a2a/sprint-25/auditor-sprint-feedback.md` |
+| sprint-25 | `a2a/sprint-25/COMPLETED` |
+| sprint-26 | `a2a/sprint-26/reviewer.md` |
+| sprint-26 | `a2a/sprint-26/engineer-feedback.md` |
+| sprint-26 | `a2a/sprint-26/auditor-sprint-feedback.md` |
+| sprint-26 | `a2a/sprint-26/COMPLETED` |
+| sprint-27 | `a2a/sprint-27/reviewer.md` |
+| sprint-27 | `a2a/sprint-27/engineer-feedback.md` |
+| sprint-27 | `a2a/sprint-27/auditor-sprint-feedback.md` |
+| sprint-27 | `a2a/sprint-27/COMPLETED` |
