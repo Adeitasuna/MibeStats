@@ -229,19 +229,7 @@ export function FloatingPanel() {
     setScreenshot(null); setErrorMsg(''); setIncludeScreenshot(true)
   }, [])
 
-  // ─── Interaction gate: show only after N page views in this session ──────
-  const [eligible, setEligible] = useState(false)
-  const INTERACTION_THRESHOLD = 3
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const key = 'fp_pageviews'
-    const count = Number(sessionStorage.getItem(key) || '0') + 1
-    sessionStorage.setItem(key, String(count))
-    if (count >= INTERACTION_THRESHOLD) setEligible(true)
-  }, [pathname])
-
-  if (!initialized || !eligible) return null
+  if (!initialized) return null
 
   // ─── Collapsed tab ────────────────────────────────────────────────────────
   if (view === 'collapsed') {
