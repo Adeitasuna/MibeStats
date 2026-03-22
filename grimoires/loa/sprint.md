@@ -5,18 +5,19 @@
 **PRD**: grimoires/loa/prd.md (v1.0.0)
 **SDD**: grimoires/loa/sdd.md (v1.0.0)
 **Cycle**: cycle-030
-**Global Sprint IDs**: sprint-25, sprint-26, sprint-27
+**Global Sprint IDs**: sprint-25, sprint-26, sprint-28, sprint-27
 
 ---
 
 ## Overview
 
-3 sprints, 1 week each, 1 solo developer. Deliverable: MibeStats publicly live on Vercel at end of sprint-3.
+4 sprints, 1 solo developer. Deliverable: MibeStats publicly live on Vercel at end of sprint-4.
 
 | Sprint | Global ID | Theme | Deliverable |
 |--------|-----------|-------|-------------|
 | Sprint 1 | sprint-25 | Foundation + Collection Overview | Vercel deployment, live floor price, data pipeline |
 | Sprint 2 | sprint-26 | Traits + Sales History | Rarity explorer, trait filters, sales charts |
+| Sprint 2.5 | sprint-28 | Analytics + Feedback + Bug Reporting | Umami server-side, NPS widget, bug reporter with screenshot |
 | Sprint 3 | sprint-27 | Portfolio + Security + Polish | Wallet search, security hardening, E2E tests |
 
 ---
@@ -40,6 +41,10 @@
 | F3.1 Price chart (all sales over time) | Sprint 2 |
 | F3.2 Volume bar chart | Sprint 2 |
 | F3.3 Filterable sales table | Sprint 2 |
+| F5.1 Server-side analytics (Umami) | Sprint 2.5 |
+| F5.2 NPS feedback widget | Sprint 2.5 |
+| F5.3 Bug reporter with screenshot | Sprint 2.5 |
+| F5.4 Internal analytics dashboard | Sprint 2.5 |
 | F4.1 Wallet address lookup | Sprint 3 |
 | F4.2 Holdings grid | Sprint 3 |
 | F4.3 Portfolio estimated value | Sprint 3 |
@@ -402,6 +407,121 @@
 - [x] Sales History page shows price chart and volume chart with real data
 - [x] URL filter params are shareable
 - [x] Navigation between all 4 pages works (portfolio page is a stub)
+
+---
+
+## Sprint 2.5 — Analytics + Feedback + Bug Reporting
+
+**Goal**: Add observability (Umami server-side analytics), user feedback collection (NPS widget), and a secure bug reporting tool with screenshot capture. Internal dashboard to view collected data.
+
+**Duration**: 2-3 days
+**Global ID**: sprint-28
+**Dependencies**: Sprint 2 complete
+
+### Task S2.5-T1 — Umami Server-Side Analytics
+
+**Description**: Deploy Umami analytics (self-hosted or Umami Cloud free tier) and integrate server-side tracking into the Next.js app. No client-side tracking script — all events sent server-side via the Umami API to avoid ad-blockers and keep the CSP clean.
+
+**Acceptance Criteria**:
+- [ ] Umami instance accessible (self-hosted on Railway/Vercel or Umami Cloud free tier)
+- [ ] `UMAMI_HOST` and `UMAMI_WEBSITE_ID` env vars configured in `.env` and Vercel
+- [ ] `lib/analytics.ts` module: `trackPageView(path, referrer?, userAgent?)` and `trackEvent(name, data?)` functions
+- [ ] Server-side tracking via Umami `/api/send` endpoint (POST requests from API routes / middleware)
+- [ ] Next.js middleware (`middleware.ts`) tracks page views server-side on every request
+- [ ] Key events tracked: page views, trait filter usage, portfolio lookup, sales table filter
+- [ ] No tracking script injected in `<head>` — purely server-side
+- [ ] No PII collected (wallet addresses hashed or excluded)
+- [ ] `.env.example` updated with new env vars
+- [ ] Verify events appear in Umami dashboard
+
+**Effort**: M (1 day)
+**Dependencies**: Sprint 2 complete
+
+---
+
+### Task S2.5-T2 — NPS Feedback Widget
+
+**Description**: Build a lightweight NPS (Net Promoter Score) widget. Floating button on all pages, opens a modal with 0-10 score + optional comment. Stored in PostgreSQL via API route.
+
+**Acceptance Criteria**:
+- [ ] Prisma migration: `feedback` table (`id`, `score INT CHECK(0-10)`, `comment TEXT NULL`, `page VARCHAR`, `user_agent VARCHAR`, `created_at TIMESTAMP`)
+- [ ] `POST /api/feedback` route: validates score (0-10 Zod), optional comment (max 1000 chars), stores in DB
+- [ ] Rate limiting: 3 submissions per IP per hour (prevent spam)
+- [ ] `<FeedbackButton>` component: floating button bottom-right, pulsing animation on first visit (localStorage flag)
+- [ ] `<FeedbackModal>` component: score selector (0-10 clickable buttons with emoji faces), optional textarea, submit button
+- [ ] Success state: "Merci !" message, auto-close after 2s
+- [ ] No PII collected — no email, no wallet address
+- [ ] Accessible: keyboard navigable, aria-labels, focus trap in modal
+- [ ] localStorage `feedback_submitted` flag: hide pulse after first submission, but button always accessible
+
+**Effort**: S (half-day)
+**Dependencies**: S2.5-T1 (for event tracking on submission)
+
+---
+
+### Task S2.5-T3 — Bug Reporter with Screenshot
+
+**Description**: Build a bug reporting tool with automatic screenshot capture using `html2canvas`. Security-first: no arbitrary file uploads, canvas-only capture, size limits, content sanitization.
+
+**Acceptance Criteria**:
+- [ ] `html2canvas` dependency added to `package.json`
+- [ ] Prisma migration: `bug_reports` table (`id`, `description TEXT`, `screenshot_b64 TEXT NULL`, `page VARCHAR`, `user_agent VARCHAR`, `viewport VARCHAR`, `git_hash VARCHAR`, `created_at TIMESTAMP`)
+- [ ] `POST /api/bug-report` route:
+  - Zod validation: `description` (min 10, max 2000 chars), `screenshot` (optional, base64 PNG)
+  - Screenshot size limit: max 500KB base64 (reject with 413 if larger)
+  - Rate limiting: 5 reports per IP per hour
+  - Strips EXIF/metadata (canvas → PNG has none by default)
+  - Stores in DB
+- [ ] `<BugReportButton>` component: small bug icon button bottom-right (next to feedback button)
+- [ ] `<BugReportModal>` component:
+  - "Capture screenshot" toggle (default ON) — uses `html2canvas` to capture current viewport
+  - Screenshot preview (thumbnail) with option to remove before sending
+  - Description textarea (required, min 10 chars)
+  - Sensitive data masking: `html2canvas` ignores elements with `data-no-capture` attribute
+  - Wallet addresses in viewport masked before capture (regex replacement on canvas)
+  - Submit button with loading state
+- [ ] Success state: "Bug signalé, merci !" with auto-close
+- [ ] `data-no-capture` attribute added to wallet address displays across the app
+- [ ] No arbitrary file upload endpoint — only canvas-generated base64 PNG accepted (validated with magic bytes `iVBOR`)
+
+**Security Notes**:
+- Screenshot is generated client-side via `html2canvas` (DOM → canvas → base64 PNG), NOT uploaded from disk
+- Server validates PNG magic bytes to reject non-PNG payloads
+- Size cap (500KB) prevents abuse
+- Rate limiting prevents spam
+- No user-uploaded files = no path traversal, no malware upload vector
+
+**Effort**: M (1 day)
+**Dependencies**: S2.5-T1 (for event tracking)
+
+---
+
+### Task S2.5-T4 — Internal Analytics Dashboard
+
+**Description**: Build an internal `/api/internal/stats` endpoint and optional admin page to view NPS scores, bug reports, and Umami stats summary.
+
+**Acceptance Criteria**:
+- [ ] `GET /api/internal/stats` route (protected by `INTERNAL_API_KEY` header check):
+  - NPS summary: avg score, response count, NPS score calculation (% promoters - % detractors), last 10 responses
+  - Bug reports: total count, last 10 reports (description, page, date), unresolved count
+  - Basic stats: total feedback, total bug reports, submissions per day (last 7 days)
+- [ ] `INTERNAL_API_KEY` env var for protection (simple bearer token, no public access)
+- [ ] Optional: Discord/Telegram webhook on new bug report (`WEBHOOK_URL` env var, fires on POST /api/bug-report)
+- [ ] `.env.example` updated with `INTERNAL_API_KEY` and optional `WEBHOOK_URL`
+
+**Effort**: S (half-day)
+**Dependencies**: S2.5-T2, S2.5-T3
+
+---
+
+**Sprint 2.5 Exit Criteria**:
+- [ ] Umami tracking server-side page views on all routes
+- [ ] NPS widget visible and functional on all pages
+- [ ] Bug reporter captures screenshot and stores report in DB
+- [ ] Internal stats endpoint returns NPS + bug report summaries
+- [ ] No PII leaked in analytics or feedback
+- [ ] All new API routes have rate limiting and Zod validation
+- [ ] `next build` passes with zero errors
 
 ---
 

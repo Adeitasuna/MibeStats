@@ -163,6 +163,45 @@ model SyncState {
 }
 
 // ─────────────────────────────────────────────
+// feedback — NPS scores and user comments
+// ─────────────────────────────────────────────
+model Feedback {
+  id        BigInt   @id @default(autoincrement())
+  score     Int                                     // 1 (bad), 3 (fine), 5 (good)
+  comment   String?  @db.Text                       // optional free-text (legacy)
+  page      String                                  // URL path where submitted
+  wallet    String?                                 // connected wallet address if any
+  visitorId String?  @map("visitor_id")             // browser cookie ID for anonymous tracking
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@map("feedback")
+}
+
+// ─────────────────────────────────────────────
+// bug_reports — user-submitted bug reports with optional screenshot
+// ─────────────────────────────────────────────
+model BugReport {
+  id            BigInt   @id @default(autoincrement())
+  description   String   @db.Text                     // min 10, max 2000 chars
+  screenshotB64 String?  @map("screenshot_b64") @db.Text // base64 PNG, max 500KB
+  consoleErrors String?  @map("console_errors") @db.Text // JSON array of recent console errors
+  status        String   @default("open")             // open | resolved
+  page          String                                // URL path where submitted
+  wallet        String?                               // connected wallet if any
+  visitorId     String?  @map("visitor_id")           // mibeid from localStorage
+  userAgent     String?  @map("user_agent")
+  viewport      String?                               // e.g. "1920x1080"
+  gitHash       String?  @map("git_hash")             // build version
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@index([status])
+  @@map("bug_reports")
+}
+
+// ─────────────────────────────────────────────
 // event_log — generic event storage
 // ─────────────────────────────────────────────
 model EventLog {

@@ -250,7 +250,7 @@ export function SalesTable({ initialSales, initialTotal }: Props) {
                   </td>
 
                   {/* Buyer */}
-                  <td className="py-2 pr-3 text-gray-400 text-xs font-mono">
+                  <td className="py-2 pr-3 text-gray-400 text-xs font-mono" data-no-capture>
                     {truncateAddress(sale.buyerAddress)}
                   </td>
 

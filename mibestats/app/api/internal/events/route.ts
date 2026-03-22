@@ -88,3 +88,21 @@ export async function GET(req: NextRequest) {
     },
   })
 }
+
+/**
+ * DELETE /api/internal/events?code=MIBE-XXXX
+ * Deletes all event_log entries for a given code (solved + register).
+ */
+export async function DELETE(req: NextRequest) {
+  const token = req.headers.get('authorization')?.replace('Bearer ', '')
+  if (!token || token !== process.env.ADMIN_TOKEN) {
+    return apiError('Unauthorized', 401)
+  }
+
+  const code = req.nextUrl.searchParams.get('code')
+  if (!code) return apiError('Missing code parameter', 400)
+
+  const deleted = await prisma.eventLog.deleteMany({ where: { code } })
+
+  return NextResponse.json({ ok: true, deleted: deleted.count })
+}

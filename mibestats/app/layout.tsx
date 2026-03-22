@@ -7,6 +7,7 @@ import { AgentationOverlay } from '@/components/dev/AgentationOverlay'
 import { ConsoleGreeting } from '@/components/dev/ConsoleGreeting'
 import { KonamiRain } from '@/components/dev/KonamiRain'
 import { MiberaWord } from '@/components/dev/MiberaWord'
+import { FloatingPanel } from '@/components/feedback/FloatingPanel'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ConsoleGreeting />
         <KonamiRain />
         <MiberaWord />
+        <FloatingPanel />
       </body>
     </html>
   )

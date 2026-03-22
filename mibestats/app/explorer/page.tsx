@@ -539,7 +539,7 @@ export default function MetadatasPage() {
                               <td className="px-4 py-3 font-medium text-white tabular-nums" style={{ textAlign: 'right' }}>
                                 {sale.priceBera.toFixed(2)}
                               </td>
-                              <td className="px-4 py-3 font-mono text-xs text-mibe-text-2" style={{ textAlign: 'right' }}>
+                              <td className="px-4 py-3 font-mono text-xs text-mibe-text-2" style={{ textAlign: 'right' }} data-no-capture>
                                 {sale.buyerAddress ? (
                                   <span className="flex items-center justify-end" style={{ gap: '1rem' }}>
                                     <span title={sale.buyerAddress}>{truncateAddress(sale.buyerAddress)}</span>
@@ -553,7 +553,7 @@ export default function MetadatasPage() {
                                   </span>
                                 ) : '—'}
                               </td>
-                              <td className="px-4 py-3 font-mono text-xs text-mibe-text-2" style={{ textAlign: 'right' }}>
+                              <td className="px-4 py-3 font-mono text-xs text-mibe-text-2" style={{ textAlign: 'right' }} data-no-capture>
                                 {sale.sellerAddress ? (
                                   <span className="flex items-center justify-end" style={{ gap: '1rem' }}>
                                     <span title={sale.sellerAddress}>{truncateAddress(sale.sellerAddress)}</span>

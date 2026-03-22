@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "active_cycle": "cycle-030",
-  "global_sprint_counter": 27,
+  "global_sprint_counter": 28,
   "cycles": [
     {
       "id": "cycle-025",
@@ -273,10 +273,18 @@
           "completed_at": "2026-02-21"
         },
         {
+          "id": "sprint-28",
+          "local_id": "sprint-2.5",
+          "label": "Analytics + Feedback + Bug Reporting",
+          "status": "completed",
+          "completed_at": "2026-03-18"
+        },
+        {
           "id": "sprint-27",
           "local_id": "sprint-3",
           "label": "Portfolio + Security + Polish",
-          "status": "pending"
+          "status": "completed",
+          "completed_at": "2026-03-18"
         }
       ],
       "sdd": "grimoires/loa/sdd.md"

@@ -98,7 +98,7 @@ export default async function PortfolioAddressPage({ params }: Props) {
           </svg>
           Portfolio
         </Link>
-        <h1 className="section-title text-xl font-mono">{short}</h1>
+        <h1 className="section-title text-xl font-mono" data-no-capture>{short}</h1>
         {count > 0 && (
           <span className="text-sm text-mibe-text-2">
             {count} Mibera{count !== 1 ? 's' : ''}
