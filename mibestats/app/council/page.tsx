@@ -1,6 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import {
+  ResponsiveContainer, LineChart, Line, AreaChart, Area,
+  BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from 'recharts'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -650,6 +655,13 @@ const PERIODS = [
   { value: '90d', label: '90 days' },
 ]
 
+const CHART_COLORS = ['#ffd700', '#16a34a', '#38bdf8', '#f87171', '#a78bfa', '#fb923c', '#f472b6', '#34d399', '#facc15', '#818cf8']
+
+const chartTooltipStyle = {
+  contentStyle: { background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 4, fontSize: '0.7rem' },
+  labelStyle: { color: '#999' },
+}
+
 function AnalyticsTab({ data, period, onPeriodChange }: {
   data: AnalyticsData | null; apiKey?: string; period: string
   onPeriodChange: (p: string) => void
@@ -664,9 +676,32 @@ function AnalyticsTab({ data, period, onPeriodChange }: {
     ? Math.round(((s.bounces?.value ?? 0) / s.visits.value) * 100)
     : 0
 
+  // Merge pageviews + sessions into one array for recharts
   const pvData = data.pageviews?.pageviews ?? []
   const sessData = data.pageviews?.sessions ?? []
-  const maxPv = Math.max(1, ...pvData.map((d) => d.y))
+  const timeSeriesData = useMemo(() => pvData.map((d, i) => ({
+    date: period === '24h'
+      ? new Date(d.x).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+      : new Date(d.x).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+    pageviews: d.y,
+    sessions: sessData[i]?.y ?? 0,
+  })), [pvData, sessData, period])
+
+  // Pie data for browsers + OS
+  const browserPie = useMemo(() => (data.browsers ?? []).map((d) => ({ name: d.x || 'Other', value: d.y })), [data.browsers])
+  const osPie = useMemo(() => (data.os ?? []).map((d) => ({ name: d.x || 'Other', value: d.y })), [data.os])
+
+  // Bar data for top pages
+  const pagesBar = useMemo(() => (data.pages ?? []).slice(0, 15).map((d) => ({
+    page: d.x || '/',
+    views: d.y,
+  })), [data.pages])
+
+  // Countries bar
+  const countriesBar = useMemo(() => (data.countries ?? []).slice(0, 15).map((d) => ({
+    country: d.x || '??',
+    views: d.y,
+  })), [data.countries])
 
   return (
     <div>
@@ -704,67 +739,140 @@ function AnalyticsTab({ data, period, onPeriodChange }: {
         </div>
       </div>
 
-      {/* Pageviews chart (CSS bar chart) */}
-      {pvData.length > 0 && (
+      {/* 1. Line chart — Pageviews & Sessions */}
+      {timeSeriesData.length > 0 && (
         <div className="card" style={{ padding: '0.75rem', marginBottom: '1rem' }}>
           <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>
             Pageviews &amp; Sessions
           </span>
-          <div className="council-analytics-chart">
-            {pvData.map((d, i) => {
-              const sess = sessData[i]?.y ?? 0
-              const label = period === '24h'
-                ? new Date(d.x).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                : new Date(d.x).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={timeSeriesData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <XAxis dataKey="date" tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} width={35} />
+              <Tooltip {...chartTooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: '0.65rem' }} />
+              <Line type="monotone" dataKey="pageviews" stroke="#ffd700" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="sessions" stroke="#16a34a" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* 2. Area chart — Unique visitors (reuses sessions as proxy) */}
+      {timeSeriesData.length > 0 && (
+        <div className="card" style={{ padding: '0.75rem', marginBottom: '1rem' }}>
+          <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>
+            Visitors
+          </span>
+          <ResponsiveContainer width="100%" height={160}>
+            <AreaChart data={timeSeriesData}>
+              <defs>
+                <linearGradient id="gradVisitors" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ffd700" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#ffd700" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <XAxis dataKey="date" tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} width={35} />
+              <Tooltip {...chartTooltipStyle} />
+              <Area type="monotone" dataKey="sessions" stroke="#ffd700" fill="url(#gradVisitors)" strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* 3. Horizontal bar — Top Pages */}
+      {pagesBar.length > 0 && (
+        <div className="card" style={{ padding: '0.75rem', marginBottom: '1rem' }}>
+          <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>
+            Top Pages
+          </span>
+          <ResponsiveContainer width="100%" height={Math.max(200, pagesBar.length * 28)}>
+            <BarChart data={pagesBar} layout="vertical" margin={{ left: 80, right: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+              <XAxis type="number" tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis type="category" dataKey="page" tick={{ fill: '#999', fontSize: 10 }} tickLine={false} axisLine={false} width={80} />
+              <Tooltip {...chartTooltipStyle} />
+              <Bar dataKey="views" fill="#ffd700" radius={[0, 3, 3, 0]} barSize={16} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* 4. Horizontal bar — Countries */}
+      {countriesBar.length > 0 && (
+        <div className="card" style={{ padding: '0.75rem', marginBottom: '1rem' }}>
+          <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>
+            Countries
+          </span>
+          <ResponsiveContainer width="100%" height={Math.max(160, countriesBar.length * 28)}>
+            <BarChart data={countriesBar} layout="vertical" margin={{ left: 40, right: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+              <XAxis type="number" tick={{ fill: '#666', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis type="category" dataKey="country" tick={{ fill: '#999', fontSize: 10 }} tickLine={false} axisLine={false} width={40} />
+              <Tooltip {...chartTooltipStyle} />
+              <Bar dataKey="views" fill="#38bdf8" radius={[0, 3, 3, 0]} barSize={16} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* 5. Donuts — Browsers & OS */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+        {browserPie.length > 0 && (
+          <div className="card" style={{ padding: '0.75rem' }}>
+            <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>Browsers</span>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={browserPie} dataKey="value" nameKey="name" cx="50%" cy="50%"
+                  innerRadius={45} outerRadius={75} paddingAngle={2} strokeWidth={0}>
+                  {browserPie.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                </Pie>
+                <Tooltip {...chartTooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: '0.6rem' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+        {osPie.length > 0 && (
+          <div className="card" style={{ padding: '0.75rem' }}>
+            <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>Operating Systems</span>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={osPie} dataKey="value" nameKey="name" cx="50%" cy="50%"
+                  innerRadius={45} outerRadius={75} paddingAngle={2} strokeWidth={0}>
+                  {osPie.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                </Pie>
+                <Tooltip {...chartTooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: '0.6rem' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </div>
+
+      {/* Referrers table (kept as simple list) */}
+      {data.referrers && data.referrers.length > 0 && (
+        <div className="card" style={{ padding: '0.75rem' }}>
+          <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>Referrers</span>
+          <div className="council-metric-list">
+            {data.referrers.map((d) => {
+              const max = Math.max(1, ...data.referrers.map((r) => r.y))
               return (
-                <div key={d.x} className="council-chart-col" title={`${label}: ${d.y} views, ${sess} sessions`}>
-                  <div className="council-chart-bars">
-                    <div className="council-chart-bar council-chart-bar--pv"
-                      style={{ height: `${(d.y / maxPv) * 100}%` }} />
-                    <div className="council-chart-bar council-chart-bar--sess"
-                      style={{ height: `${(sess / maxPv) * 100}%` }} />
+                <div key={d.x || '(direct)'} className="council-metric-row">
+                  <span className="council-metric-name" title={d.x}>{d.x || '(direct)'}</span>
+                  <div className="council-metric-bar-bg">
+                    <div className="council-metric-bar-fill" style={{ width: `${(d.y / max) * 100}%` }} />
                   </div>
-                  <span className="council-chart-label">{label}</span>
+                  <span className="council-metric-value">{d.y}</span>
                 </div>
               )
             })}
           </div>
-          <div className="council-nps-legend" style={{ marginTop: '0.5rem' }}>
-            <span style={{ color: 'var(--accent-gold)' }}>Pageviews</span>
-            <span style={{ color: 'var(--accent-green)' }}>Sessions</span>
-          </div>
         </div>
       )}
-
-      {/* Metrics tables */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-        <MetricTable title="Top Pages" data={data.pages} />
-        <MetricTable title="Referrers" data={data.referrers} />
-        <MetricTable title="Browsers" data={data.browsers} />
-        <MetricTable title="OS" data={data.os} />
-        <MetricTable title="Countries" data={data.countries} />
-      </div>
-    </div>
-  )
-}
-
-function MetricTable({ title, data }: { title: string; data: MetricEntry[] }) {
-  if (!data || data.length === 0) return null
-  const max = Math.max(1, ...data.map((d) => d.y))
-  return (
-    <div className="card" style={{ padding: '0.75rem' }}>
-      <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>{title}</span>
-      <div className="council-metric-list">
-        {data.map((d) => (
-          <div key={d.x || '(direct)'} className="council-metric-row">
-            <span className="council-metric-name" title={d.x}>{d.x || '(direct)'}</span>
-            <div className="council-metric-bar-bg">
-              <div className="council-metric-bar-fill" style={{ width: `${(d.y / max) * 100}%` }} />
-            </div>
-            <span className="council-metric-value">{d.y}</span>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
