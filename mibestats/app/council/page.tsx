@@ -29,6 +29,19 @@ interface StatsData {
   daily: { feedback: number; bugs: number }
 }
 
+interface MetricEntry { x: string; y: number }
+interface PageviewEntry { x: string; y: number }
+interface AnalyticsData {
+  period: string
+  stats: { pageviews: { value: number }; visitors: { value: number }; visits: { value: number }; bounces: { value: number }; totaltime: { value: number } }
+  pageviews: { pageviews: PageviewEntry[]; sessions: PageviewEntry[] }
+  pages: MetricEntry[]
+  referrers: MetricEntry[]
+  browsers: MetricEntry[]
+  os: MetricEntry[]
+  countries: MetricEntry[]
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
 function fmtDate(iso: string | null) {
@@ -46,15 +59,24 @@ function truncAddr(addr: string | null) {
 export default function CouncilPage() {
   const [apiKey, setApiKey] = useState('')
   const [authed, setAuthed] = useState(false)
-  const [tab, setTab] = useState<'eggs' | 'feedback' | 'bugs'>('eggs')
+  const [tab, setTab] = useState<'eggs' | 'feedback' | 'bugs' | 'analytics'>('eggs')
   const [eggs, setEggs] = useState<EggsData | null>(null)
   const [stats, setStats] = useState<StatsData | null>(null)
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [analyticsPeriod, setAnalyticsPeriod] = useState('7d')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
     const saved = sessionStorage.getItem('council_key')
     if (saved) { setApiKey(saved); setAuthed(true) }
+  }, [])
+
+  const fetchAnalytics = useCallback(async (key: string, period: string) => {
+    try {
+      const res = await fetch(`/api/internal/analytics?period=${period}`, { headers: { 'x-api-key': key } })
+      if (res.ok) setAnalytics(await res.json())
+    } catch { /* analytics is optional */ }
   }, [])
 
   const fetchData = useCallback(async (key: string) => {
@@ -72,14 +94,15 @@ export default function CouncilPage() {
       ])
       setEggs(eggsData); setStats(statsData); setAuthed(true)
       sessionStorage.setItem('council_key', key)
+      fetchAnalytics(key, analyticsPeriod)
     } catch { setError('Connection failed') }
     finally { setLoading(false) }
-  }, [])
+  }, [fetchAnalytics, analyticsPeriod])
 
   useEffect(() => { if (authed && apiKey) fetchData(apiKey) }, [authed, apiKey, fetchData])
 
   const handleLogin = (e: React.FormEvent) => { e.preventDefault(); if (apiKey.trim()) fetchData(apiKey) }
-  const handleLogout = () => { setAuthed(false); setApiKey(''); setEggs(null); setStats(null); sessionStorage.removeItem('council_key') }
+  const handleLogout = () => { setAuthed(false); setApiKey(''); setEggs(null); setStats(null); setAnalytics(null); sessionStorage.removeItem('council_key') }
 
   // ─── Login ──────────────────────────────────────────────────────────────────
 
@@ -152,11 +175,12 @@ export default function CouncilPage() {
 
       {/* Tabs */}
       <div className="council-tabs">
-        {(['eggs', 'feedback', 'bugs'] as const).map((t) => (
+        {(['eggs', 'feedback', 'bugs', 'analytics'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={`council-tab ${tab === t ? 'council-tab--active' : ''}`}>
             {t === 'eggs' ? `Eggs (${eggs?.entries.length ?? 0})` :
              t === 'feedback' ? `Feedback (${stats?.nps.total ?? 0})` :
-             `Bugs (${stats?.bugs.total ?? 0})`}
+             t === 'bugs' ? `Bugs (${stats?.bugs.total ?? 0})` :
+             'Analytics'}
           </button>
         ))}
       </div>
@@ -165,6 +189,8 @@ export default function CouncilPage() {
       {tab === 'eggs' && <EggsTab eggs={eggs} apiKey={apiKey} onRefresh={() => fetchData(apiKey)} />}
       {tab === 'feedback' && <FeedbackTab stats={stats} apiKey={apiKey} onRefresh={() => fetchData(apiKey)} />}
       {tab === 'bugs' && <BugsTab stats={stats} apiKey={apiKey} onRefresh={() => fetchData(apiKey)} />}
+      {tab === 'analytics' && <AnalyticsTab data={analytics} apiKey={apiKey} period={analyticsPeriod}
+        onPeriodChange={(p) => { setAnalyticsPeriod(p); fetchAnalytics(apiKey, p) }} />}
     </div>
   )
 }
@@ -610,6 +636,134 @@ function BugsTab({ stats, apiKey, onRefresh }: { stats: StatsData | null; apiKey
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  )
+}
+
+// ─── Analytics Tab ────────────────────────────────────────────────────────────
+
+const PERIODS = [
+  { value: '24h', label: '24h' },
+  { value: '7d', label: '7 days' },
+  { value: '30d', label: '30 days' },
+  { value: '90d', label: '90 days' },
+]
+
+function AnalyticsTab({ data, period, onPeriodChange }: {
+  data: AnalyticsData | null; apiKey?: string; period: string
+  onPeriodChange: (p: string) => void
+}) {
+  if (!data) return <p className="council-empty">Loading analytics... (requires UMAMI_API_KEY)</p>
+
+  const s = data.stats
+  const avgTime = s.visits?.value > 0
+    ? Math.round((s.totaltime?.value ?? 0) / s.visits.value / 1000)
+    : 0
+  const bounceRate = s.visits?.value > 0
+    ? Math.round(((s.bounces?.value ?? 0) / s.visits.value) * 100)
+    : 0
+
+  const pvData = data.pageviews?.pageviews ?? []
+  const sessData = data.pageviews?.sessions ?? []
+  const maxPv = Math.max(1, ...pvData.map((d) => d.y))
+
+  return (
+    <div>
+      {/* Period selector */}
+      <div className="council-filter-group" style={{ marginBottom: '1rem' }}>
+        {PERIODS.map((p) => (
+          <button key={p.value} onClick={() => onPeriodChange(p.value)}
+            className={`council-filter-btn ${period === p.value ? 'council-filter-btn--active' : ''}`}>
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Overview cards */}
+      <div className="council-grid">
+        <div className="stat-card stat-card--gold">
+          <span className="card-title-upper">Pageviews</span>
+          <span className="council-stat-value">{s.pageviews?.value?.toLocaleString() ?? 0}</span>
+        </div>
+        <div className="stat-card stat-card--gold">
+          <span className="card-title-upper">Unique Visitors</span>
+          <span className="council-stat-value">{s.visitors?.value?.toLocaleString() ?? 0}</span>
+        </div>
+        <div className="stat-card">
+          <span className="card-title-upper">Sessions</span>
+          <span className="council-stat-value">{s.visits?.value?.toLocaleString() ?? 0}</span>
+        </div>
+        <div className="stat-card">
+          <span className="card-title-upper">Bounce Rate</span>
+          <span className="council-stat-value">{bounceRate}%</span>
+        </div>
+        <div className="stat-card">
+          <span className="card-title-upper">Avg. Visit</span>
+          <span className="council-stat-value">{avgTime}s</span>
+        </div>
+      </div>
+
+      {/* Pageviews chart (CSS bar chart) */}
+      {pvData.length > 0 && (
+        <div className="card" style={{ padding: '0.75rem', marginBottom: '1rem' }}>
+          <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>
+            Pageviews &amp; Sessions
+          </span>
+          <div className="council-analytics-chart">
+            {pvData.map((d, i) => {
+              const sess = sessData[i]?.y ?? 0
+              const label = period === '24h'
+                ? new Date(d.x).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                : new Date(d.x).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+              return (
+                <div key={d.x} className="council-chart-col" title={`${label}: ${d.y} views, ${sess} sessions`}>
+                  <div className="council-chart-bars">
+                    <div className="council-chart-bar council-chart-bar--pv"
+                      style={{ height: `${(d.y / maxPv) * 100}%` }} />
+                    <div className="council-chart-bar council-chart-bar--sess"
+                      style={{ height: `${(sess / maxPv) * 100}%` }} />
+                  </div>
+                  <span className="council-chart-label">{label}</span>
+                </div>
+              )
+            })}
+          </div>
+          <div className="council-nps-legend" style={{ marginTop: '0.5rem' }}>
+            <span style={{ color: 'var(--accent-gold)' }}>Pageviews</span>
+            <span style={{ color: 'var(--accent-green)' }}>Sessions</span>
+          </div>
+        </div>
+      )}
+
+      {/* Metrics tables */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+        <MetricTable title="Top Pages" data={data.pages} />
+        <MetricTable title="Referrers" data={data.referrers} />
+        <MetricTable title="Browsers" data={data.browsers} />
+        <MetricTable title="OS" data={data.os} />
+        <MetricTable title="Countries" data={data.countries} />
+      </div>
+    </div>
+  )
+}
+
+function MetricTable({ title, data }: { title: string; data: MetricEntry[] }) {
+  if (!data || data.length === 0) return null
+  const max = Math.max(1, ...data.map((d) => d.y))
+  return (
+    <div className="card" style={{ padding: '0.75rem' }}>
+      <span className="card-title-upper" style={{ marginBottom: '0.5rem', display: 'block' }}>{title}</span>
+      <div className="council-metric-list">
+        {data.map((d) => (
+          <div key={d.x || '(direct)'} className="council-metric-row">
+            <span className="council-metric-name" title={d.x}>{d.x || '(direct)'}</span>
+            <div className="council-metric-bar-bg">
+              <div className="council-metric-bar-fill" style={{ width: `${(d.y / max) * 100}%` }} />
+            </div>
+            <span className="council-metric-value">{d.y}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
