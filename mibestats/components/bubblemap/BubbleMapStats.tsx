@@ -5,20 +5,11 @@ import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
 import type { BubbleMapNode, BubbleMapLink } from '@/types'
+import { HOLDER_TIERS as TIER_ORDER, TIER_COLORS } from '@/lib/holder-tiers'
 
 interface Props {
   nodes: BubbleMapNode[]
   links: BubbleMapLink[]
-}
-
-const TIER_ORDER = ['whale', 'diamond', 'gold', 'silver', 'bronze', 'holder'] as const
-const TIER_COLORS: Record<string, string> = {
-  whale: '#ffd700',
-  diamond: '#b9f2ff',
-  gold: '#f0a030',
-  silver: '#c0c0c0',
-  bronze: '#cd7f32',
-  holder: '#555',
 }
 const PAGE_SIZE = 20
 

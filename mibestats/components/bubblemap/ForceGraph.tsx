@@ -4,26 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import type { ForceGraphMethods } from 'react-force-graph-2d'
 import type { BubbleMapNode, BubbleMapLink } from '@/types'
+import { HOLDER_TIERS, TIER_COLORS, TIER_LABELS } from '@/lib/holder-tiers'
 
 /* ── Constants ── */
 
-const TIER_COLORS: Record<string, string> = {
-  whale: '#ffd700',
-  diamond: '#b9f2ff',
-  gold: '#f0a030',
-  silver: '#c0c0c0',
-  bronze: '#cd7f32',
-  holder: '#555',
-}
-
-const TIER_LEGEND = [
-  { tier: 'whale', color: '#ffd700', label: 'Whale (100+)' },
-  { tier: 'diamond', color: '#b9f2ff', label: 'Diamond (35-99)' },
-  { tier: 'gold', color: '#f0a030', label: 'Gold (10-34)' },
-  { tier: 'silver', color: '#c0c0c0', label: 'Silver (4-9)' },
-  { tier: 'bronze', color: '#cd7f32', label: 'Bronze (2-3)' },
-  { tier: 'holder', color: '#555', label: 'Holder (1)' },
-]
+const TIER_LEGEND = HOLDER_TIERS.map((tier) => ({
+  tier,
+  color: TIER_COLORS[tier],
+  label: TIER_LABELS[tier],
+}))
 
 type GraphNode = BubbleMapNode & { x?: number; y?: number }
 type GraphLink = BubbleMapLink & { [k: string]: unknown }

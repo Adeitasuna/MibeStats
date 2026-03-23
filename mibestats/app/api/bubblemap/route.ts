@@ -7,14 +7,7 @@ export const revalidate = 300
 interface WalletRow { address: string; count: bigint }
 interface EdgeRow { source: string; target: string; weight: bigint; volume: string }
 
-function tierFromCount(count: number): string {
-  if (count >= 100) return 'whale'
-  if (count >= 35) return 'diamond'
-  if (count >= 10) return 'gold'
-  if (count >= 4) return 'silver'
-  if (count >= 2) return 'bronze'
-  return 'holder'
-}
+import { tierFromCount } from '@/lib/holder-tiers'
 
 export const GET = withRateLimit('bubblemap', 30, async (req) => {
   const [wallets, edges] = await Promise.all([
