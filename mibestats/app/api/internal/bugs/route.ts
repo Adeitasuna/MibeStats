@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { apiError } from '@/lib/api-error'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 function checkAuth(req: NextRequest): boolean {
   const token = req.headers.get('authorization')?.replace('Bearer ', '')
@@ -12,6 +13,8 @@ function checkAuth(req: NextRequest): boolean {
 /** PATCH /api/internal/bugs?id=123&status=resolved */
 export async function PATCH(req: NextRequest) {
   if (!checkAuth(req)) return apiError('Unauthorized', 401)
+  const rl = checkRateLimit(`internal-bugs:${getClientIp(req)}`, 30, 60)
+  if (!rl.success) return apiError('Too many requests', 429)
 
   const id = req.nextUrl.searchParams.get('id')
   const status = req.nextUrl.searchParams.get('status')
@@ -29,6 +32,8 @@ export async function PATCH(req: NextRequest) {
 /** DELETE /api/internal/bugs?id=123 */
 export async function DELETE(req: NextRequest) {
   if (!checkAuth(req)) return apiError('Unauthorized', 401)
+  const rl2 = checkRateLimit(`internal-bugs:${getClientIp(req)}`, 30, 60)
+  if (!rl2.success) return apiError('Too many requests', 429)
 
   const id = req.nextUrl.searchParams.get('id')
   if (!id) return apiError('Missing id', 400)

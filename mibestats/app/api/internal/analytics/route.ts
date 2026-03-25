@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { apiError } from '@/lib/api-error'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 /**
  * GET /api/internal/analytics
@@ -21,6 +22,9 @@ export async function GET(req: NextRequest) {
   if (allowed.length === 0 || !apiKey || !allowed.includes(apiKey)) {
     return apiError('Unauthorized', 401)
   }
+
+  const rl = checkRateLimit(`internal-analytics:${getClientIp(req)}`, 30, 60)
+  if (!rl.success) return apiError('Too many requests', 429)
 
   const umamiToken = process.env.UMAMI_API_KEY
   const websiteId = process.env.UMAMI_WEBSITE_ID

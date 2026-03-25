@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { apiError } from '@/lib/api-error'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 /**
  * GET /api/internal/stats
@@ -17,6 +18,9 @@ export async function GET(req: NextRequest) {
   if (allowed.length === 0 || !apiKey || !allowed.includes(apiKey)) {
     return apiError('Unauthorized', 401)
   }
+
+  const rl = checkRateLimit(`internal-stats:${getClientIp(req)}`, 30, 60)
+  if (!rl.success) return apiError('Too many requests', 429)
 
   const [
     bugReportCount,
